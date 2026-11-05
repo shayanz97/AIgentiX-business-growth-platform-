@@ -93,4 +93,3 @@ def list_members(db: Session, tenant: TenantContext) -> list[OrganizationMembers
         .order_by(User.email)
     )
     return list(db.scalars(stmt).unique())
-

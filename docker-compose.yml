@@ -9,6 +9,10 @@ x-api-env: &api-env
   SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
   SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-168}
 
+x-api-build: &api-build
+  context: apps/api
+  dockerfile: ../../infra/docker/api.Dockerfile
+
 services:
   db:
     image: postgres:16-alpine
@@ -28,9 +32,7 @@ services:
 
   # One-shot: applies Alembic migrations, then exits. api/worker start only after it succeeds.
   migrate:
-    build:
-      context: apps/api
-      dockerfile: ../../infra/docker/api.Dockerfile
+    build: *api-build
     image: aigentix-api:dev
     command: ["alembic", "upgrade", "head"]
     environment: *api-env
@@ -39,6 +41,7 @@ services:
     restart: "no"
 
   api:
+    build: *api-build
     image: aigentix-api:dev
     environment: *api-env
     ports:
@@ -48,6 +51,7 @@ services:
     restart: unless-stopped
 
   worker:
+    build: *api-build
     image: aigentix-api:dev
     command: ["python", "-m", "aigentix.worker"]
     environment: *api-env
