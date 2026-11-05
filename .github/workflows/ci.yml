@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (lint, types, tests)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aigentix
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: aigentix_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U aigentix" --health-interval 5s --health-timeout 3s --health-retries 10
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      TEST_DATABASE_URL: postgresql://aigentix:ci-only-password@localhost:5432/aigentix_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run ruff check src tests migrations
+      - run: uv run ruff format --check src tests migrations
+      - run: uv run mypy
+      - run: uv run pytest
+
+  contracts:
+    name: API contract is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: uv sync --frozen
+        working-directory: apps/api
+      - run: npm ci
+        working-directory: apps/web
+      - name: Regenerate OpenAPI document and TypeScript types
+        run: |
+          (cd apps/api && uv run python -m aigentix.export_openapi ../../packages/shared-contracts/openapi.json)
+          (cd apps/web && npm run gen:api)
+      - name: Fail if generated contracts differ from the committed ones
+        run: git diff --exit-code -- packages/shared-contracts
+
+  frontend:
+    name: Frontend (lint, types, tests, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npm run lint -- --max-warnings 0
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: Integration (Docker Compose + Playwright)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Create .env with throwaway secrets
+        run: |
+          cp .env.example .env
+          sed -i "s/replace-with-a-long-random-password/$(openssl rand -hex 24)/" .env
+          echo "E2E_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+      - name: Build and start the stack
+        run: docker compose up -d --build --wait --wait-timeout 300
+      - name: Seed demo tenants
+        run: docker compose run --rm -e AIGENTIX_PASSWORD="$E2E_PASSWORD" api python -m aigentix.cli seed-dev
+      - name: Install Playwright
+        working-directory: apps/web
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Run E2E tests
+        working-directory: apps/web
+        run: npx playwright test
+      - name: Verify the UI-created project persisted in PostgreSQL
+        run: |
+          count=$(docker compose exec -T db psql -U aigentix -d aigentix -tAc "SELECT count(*) FROM research_projects WHERE name LIKE 'E2E project %'")
+          test "$count" -ge 1
+      - name: Service logs
+        if: failure()
+        run: docker compose logs --no-color
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+      - if: always()
+        run: docker compose down -v

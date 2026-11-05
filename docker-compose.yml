@@ -1,0 +1,74 @@
+# Local development / single-host stack. Copy .env.example to .env first.
+name: aigentix
+
+x-api-env: &api-env
+  ENVIRONMENT: ${ENVIRONMENT:-development}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  DATABASE_URL: postgresql://${POSTGRES_USER:-aigentix}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-aigentix}
+  CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+  SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
+  SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-168}
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aigentix}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-aigentix}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot: applies Alembic migrations, then exits. api/worker start only after it succeeds.
+  migrate:
+    build:
+      context: apps/api
+      dockerfile: ../../infra/docker/api.Dockerfile
+    image: aigentix-api:dev
+    command: ["alembic", "upgrade", "head"]
+    environment: *api-env
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+
+  api:
+    image: aigentix-api:dev
+    environment: *api-env
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    restart: unless-stopped
+
+  worker:
+    image: aigentix-api:dev
+    command: ["python", "-m", "aigentix.worker"]
+    environment: *api-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    restart: unless-stopped
+    healthcheck:
+      disable: true
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+      args:
+        API_INTERNAL_URL: http://api:8000
+    image: aigentix-web:dev
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+volumes:
+  pgdata:
