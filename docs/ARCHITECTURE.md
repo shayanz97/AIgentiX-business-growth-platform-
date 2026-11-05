@@ -42,7 +42,9 @@ authorization decisions, and never import FastAPI. Routes validate input, call a
 ## Authentication
 
 Server-side sessions: Argon2id password hashes (pwdlib), random 256-bit session tokens stored as SHA-256 hashes,
-HttpOnly/SameSite=Lax/Secure cookie, rotation on login, deletion on logout, absolute expiry (default 7 days).
+HttpOnly/SameSite=Lax/Secure cookie, rotation on login, deletion on logout, absolute expiry (default 7 days),
+per-account login throttling and bounded concurrent hashing. `ENVIRONMENT=production` refuses
+`SESSION_COOKIE_SECURE=false` and disables the interactive API docs.
 Rationale and alternatives: `docs/SPRINT_1_PLAN.md` §3. An OIDC/SSO provider can later be added as another way to
 *create* the same session, without changing authorization code.
 
@@ -76,20 +78,37 @@ router, which lets the UI show them as disabled without pretending they work.
    `workflow_runs.id` — still no extra infrastructure.
 5. LLM/HTTP clients live in `aigentix/integrations/` behind small interfaces so they can be faked in tests.
 
+### Decision: `workflow_runs.project_id` (accepted trade-off)
+
+`workflow_runs` (platform) has a composite FK to `research_projects` (Lead Intelligence). This couples a platform
+table to one module's table at the schema level, but buys a database-enforced same-tenant guarantee for the only
+run subject that exists. **Revisit before a second module needs runs**: either a generic
+`subject_type`/`subject_id` (integrity enforced in services + tests) or module-owned link tables
+(`lead_intelligence_project_runs(run_id, project_id, organization_id)` with composite FKs to both sides).
+Python code is unaffected either way: the platform never imports module models.
+
+Worker failure handling: handler exceptions are recorded in a fresh session (so a broken transaction cannot leave a
+run in `running`); only `WorkflowError` messages are shown to tenant users, other exception text stays in the worker
+log; housekeeping fails runs stuck in `running` longer than `WORKER_STALE_RUN_MINUTES` and purges expired sessions.
+
 ## API conventions
 
 - Versioned under `/api/v1`; OpenAPI at `/api/v1/openapi.json`, Swagger UI at `/api/v1/docs`.
 - Lists: `?limit=1..100&offset=` → `{items, total, limit, offset}`.
 - Errors: `{"error": {"code", "message", "details"}}` with codes `not_authenticated` (401), `forbidden` (403),
-  `not_found` (404), `invalid_input` (400), `validation_error` (422), `conflict` (409), `origin_not_allowed` (403).
+  `not_found` (404), `invalid_input` (400), `validation_error` (422), `conflict` (409), `origin_not_allowed` (403),
+  `too_many_attempts` (429), `service_busy` (503).
 - Contract: `make contracts` regenerates `packages/shared-contracts`; the web client is typed from it.
 
 ## Known limitations (Sprint 1)
 
 - No public sign-up, invitations, password reset or e-mail verification (users are created via CLI).
-- No login rate limiting / lockout yet — add before public exposure (reverse proxy limit or app-level).
-- Expired sessions are rejected but not purged automatically (`purge_expired_sessions` exists; schedule it).
-- Worker does not recover runs stuck in `running` after a crash (needs a lease/heartbeat timeout).
+- Login throttling (10 failures / 15 min per account, max 4 concurrent Argon2 hashes) is **in-process**: correct for
+  one API process. With several processes/replicas, add an IP-based limit at the reverse proxy and/or move the
+  counters to PostgreSQL.
+- Stuck runs are failed (not retried) after `WORKER_STALE_RUN_MINUTES`; retries/backoff come with real workflows.
+- `target_url` is only syntax-validated. Before Sprint 2 fetches it, resolve the host and block private,
+  loopback and link-local ranges (re-check after each redirect) to prevent SSRF.
 - No member management UI/API beyond listing; no project update/archive endpoints.
 - `API_INTERNAL_URL` is fixed at web build time (Next.js rewrites are compiled).
 - The active organization lives in `localStorage`; the server never trusts it without membership checks.

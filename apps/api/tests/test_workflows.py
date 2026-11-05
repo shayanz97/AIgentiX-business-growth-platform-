@@ -69,7 +69,8 @@ def test_worker_records_failures(db: Session, tenant_a: Tenant, registry: Workfl
     db.refresh(run)
     assert run.status == WorkflowStatus.FAILED
     assert run.error_type == "RuntimeError"
-    assert run.error_message == "upstream exploded"
+    # Internal exception text is not exposed to tenant users.
+    assert run.error_message == "The workflow failed due to an internal error."
     assert run.completed_at is not None
 
 

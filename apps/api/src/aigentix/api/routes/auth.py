@@ -9,6 +9,7 @@ from aigentix.api.schemas import ErrorResponse, UserRead
 from aigentix.core.errors import NotAuthenticated
 from aigentix.core.logging import get_logger
 from aigentix.platform.identity import service as identity
+from aigentix.platform.identity.throttle import login_throttle
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 log = get_logger(__name__)
@@ -23,15 +24,20 @@ class LoginRequest(BaseModel):
     "/login",
     response_model=UserRead,
     operation_id="login",
-    responses={401: {"model": ErrorResponse}},
+    responses={401: {"model": ErrorResponse}, 429: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
 )
 def login(
     body: LoginRequest, request: Request, response: Response, db: DbSession, settings: AppSettings
 ) -> UserRead:
-    user = identity.authenticate(db, email=body.email, password=body.password)
+    account = identity.normalise_email(body.email)
+    login_throttle.check(account)
+    with login_throttle.hashing_slot():
+        user = identity.authenticate(db, email=account, password=body.password)
     if user is None:
+        login_throttle.record_failure(account)
         log.info("auth.login_failed")
         raise NotAuthenticated("Invalid e-mail or password")
+    login_throttle.reset(account)
 
     # Rotate: drop any session the browser already had (prevents session fixation).
     if old := request.cookies.get(settings.session_cookie_name):

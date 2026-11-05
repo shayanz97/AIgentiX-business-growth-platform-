@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, PostgresDsn, field_validator
+from pydantic import Field, PostgresDsn, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -23,7 +23,12 @@ class Settings(BaseSettings):
     session_cookie_secure: bool = True
     session_ttl_hours: int = Field(default=24 * 7, ge=1, le=24 * 30)
 
+    # Used by /ready to verify the database is migrated to the head revision.
+    alembic_ini: str = "alembic.ini"
+
     worker_poll_interval_seconds: float = Field(default=2.0, gt=0)
+    # RUNNING runs older than this are failed by worker housekeeping (crash recovery).
+    worker_stale_run_minutes: int = Field(default=30, ge=1)
 
     @field_validator("cors_origins", mode="before")
     @classmethod
@@ -38,6 +43,16 @@ class Settings(BaseSettings):
         if "*" in value:
             raise ValueError("Wildcard CORS origins are not allowed with credentialed requests")
         return value
+
+    @model_validator(mode="after")
+    def _production_guards(self) -> "Settings":
+        if self.environment == "production" and not self.session_cookie_secure:
+            raise ValueError("SESSION_COOKIE_SECURE must be true in production")
+        return self
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment == "production"
 
     @property
     def sqlalchemy_url(self) -> str:

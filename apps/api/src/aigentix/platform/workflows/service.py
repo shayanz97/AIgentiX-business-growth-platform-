@@ -1,9 +1,10 @@
 """Workflow run lifecycle. Framework-independent; used by the API (reads/enqueue) and the worker."""
 
 import uuid
+from datetime import timedelta
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from aigentix.core.db import utcnow
@@ -13,6 +14,13 @@ from aigentix.platform.workflows.models import WorkflowRun, WorkflowStatus
 from aigentix.platform.workflows.registry import WorkflowRegistry
 
 MAX_ERROR_LENGTH = 2000
+
+
+class WorkflowError(Exception):
+    """Raise from a handler for an expected failure whose message is safe to show to tenant users.
+
+    Any other exception is recorded with a generic message; details go to the worker log only.
+    """
 
 
 def enqueue(
@@ -84,6 +92,24 @@ def mark_succeeded(db: Session, run: WorkflowRun, result: dict[str, Any] | None)
     if result:
         run.run_metadata = {**run.run_metadata, "result": result}
     db.flush()
+
+
+def fail_stale_runs(db: Session, *, older_than: timedelta) -> int:
+    """Fail runs stuck in RUNNING (e.g. the worker was killed mid-run). Returns the number affected."""
+    result = db.execute(
+        update(WorkflowRun)
+        .where(
+            WorkflowRun.status == WorkflowStatus.RUNNING.value,
+            WorkflowRun.started_at < utcnow() - older_than,
+        )
+        .values(
+            status=WorkflowStatus.FAILED.value,
+            completed_at=utcnow(),
+            error_type="StaleRun",
+            error_message="The run did not finish in time and was stopped.",
+        )
+    )
+    return int(result.rowcount)  # type: ignore[attr-defined]
 
 
 def mark_failed(db: Session, run: WorkflowRun, *, error_type: str, error_message: str) -> None:

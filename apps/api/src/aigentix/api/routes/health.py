@@ -1,9 +1,25 @@
+from functools import lru_cache
+from pathlib import Path
+
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy import text
 
 from aigentix.api.deps import DbSession
+from aigentix.core.config import get_settings
+
+
+@lru_cache
+def _expected_head() -> str | None:
+    """Head revision of the migration scripts shipped with this build (None if they are not available)."""
+    ini = Path(get_settings().alembic_ini)
+    if not ini.is_file():
+        return None
+    return ScriptDirectory.from_config(Config(str(ini))).get_current_head()
+
 
 router = APIRouter(tags=["health"])
 
@@ -30,6 +46,7 @@ def ready(db: DbSession) -> HealthStatus | JSONResponse:
         version = db.execute(text("SELECT version_num FROM alembic_version")).scalar()
     except Exception:
         return JSONResponse(status_code=503, content={"status": "database_unavailable"})
-    if version is None:
+    head = _expected_head()
+    if version is None or (head is not None and version != head):
         return JSONResponse(status_code=503, content={"status": "migrations_pending"})
     return HealthStatus(status="ready")

@@ -5,11 +5,7 @@ import { Suspense } from "react";
 
 import { Logo } from "@/components/app-shell";
 import { LoginForm } from "@/components/forms/login-form";
-
-function safeNext(value: string | null): string {
-  // Only allow same-site relative paths (prevents open redirects such as //evil.example).
-  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/dashboard";
-}
+import { safeNextPath } from "@/lib/redirect";
 
 function LoginContent() {
   const router = useRouter();
@@ -17,7 +13,7 @@ function LoginContent() {
   return (
     <LoginForm
       onSuccess={() => {
-        router.replace(safeNext(params.get("next")));
+        router.replace(safeNextPath(params.get("next"), window.location.origin));
         router.refresh();
       }}
     />

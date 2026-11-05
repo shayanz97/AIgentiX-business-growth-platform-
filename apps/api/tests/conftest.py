@@ -10,6 +10,9 @@ import pytest
 TEST_DATABASE_URL = os.environ.get(
     "TEST_DATABASE_URL", "postgresql://aigentix:aigentix-local-dev@localhost:5432/aigentix_test"
 )
+# The suite drops and recreates the schema: refuse anything that is not clearly a test database.
+if not TEST_DATABASE_URL.rsplit("/", 1)[-1].split("?")[0].endswith("_test"):
+    raise RuntimeError("TEST_DATABASE_URL must point to a database whose name ends with '_test'")
 # Configure the application *before* importing it.
 os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 os.environ["ENVIRONMENT"] = "test"
@@ -29,6 +32,7 @@ from aigentix.core.config import get_settings  # noqa: E402
 from aigentix.core.db import get_engine, get_session_factory  # noqa: E402
 from aigentix.platform.identity import service as identity  # noqa: E402
 from aigentix.platform.identity.models import User  # noqa: E402
+from aigentix.platform.identity.throttle import login_throttle  # noqa: E402
 from aigentix.platform.organizations import service as orgs  # noqa: E402
 from aigentix.platform.organizations.models import Organization, Role  # noqa: E402
 
@@ -56,6 +60,12 @@ def engine() -> Iterator[Engine]:
     command.upgrade(alembic_config(TEST_DATABASE_URL), "head")
     yield eng
     eng.dispose()
+
+
+@pytest.fixture(autouse=True)
+def _reset_login_throttle() -> Iterator[None]:
+    yield
+    login_throttle._failures.clear()
 
 
 @pytest.fixture(autouse=True)

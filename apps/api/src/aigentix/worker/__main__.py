@@ -1,5 +1,7 @@
 """Worker entrypoint: `python -m aigentix.worker`."""
 
+from datetime import timedelta
+
 from aigentix.core.config import get_settings
 from aigentix.core.db import get_session_factory
 from aigentix.core.logging import configure_logging
@@ -10,7 +12,12 @@ from aigentix.worker.runner import run_forever
 def main() -> None:
     settings = get_settings()
     configure_logging(settings.log_level, json=settings.log_json)
-    run_forever(get_session_factory(), build_registry(), settings.worker_poll_interval_seconds)
+    run_forever(
+        get_session_factory(),
+        build_registry(),
+        settings.worker_poll_interval_seconds,
+        stale_after=timedelta(minutes=settings.worker_stale_run_minutes),
+    )
 
 
 if __name__ == "__main__":

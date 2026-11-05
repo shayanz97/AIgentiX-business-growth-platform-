@@ -37,11 +37,10 @@ def create_user(db: Session, *, email: str, password: str, full_name: str = "") 
     user = User(
         email=normalise_email(email), full_name=full_name.strip(), password_hash=hash_password(password)
     )
-    db.add(user)
     try:
-        db.flush()
+        with db.begin_nested():  # savepoint: a duplicate must not roll back the caller's transaction
+            db.add(user)
     except IntegrityError as exc:
-        db.rollback()
         raise Conflict("A user with this e-mail already exists") from exc
     return user
 

@@ -1,3 +1,4 @@
+import re
 import time
 import uuid
 from collections.abc import Awaitable, Callable
@@ -10,6 +11,7 @@ from aigentix.core.logging import get_logger
 
 log = get_logger("aigentix.request")
 
+_REQUEST_ID = re.compile(r"[A-Za-z0-9-]{1,64}")
 UNSAFE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 Handler = Callable[[Request], Awaitable[Response]]
 
@@ -39,9 +41,8 @@ def origin_check(allowed_origins: list[str]) -> Callable[[Request, Handler], Awa
 
 async def request_logging(request: Request, call_next: Handler) -> Response:
     """One structured log line per request. Logs path only (no query string, headers, cookies or body)."""
-    request_id = request.headers.get("x-request-id") or str(uuid.uuid4())
-    if len(request_id) > 64:
-        request_id = str(uuid.uuid4())
+    supplied = request.headers.get("x-request-id", "")
+    request_id = supplied if _REQUEST_ID.fullmatch(supplied) else str(uuid.uuid4())
     structlog.contextvars.bind_contextvars(request_id=request_id)
     start = time.perf_counter()
     try:

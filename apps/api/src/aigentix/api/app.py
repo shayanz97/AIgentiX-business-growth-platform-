@@ -49,7 +49,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title="AIgentiX Growth Platform API",
         version=__version__,
         openapi_url=f"{API_PREFIX}/openapi.json",
-        docs_url=f"{API_PREFIX}/docs",
+        # Interactive docs are disabled in production; the OpenAPI document stays available for clients.
+        docs_url=None if settings.is_production else f"{API_PREFIX}/docs",
         redoc_url=None,
         responses={
             400: {"model": ErrorResponse},
