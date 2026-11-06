@@ -8,7 +8,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from aigentix.core.db import utcnow
-from aigentix.platform.workflows.errors import WorkflowCancelled
+from aigentix.platform.workflows.errors import WorkflowCancelled, WorkflowClaimLost
 from aigentix.platform.workflows.models import WorkflowRun, WorkflowStatus
 
 
@@ -30,6 +30,8 @@ class WorkflowContext:
         self.db = db
         self.run = run
         self._session_factory = session_factory
+        # The attempt number this worker claimed; any other value means another worker owns the run now.
+        self.claimed_attempt = run.attempts
 
     @property
     def run_id(self) -> Any:
@@ -42,9 +44,15 @@ class WorkflowContext:
     # --- progress -------------------------------------------------------------------------------
 
     def checkpoint(self, step: str, progress: int) -> None:
-        """Commit work done so far, record the step about to start, and honour cancellation."""
-        cancel_requested = self.db.scalar(select(WorkflowRun.cancel_requested_at).where(WorkflowRun.id == self.run.id))
-        if cancel_requested is not None:
+        """Commit work done so far, record the step about to start, and honour cancellation and ownership."""
+        row = self.db.execute(
+            select(WorkflowRun.status, WorkflowRun.attempts, WorkflowRun.cancel_requested_at)
+            .where(WorkflowRun.id == self.run.id)
+            .with_for_update()
+        ).one()
+        if row.status != WorkflowStatus.RUNNING.value or row.attempts != self.claimed_attempt:
+            raise WorkflowClaimLost
+        if row.cancel_requested_at is not None:
             raise WorkflowCancelled
         self.run.current_step = step
         self.run.progress = max(0, min(100, progress))

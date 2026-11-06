@@ -96,3 +96,24 @@ cancel, stale recovery, duplicate-run prevention. Eval: 12 fixture companies (st
 conflicting/injection/malformed/blocked) run through the full pipeline with the test double; scripted bad LLM
 outputs to prove unsupported claims are dropped/flagged. E2E (Playwright, Docker): create company → research →
 monitor → evidence → review opportunity; CSV bulk import + campaign.
+
+## 7. Completion notes
+
+**Delegation actually used**: lead (backend, workflow, AI, tests, integration); one Sonnet agent wrote the 12
+fixture websites; one Sonnet agent built the frontend against the frozen OpenAPI contract (`apps/web` only);
+an independent read-only reviewer audited the result. The lead verified every agent's output by running the checks.
+
+**Deviations from this plan**: none in scope. Additions found necessary: a wall-clock fetch deadline and
+claim-ownership checks (review H1), host-based link filtering (M1), excerpt-backed LLM wording (M2), lost-cancel
+fix (M3), hard cost cap (M4), no compression / no keep-alive in the fetcher, robots 5xx retried, LIKE escaping.
+One fixture expectation was corrected (`fjord-accounting.example` listed `document_download`, but the site has no
+downloadable files; it describes uploads → `document_workflow`).
+
+**Live check**: researching https://www.python.org/ from the host worker (internet mode, no LLM key) found four
+bugs the fixtures did not (meta tags removed before being read, substring keyword matching, navigation text as
+excerpts, metadata description listed as unknown); all fixed with regression tests.
+
+**Not verified**: the real Anthropic provider has never been called (no API key in this environment) — its error
+mapping, refusal handling, fallback parameters and cost estimation are tested against a fake SDK client only, and
+opportunity quality has only been evaluated with the rule-based test double. Run `/research-eval` live (opt-in,
+capped) before relying on AI output.

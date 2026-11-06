@@ -14,8 +14,13 @@ from aigentix.core.logging import get_logger
 from aigentix.platform.identity.service import purge_expired_sessions
 from aigentix.platform.workflows import service
 from aigentix.platform.workflows.context import WorkflowContext
-from aigentix.platform.workflows.errors import TransientWorkflowError, WorkflowCancelled, WorkflowError
-from aigentix.platform.workflows.models import WorkflowRun
+from aigentix.platform.workflows.errors import (
+    TransientWorkflowError,
+    WorkflowCancelled,
+    WorkflowClaimLost,
+    WorkflowError,
+)
+from aigentix.platform.workflows.models import WorkflowRun, WorkflowStatus
 from aigentix.platform.workflows.registry import WorkflowRegistry
 
 log = get_logger("aigentix.worker")
@@ -29,17 +34,24 @@ class WorkerSettings:
     stale_after: timedelta = timedelta(minutes=30)
 
 
+def _still_owned(run: WorkflowRun | None, claimed_attempt: int) -> bool:
+    return run is not None and run.status == WorkflowStatus.RUNNING.value and run.attempts == claimed_attempt
+
+
 def _with_run(
     session_factory: sessionmaker[Session],
     run_id: uuid.UUID,
+    claimed_attempt: int,
     action: Callable[[Session, WorkflowRun], object],
 ) -> None:
-    """Apply a final state change in a fresh session (the run's own session may be unusable)."""
+    """Apply a final state change in a fresh session — only if this worker still owns the run."""
     with session_factory() as db:
-        run = db.get(WorkflowRun, run_id, with_for_update=True)
-        if run is not None:
-            action(db, run)
-            db.commit()
+        run = db.get(WorkflowRun, run_id, with_for_update=True, populate_existing=True)
+        if run is None or not _still_owned(run, claimed_attempt):
+            log.warning("workflow.claim_lost", run_id=str(run_id), claimed_attempt=claimed_attempt)
+            return
+        action(db, run)
+        db.commit()
 
 
 def run_once(
@@ -56,6 +68,7 @@ def run_once(
             return False
         db.commit()  # persist the RUNNING state before executing
         run_id = run.id
+        claimed = run.attempts
         bound = log.bind(
             run_id=str(run_id),
             workflow_type=run.workflow_type,
@@ -76,11 +89,18 @@ def run_once(
 
         try:
             result = handler(WorkflowContext(db, run, session_factory))
+            db.refresh(run, with_for_update=True)
+            if not _still_owned(run, claimed):
+                raise WorkflowClaimLost
             service.mark_finished(db, run, result.status, summary=result.summary, message=result.message)
             db.commit()
+        except WorkflowClaimLost:
+            db.rollback()
+            bound.warning("workflow.claim_lost")
+            return True
         except WorkflowCancelled:
             db.rollback()
-            _with_run(session_factory, run_id, service.mark_cancelled)
+            _with_run(session_factory, run_id, claimed, service.mark_cancelled)
             bound.info("workflow.cancelled")
             return True
         except (TransientWorkflowError, OperationalError) as exc:
@@ -91,6 +111,7 @@ def run_once(
             _with_run(
                 session_factory,
                 run_id,
+                claimed,
                 lambda s, r: retried.append(
                     service.schedule_retry(
                         s,
@@ -115,6 +136,7 @@ def run_once(
             _with_run(
                 session_factory,
                 run_id,
+                claimed,
                 lambda s, r: service.mark_failed(s, r, error_type=error_type, error_message=message),
             )
             return True

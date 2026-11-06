@@ -71,6 +71,9 @@ router, which lets the UI show them as disabled without pretending they work.
   re-queued with exponential backoff until `max_attempts`; anything else → failed with a generic message (details
   only in logs). Housekeeping re-queues runs whose heartbeat stopped (resume from the persisted step) or fails
   them after the last attempt, and purges expired sessions.
+- Ownership: a worker records the attempt number it claimed; `checkpoint` and every final write verify that the
+  run is still `running` with that attempt, so a worker whose run was recovered and re-claimed elsewhere stops
+  without writing. A cancel requested during a failed attempt wins over the retry.
 - PostgreSQL remains the queue: no Redis/Celery/Temporal/Kafka.
 
 ## Lead Intelligence research (Sprint 2)
@@ -93,8 +96,10 @@ VALIDATE_INPUT → FETCH_WEBSITE → DISCOVER_RELEVANT_PAGES → EXTRACT_INFORMA
 **SSRF protection (`SafeFetcher`)**: resolve once; every address must be global unicast (blocks loopback, RFC1918,
 link-local/metadata, CGNAT, multicast, reserved, IPv4-mapped, NAT64, 6to4, Teredo); connect to the validated IP with
 the original Host header and TLS SNI (no DNS-rebinding window); redirects followed manually (≤5) and re-validated;
-environment proxies ignored; responses streamed with a byte cap applied after decompression; connect/read timeouts;
-per-domain request spacing.
+environment proxies ignored; no keep-alive reuse (the pool is keyed by IP); uncompressed responses only, streamed
+with a byte cap; connect/read timeouts plus a 30 s wall-clock deadline per request (slow-drip servers) and a
+discovery time budget per run; per-domain request spacing. Look-alike or foreign links in model output are removed
+by host comparison (`acme.com.evil.io`, `evil.com/?x=acme.com`, bare domains).
 
 **Untrusted content**: hidden elements, comments, scripts, `<meta>`/`<title>` and site chrome (nav/header/footer)
 are removed from text; e-mail addresses and phone numbers are redacted before storage. Prompts wrap content in
@@ -106,6 +111,12 @@ text as plain text.
 unavailable"; no opportunities are generated. `LLM_PROVIDER=fixture` (rule-based test double) and
 `RESEARCH_FETCH_BACKEND=fixtures` (bundled `*.example` sites) exist for CI/E2E/demos and are refused in production.
 Models used and prompt versions are stored with every run and shown in the UI.
+
+**Cost control**: `LLM_MAX_COST_PER_RUN_USD` is a hard cap — `max_tokens` for each call is derived from the
+remaining budget at the output price of the configured model, repair attempts stop when the budget is spent, and
+responses that fail schema parsing are recorded at their worst-case output cost (the SDK does not report their
+usage). LLM evidence wording that its excerpt does not back is downgraded to a low-confidence inference, and
+negative characterisations without textual support are dropped.
 
 **Retention**: page text is truncated (`RESEARCH_MAX_TEXT_CHARS`) and kept only as provenance for evidence; no
 full-site copies, no personal profiles crawled, contact details redacted.

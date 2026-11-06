@@ -28,6 +28,8 @@ class ResearchSettings(BaseSettings):
     research_domain_min_interval_seconds: float = Field(default=0.5, ge=0)  # ≈ ≤2 requests/second per domain
     research_max_concurrent_runs: int = Field(default=2, ge=1)
     research_max_attempts: int = Field(default=3, ge=1, le=10)
+    # Stop reading further pages after this long (each request is separately capped by a 30 s deadline).
+    research_max_discovery_seconds: float = Field(default=180.0, gt=0)
 
     # LLM
     llm_provider: Literal["anthropic", "fixture", "none"] = "anthropic"

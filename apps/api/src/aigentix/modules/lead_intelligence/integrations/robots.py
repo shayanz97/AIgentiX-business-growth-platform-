@@ -15,6 +15,7 @@ class RobotsPolicy:
     parser: RobotFileParser | None  # None = no restrictions
     disallow_all: bool = False
     crawl_delay: float | None = None
+    unavailable: bool = False  # robots.txt answered 5xx: treat as temporary, retry later
 
     def allows(self, user_agent_token: str, url: str) -> bool:
         if self.disallow_all:
@@ -27,7 +28,7 @@ def load_robots(fetcher: SafeFetcher, origin: str, user_agent_token: str) -> Rob
     if 400 <= page.status < 500:
         return RobotsPolicy(parser=None)
     if not page.ok:
-        return RobotsPolicy(parser=None, disallow_all=True)
+        return RobotsPolicy(parser=None, disallow_all=True, unavailable=page.status >= 500 or page.status == 429)
     parser = RobotFileParser()
     parser.parse(page.body[:500_000].decode("utf-8", errors="replace").splitlines())
     delay = parser.crawl_delay(user_agent_token)

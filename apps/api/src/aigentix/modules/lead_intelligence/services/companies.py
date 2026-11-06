@@ -117,7 +117,9 @@ def create_company(
     return company, created
 
 
-def latest_runs(db: Session, company_ids: Sequence[uuid.UUID]) -> dict[uuid.UUID, LatestRun]:
+def latest_runs(
+    db: Session, company_ids: Sequence[uuid.UUID], organization_id: uuid.UUID
+) -> dict[uuid.UUID, LatestRun]:
     if not company_ids:
         return {}
     rows = db.execute(
@@ -129,7 +131,7 @@ def latest_runs(db: Session, company_ids: Sequence[uuid.UUID]) -> dict[uuid.UUID
             WorkflowRun.created_at,
         )
         .join(WorkflowRun, WorkflowRun.id == ResearchRun.workflow_run_id)
-        .where(ResearchRun.company_id.in_(company_ids))
+        .where(ResearchRun.company_id.in_(company_ids), ResearchRun.organization_id == organization_id)
         .order_by(ResearchRun.company_id, WorkflowRun.created_at.desc())
         .ext(distinct_on(ResearchRun.company_id))
     )
@@ -147,8 +149,13 @@ def list_companies(
 ) -> tuple[list[Company], int]:
     conditions = [Company.organization_id == tenant.organization_id]
     if query:
-        pattern = f"%{query.strip().lower()}%"
-        conditions.append(or_(func.lower(Company.name).like(pattern), Company.canonical_domain.like(pattern)))
+        escaped = query.strip().lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        pattern = f"%{escaped}%"
+        conditions.append(
+            or_(
+                func.lower(Company.name).like(pattern, escape="\\"), Company.canonical_domain.like(pattern, escape="\\")
+            )
+        )
     base = select(Company).where(*conditions)
     if project_id is not None:
         get_project(db, tenant, project_id)

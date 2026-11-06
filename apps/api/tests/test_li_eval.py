@@ -19,7 +19,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from aigentix.modules.lead_intelligence.agents.opportunity_auditor import _UNSUPPORTED_TERMS
+from aigentix.modules.lead_intelligence.agents.text_safety import UNSUPPORTED_TERMS
 from aigentix.modules.lead_intelligence.config import ResearchSettings
 from aigentix.modules.lead_intelligence.integrations.fixture_web import FIXTURE_ROOT, fixture_domains
 from aigentix.modules.lead_intelligence.integrations.llm import build_provider
@@ -107,7 +107,7 @@ def evaluate(domain: str, run: dict[str, Any], results: dict[str, Any], db: Sess
     # Unsupported claims are either absent or flagged.
     for o in results["opportunities"]:
         claims = f"{o['observed_context']} {o['problem_hypothesis']}".lower()
-        if any(t in claims for t in _UNSUPPORTED_TERMS):
+        if any(t in claims for t in UNSUPPORTED_TERMS):
             case.checks["negative_claims_flagged"] = "unsupported_claim" in o["quality_flags"] or case.checks.get(
                 "negative_claims_flagged", True
             )

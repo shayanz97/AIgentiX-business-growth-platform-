@@ -15,5 +15,9 @@ class TransientWorkflowError(WorkflowError):
     """
 
 
+class WorkflowClaimLost(Exception):
+    """This worker no longer owns the run (it was recovered and re-claimed elsewhere). Stop without writing."""
+
+
 class WorkflowCancelled(Exception):
     """Raised at a step boundary when cancellation was requested."""

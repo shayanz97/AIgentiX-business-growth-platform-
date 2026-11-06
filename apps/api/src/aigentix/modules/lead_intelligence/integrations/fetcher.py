@@ -128,6 +128,8 @@ class FetcherConfig:
     connect_timeout_seconds: float = 5.0
     max_bytes: int = 2_000_000
     max_redirects: int = 5
+    # Wall-clock limit for one get() including redirects: read timeouts alone do not stop a slow-drip server.
+    total_timeout_seconds: float = 30.0
 
 
 class SafeFetcher:
@@ -148,6 +150,9 @@ class SafeFetcher:
             trust_env=False,
             verify=ssl.create_default_context(),
             timeout=httpx2.Timeout(config.timeout_seconds, connect=config.connect_timeout_seconds),
+            # No connection reuse: the pool is keyed by IP, so a kept-alive connection could otherwise serve a
+            # different hostname without a certificate check for that name.
+            limits=httpx2.Limits(max_keepalive_connections=0),
         )
 
     def close(self) -> None:
@@ -172,7 +177,10 @@ class SafeFetcher:
 
     def get(self, url: str) -> FetchedPage:
         current = url
+        deadline = time.monotonic() + self.config.total_timeout_seconds
         for _hop in range(self.config.max_redirects + 1):
+            if time.monotonic() > deadline:
+                raise TransientFetchError("The website responded too slowly", url=current)
             scheme, host, port, ip = self._validated_target(current)
             parts = urlsplit(current)
             ip_host = f"[{ip}]" if ":" in ip else ip
@@ -184,7 +192,8 @@ class SafeFetcher:
                 "Host": host if default_port else f"{host}:{port}",
                 "User-Agent": self.config.user_agent,
                 "Accept": "text/html,application/xhtml+xml,text/plain;q=0.8,*/*;q=0.1",
-                "Accept-Encoding": "gzip, deflate",
+                # No compression: avoids decompression bombs inflating far past the byte limit in memory.
+                "Accept-Encoding": "identity",
             }
             self._rate_limiter.wait(host)
             request = self._client.build_request(
@@ -203,14 +212,14 @@ class SafeFetcher:
                         raise FetchError("Redirect without a location", url=current)
                     current = urljoin(current, location)
                     continue
-                body = self._read_limited(response, current)
+                body = self._read_limited(response, current, deadline)
                 content_type = response.headers.get("content-type", "").split(";")[0].strip().lower()
                 return FetchedPage(url=current, status=response.status_code, content_type=content_type, body=body)
             finally:
                 response.close()
         raise FetchError("Too many redirects", url=current)
 
-    def _read_limited(self, response: httpx2.Response, url: str) -> bytes:
+    def _read_limited(self, response: httpx2.Response, url: str, deadline: float) -> bytes:
         declared = response.headers.get("content-length")
         if declared and declared.isdigit() and int(declared) > self.config.max_bytes:
             raise ResponseTooLarge("The page is larger than the allowed size", url=url)
@@ -218,6 +227,8 @@ class SafeFetcher:
         size = 0
         try:
             for chunk in response.iter_bytes():
+                if time.monotonic() > deadline:
+                    raise TransientFetchError("The website responded too slowly", url=url)
                 size += len(chunk)
                 if size > self.config.max_bytes:
                     raise ResponseTooLarge("The page is larger than the allowed size", url=url)

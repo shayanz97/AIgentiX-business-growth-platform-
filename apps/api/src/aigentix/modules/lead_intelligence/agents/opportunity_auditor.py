@@ -3,34 +3,21 @@
 import json
 import re
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
 from aigentix.modules.lead_intelligence.agents.calls import UsageSink, call_with_repair
 from aigentix.modules.lead_intelligence.agents.prompts import AUDIT_SYSTEM
 from aigentix.modules.lead_intelligence.agents.schemas import AuditOutput, ProposedOpportunity
-from aigentix.modules.lead_intelligence.agents.text_safety import neutralise_markup, strip_foreign_urls
+from aigentix.modules.lead_intelligence.agents.text_safety import (
+    UNSUPPORTED_TERMS,
+    neutralise_markup,
+    strip_foreign_urls,
+)
 from aigentix.modules.lead_intelligence.integrations.llm import LLMProvider
 
 MAX_OPPORTUNITIES = 3
-# Negative characterisations that need explicit support in the cited evidence.
-_UNSUPPORTED_TERMS = (
-    "inefficien",
-    "slow",
-    "outdated",
-    "manual process",
-    "manually",
-    "struggl",
-    "poor ",
-    "wasting",
-    "waste of",
-    "bottleneck",
-    "understaffed",
-    "overwhelmed",
-    "backlog",
-    "legacy system",
-    "error-prone",
-)
 _LABEL = re.compile(r"^E(\d+)$")
 
 
@@ -44,6 +31,7 @@ class PromptEvidence:
     basis: str
     confidence: str
     source_url: str
+    origin: str = "deterministic"  # deterministic | llm
 
 
 @dataclass
@@ -115,8 +103,11 @@ def _verify(
 
     confidence = proposal.confidence
     claims = f"{proposal.observed_context} {proposal.problem_hypothesis}".lower()
-    support = " ".join(f"{e.observed_fact} {e.excerpt}" for e in cited).lower()
-    if any(term in claims and term not in support for term in _UNSUPPORTED_TERMS):
+    # Support = verbatim excerpts plus parser-generated facts. LLM-written facts are not proof of themselves.
+    support = " ".join(
+        e.excerpt + (f" {e.observed_fact}" if e.origin == "deterministic" else "") for e in cited
+    ).lower()
+    if any(term in claims and term not in support for term in UNSUPPORTED_TERMS):
         flags.add("unsupported_claim")
         confidence = "low"
     if confidence == "high" and len(cited) < 2:
@@ -171,6 +162,8 @@ def run_audit(
     company_domain: str | None,
     max_repairs: int,
     record_usage: UsageSink,
+    max_tokens: int | None = None,
+    can_spend: Callable[[], bool] | None = None,
 ) -> AuditResult:
     if not evidence:
         return AuditResult(opportunities=[], summary="No evidence was collected, so no opportunity can be proposed.")
@@ -180,7 +173,8 @@ def run_audit(
         system=AUDIT_SYSTEM,
         user=build_audit_prompt(profile, evidence),
         output_model=AuditOutput,
-        max_tokens=16_000,
+        max_tokens=max_tokens or 16_000,
+        can_spend=can_spend,
         max_repairs=max_repairs,
         record_usage=record_usage,
     )

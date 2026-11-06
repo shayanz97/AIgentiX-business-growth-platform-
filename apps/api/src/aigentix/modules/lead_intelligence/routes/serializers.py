@@ -25,7 +25,8 @@ from aigentix.platform.workflows.models import WorkflowStatus
 
 
 def company_reads(db: Session, companies: Sequence[Company]) -> list[CompanyRead]:
-    latest = company_service.latest_runs(db, [c.id for c in companies])
+    org = companies[0].organization_id if companies else None
+    latest = company_service.latest_runs(db, [c.id for c in companies], org) if org else {}
     out = []
     for c in companies:
         run = latest.get(c.id)

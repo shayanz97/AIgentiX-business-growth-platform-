@@ -65,6 +65,18 @@ class LLMInvalidOutput(LLMError):
     """The response did not match the requested schema (repairable)."""
 
 
+class LLMBudgetExceeded(LLMError):
+    """Another call would exceed the per-run cost limit."""
+
+
+def max_output_tokens_within(budget_usd: Decimal, model: str, ceiling: int) -> int:
+    """Largest max_tokens whose worst-case output cost stays within 80% of the remaining budget."""
+    _, price_out = MODEL_PRICES.get(model, (Decimal("10.00"), Decimal("50.00")))
+    if budget_usd <= 0:
+        return 0
+    return max(0, min(ceiling, int(budget_usd * Decimal("0.8") / price_out * _MILLION)))
+
+
 class LLMProvider(Protocol):
     name: str
 
@@ -134,7 +146,11 @@ class AnthropicProvider:
                     output_format=output_model,
                 )
         except ValidationError as exc:
-            raise LLMInvalidOutput(f"Response did not match the schema: {exc.error_count()} error(s)") from exc
+            # The SDK does not expose usage when parsing fails: record a worst-case estimate so the cost cap holds.
+            estimate = LLMUsage(model=model, output_tokens=max_tokens, cost_usd=estimate_cost(model, 0, max_tokens))
+            raise LLMInvalidOutput(
+                f"Response did not match the schema: {exc.error_count()} error(s)", usage=estimate
+            ) from exc
         except (anthropic.RateLimitError, anthropic.InternalServerError, anthropic.APIConnectionError) as exc:
             raise LLMTransientError(f"AI provider temporarily unavailable ({type(exc).__name__})") from exc
         except anthropic.APIStatusError as exc:

@@ -17,6 +17,7 @@ import time
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -46,11 +47,14 @@ from aigentix.modules.lead_intelligence.integrations.html import (
     name_from_title,
 )
 from aigentix.modules.lead_intelligence.integrations.llm import (
+    LLMBudgetExceeded,
     LLMError,
     LLMProvider,
     LLMTransientError,
     LLMUsage,
+    Task,
     build_provider,
+    max_output_tokens_within,
 )
 from aigentix.modules.lead_intelligence.integrations.robots import RobotsPolicy, load_robots
 from aigentix.modules.lead_intelligence.models import (
@@ -170,16 +174,28 @@ class _Research:
         """Transient AI errors are retried unless this is the last attempt; otherwise AI is marked failed."""
         if isinstance(exc, LLMTransientError) and not self._last_attempt():
             raise TransientWorkflowError("The AI provider is temporarily unavailable; the run will retry.") from exc
+        if isinstance(exc, LLMBudgetExceeded):
+            self.ctx.set_state("ai_status", "skipped")
+            self.ctx.set_state("ai_message", f"AI analysis stopped: {exc}.")
+            return
         log.warning("research.ai_failed", stage=stage, error_type=type(exc).__name__)
         self.ctx.set_state("ai_status", "failed")
         self.ctx.set_state("ai_message", f"AI {stage} failed: {exc}")
 
-    def _budget_left(self) -> bool:
-        if self.ctx.spent_usd() >= self.settings.llm_max_cost_per_run_usd:
+    def _remaining_budget(self) -> Decimal:
+        return self.settings.llm_max_cost_per_run_usd - self.ctx.spent_usd()
+
+    def _can_spend(self) -> bool:
+        return self._remaining_budget() > 0
+
+    def _token_budget(self, provider: LLMProvider, task: Task, ceiling: int) -> int | None:
+        """max_tokens such that worst-case output stays inside the remaining per-run budget; None = skip AI."""
+        tokens = max_output_tokens_within(self._remaining_budget(), provider.model_for(task), ceiling)
+        if tokens < 1_024:
             self.ctx.set_state("ai_status", "skipped")
             self.ctx.set_state("ai_message", "AI analysis skipped: the per-run cost limit was reached.")
-            return False
-        return True
+            return None
+        return tokens
 
     def _sources(self) -> list[ResearchSource]:
         return list(
@@ -290,6 +306,8 @@ class _Research:
             return
         try:
             robots = self._robots(homepage)
+            if robots.unavailable:
+                raise TransientWorkflowError("The website's robots.txt is temporarily unavailable.")
             if not robots.allows(self.settings.research_robots_token, homepage):
                 raise WorkflowError("The website's robots.txt does not allow automated research.")
             page = self._fetch(self._fetcher, homepage)
@@ -309,6 +327,9 @@ class _Research:
         final_domain = canonical_domain(urlsplit(page.url).hostname or "")
         self.ctx.set_state("site_domain", final_domain)
         self.ctx.set_state("home_links", [[link.url, link.text] for link in content.links[:MAX_LINKS_KEPT]])
+        final = urlsplit(page.url)
+        # After a cross-site redirect, the destination site's robots.txt governs the remaining pages.
+        self.ctx.set_state("site_origin", f"{final.scheme}://{final.hostname}/")
         self.ctx.set_state(
             "home_meta",
             {"title": content.title, "site_name": content.site_name, "description": content.description},
@@ -328,16 +349,20 @@ class _Research:
         links = [Link(url=u, text=t) for u, t in self.ctx.get_state("home_links", [])]
         candidates = discover_relevant_links(links, domain=domain, limit=self.settings.research_max_pages - 1)
         existing = {s.source_url for s in self._sources()}
-        homepage: str = self.ctx.get_state("homepage")
+        origin: str = self.ctx.get_state("site_origin") or self.ctx.get_state("homepage")
         try:
-            robots = self._robots(homepage)
+            robots = self._robots(origin)
         except FetchError as exc:
             if exc.transient:
                 raise TransientWorkflowError(f"Could not load robots.txt: {exc}") from exc
             raise WorkflowError(f"Could not load robots.txt: {exc}") from exc
         delay = min(robots.crawl_delay or 0.0, _CRAWL_DELAY_CAP_SECONDS)
+        started = time.monotonic()
         for index, (url, category) in enumerate(candidates):
             if url in existing:
+                continue
+            if time.monotonic() - started > self.settings.research_max_discovery_seconds:
+                self._save_source(url, category, status="skipped", error="Time budget for this run was reached")
                 continue
             # Heartbeat, cancellation point and commit of the previous page.
             self.ctx.checkpoint("discover_relevant_pages", 20 + int(30 * index / max(len(candidates), 1)))
@@ -387,7 +412,10 @@ class _Research:
             self.ctx.set_state("ai_status", "unavailable")
             self.ctx.set_state("ai_message", "AI analysis unavailable: no AI provider is configured.")
             return
-        if not sources or not self._budget_left():
+        if not sources:
+            return
+        max_tokens = self._token_budget(provider, "extraction", 8_000)
+        if max_tokens is None:
             return
         prompt_sources = [
             PromptSource(
@@ -407,6 +435,8 @@ class _Research:
                 company_domain=self.ctx.get_state("site_domain"),
                 max_repairs=self.settings.llm_max_repairs,
                 record_usage=self._record_usage,
+                max_tokens=max_tokens,
+                can_spend=self._can_spend,
             )
         except LLMError as exc:
             self._ai_failed(exc, "extraction")
@@ -555,7 +585,8 @@ class _Research:
                 self.ctx.set_state("ai_status", "unavailable")
                 self.ctx.set_state("ai_message", "AI analysis unavailable: no AI provider is configured.")
             return
-        if not self._budget_left():
+        max_tokens = self._token_budget(provider, "audit", 16_000)
+        if max_tokens is None:
             return
         ids = [uuid.UUID(i) for i in self.ctx.get_state("evidence_ids", [])]
         evidence = list(self.db.scalars(select(Evidence).where(Evidence.id.in_(ids)))) if ids else []
@@ -578,6 +609,7 @@ class _Research:
                 basis=e.basis,
                 confidence=e.confidence,
                 source_url=urls.get(e.source_id, ""),
+                origin=e.origin,
             )
             for i, e in enumerate(evidence, start=1)
         ]
@@ -594,6 +626,8 @@ class _Research:
                 company_domain=self.ctx.get_state("site_domain"),
                 max_repairs=self.settings.llm_max_repairs,
                 record_usage=self._record_usage,
+                max_tokens=max_tokens,
+                can_spend=self._can_spend,
             )
         except LLMError as exc:
             self._ai_failed(exc, "opportunity audit")

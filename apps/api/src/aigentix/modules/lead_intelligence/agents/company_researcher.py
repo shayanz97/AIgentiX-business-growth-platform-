@@ -1,15 +1,18 @@
 """Company Researcher agent: LLM-based semantic extraction, verified against stored source text."""
 
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from aigentix.modules.lead_intelligence.agents.calls import UsageSink, call_with_repair
 from aigentix.modules.lead_intelligence.agents.prompts import EXTRACTION_SYSTEM
 from aigentix.modules.lead_intelligence.agents.schemas import ExtractionOutput
 from aigentix.modules.lead_intelligence.agents.text_safety import (
+    UNSUPPORTED_TERMS,
     excerpt_in_source,
     neutralise_markup,
     strip_foreign_urls,
+    supports,
 )
 from aigentix.modules.lead_intelligence.integrations.llm import LLMProvider
 from aigentix.modules.lead_intelligence.models import EvidenceType
@@ -73,12 +76,17 @@ def build_extraction_prompt(sources: list[PromptSource]) -> str:
     return "Sources:\n\n" + "\n\n".join(blocks) + "\n\nExtract the company profile."
 
 
+def _clean_name(name: str | None) -> str | None:
+    cleaned, removed = strip_foreign_urls((name or "").strip()[:200], None)
+    return None if removed or not cleaned else cleaned
+
+
 def validate_extraction(
     output: ExtractionOutput, sources: list[PromptSource], *, company_domain: str | None
 ) -> ExtractionResult:
     by_label = {s.label: s for s in sources}
     result = ExtractionResult(
-        company_name=(output.company_name or "").strip()[:200] or None,
+        company_name=_clean_name(output.company_name),
         unknown_fields=list(output.unknown_fields),
     )
     for assertion in output.assertions:
@@ -95,12 +103,21 @@ def validate_extraction(
         value, _ = strip_foreign_urls(assertion.value.strip()[:400], company_domain)
         if not value:
             continue
+        excerpt = assertion.supporting_excerpt
+        lowered = value.lower()
+        if any(term in lowered and term not in excerpt.lower() for term in UNSUPPORTED_TERMS):
+            result.dropped.append(f"{assertion.field}: negative characterisation not in the excerpt")
+            continue
+        basis, confidence = assertion.basis, assertion.confidence
+        if not supports(value, excerpt):
+            # The excerpt exists but does not back the wording: keep it only as a low-confidence inference.
+            basis, confidence = "inferred", "low"
         result.assertions.append(
             VerifiedAssertion(
                 field=assertion.field,
                 value=value,
-                basis=assertion.basis,
-                confidence=assertion.confidence,
+                basis=basis,
+                confidence=confidence,
                 source_id=source.source_id,
                 excerpt=assertion.supporting_excerpt.strip()[:400],
             )
@@ -115,6 +132,8 @@ def run_extraction(
     company_domain: str | None,
     max_repairs: int,
     record_usage: UsageSink,
+    max_tokens: int | None = None,
+    can_spend: Callable[[], bool] | None = None,
 ) -> ExtractionResult:
     output = call_with_repair(
         provider,
@@ -122,7 +141,8 @@ def run_extraction(
         system=EXTRACTION_SYSTEM,
         user=build_extraction_prompt(sources),
         output_model=ExtractionOutput,
-        max_tokens=8_000,
+        max_tokens=max_tokens or 8_000,
+        can_spend=can_spend,
         max_repairs=max_repairs,
         record_usage=record_usage,
     )

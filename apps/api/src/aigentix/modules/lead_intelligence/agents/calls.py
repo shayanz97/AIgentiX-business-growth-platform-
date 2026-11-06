@@ -6,6 +6,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from aigentix.modules.lead_intelligence.integrations.llm import (
+    LLMBudgetExceeded,
     LLMError,
     LLMInvalidOutput,
     LLMProvider,
@@ -26,9 +27,12 @@ def call_with_repair[T: BaseModel](
     max_tokens: int,
     max_repairs: int,
     record_usage: UsageSink,
+    can_spend: Callable[[], bool] | None = None,
 ) -> T:
     content = user
     for attempt in range(max_repairs + 1):
+        if attempt > 0 and can_spend is not None and not can_spend():
+            raise LLMBudgetExceeded("The per-run AI cost limit was reached before the response could be repaired")
         messages: list[dict[str, Any]] = [{"role": "user", "content": content}]
         try:
             response = provider.structured(

@@ -159,6 +159,9 @@ def schedule_retry(
     db: Session, run: WorkflowRun, *, error_type: str, error_message: str, base_delay: timedelta
 ) -> bool:
     """Re-queue a run after a transient error. Returns False (and fails the run) when attempts are exhausted."""
+    if run.cancel_requested_at is not None:  # a cancel requested during the failed attempt wins
+        mark_cancelled(db, run)
+        return False
     if run.attempts >= run.max_attempts:
         mark_failed(
             db,
