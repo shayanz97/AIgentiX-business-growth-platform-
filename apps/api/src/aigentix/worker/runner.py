@@ -5,6 +5,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
+from pathlib import Path
 from types import FrameType
 
 from sqlalchemy.exc import OperationalError
@@ -32,6 +33,17 @@ GENERIC_FAILURE = "The workflow failed due to an internal error."
 class WorkerSettings:
     retry_base_delay: timedelta = timedelta(seconds=30)
     stale_after: timedelta = timedelta(minutes=30)
+    # Touched on every loop iteration; the container healthcheck requires it to be recent.
+    heartbeat_file: Path | None = None
+
+
+def _touch(path: Path | None) -> None:
+    if path is None:
+        return
+    try:
+        path.touch()
+    except OSError:
+        log.warning("worker.heartbeat_file_unwritable", path=str(path))
 
 
 def _still_owned(run: WorkflowRun | None, claimed_attempt: int) -> bool:
@@ -169,19 +181,22 @@ def run_forever(
     *,
     settings: WorkerSettings | None = None,
     housekeeping_interval: float = 60.0,
+    stop: threading.Event | None = None,
 ) -> None:
     settings = settings or WorkerSettings()
-    stop = threading.Event()
+    stop = stop or threading.Event()
 
     def _handle_signal(signum: int, _frame: FrameType | None) -> None:
         log.info("worker.stopping", signal=signum)
         stop.set()
 
-    signal.signal(signal.SIGTERM, _handle_signal)
-    signal.signal(signal.SIGINT, _handle_signal)
+    if threading.current_thread() is threading.main_thread():  # signal handlers only work in the main thread
+        signal.signal(signal.SIGTERM, _handle_signal)
+        signal.signal(signal.SIGINT, _handle_signal)
     log.info("worker.started", workflow_types=sorted(registry.specs), poll_interval=poll_interval)
     next_housekeeping = 0.0
     while not stop.is_set():
+        _touch(settings.heartbeat_file)
         try:
             if time.monotonic() >= next_housekeeping:
                 housekeeping(session_factory, stale_after=settings.stale_after)

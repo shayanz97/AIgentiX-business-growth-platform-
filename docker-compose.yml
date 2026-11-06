@@ -68,8 +68,18 @@ services:
     depends_on:
       migrate: { condition: service_completed_successfully }
     restart: unless-stopped
+    # The image's default healthcheck probes the API port; the worker proves liveness by touching a file on
+    # every loop iteration instead (stale after 60 s → unhealthy).
     healthcheck:
-      disable: true
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os,sys,time; sys.exit(0 if time.time() - os.path.getmtime('/tmp/aigentix-worker.heartbeat') < 60 else 1)"
+      interval: 10s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
 
   web:
     build:

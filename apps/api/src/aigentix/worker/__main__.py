@@ -1,6 +1,7 @@
 """Worker entrypoint: `python -m aigentix.worker`."""
 
 from datetime import timedelta
+from pathlib import Path
 
 from aigentix.core.config import get_settings
 from aigentix.core.db import get_session_factory
@@ -19,6 +20,7 @@ def main() -> None:
         settings=WorkerSettings(
             retry_base_delay=timedelta(seconds=settings.worker_retry_base_seconds),
             stale_after=timedelta(minutes=settings.worker_stale_run_minutes),
+            heartbeat_file=Path(settings.worker_heartbeat_file) if settings.worker_heartbeat_file else None,
         ),
     )
 

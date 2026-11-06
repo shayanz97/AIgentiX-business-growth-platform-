@@ -105,7 +105,9 @@ jobs:
         run: |
           cp .env.example .env
           sed -i "s/replace-with-a-long-random-password/$(openssl rand -hex 24)/" .env
-          echo "E2E_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+          password="$(openssl rand -hex 16)"
+          echo "::add-mask::$password"
+          echo "E2E_PASSWORD=$password" >> "$GITHUB_ENV"
       - name: Build and start the stack (offline research fixtures + LLM test double)
         run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build --wait --wait-timeout 300
       - name: Seed demo tenants

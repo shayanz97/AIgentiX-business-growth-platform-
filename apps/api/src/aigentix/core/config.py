@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     # RUNNING runs older than this are failed by worker housekeeping (crash recovery).
     worker_stale_run_minutes: int = Field(default=10, ge=1)
     worker_retry_base_seconds: float = Field(default=30.0, ge=0)
+    # Liveness file for the worker container healthcheck (empty = disabled).
+    worker_heartbeat_file: str = "/tmp/aigentix-worker.heartbeat"  # noqa: S108 - container-local liveness file
 
     @field_validator("cors_origins", mode="before")
     @classmethod

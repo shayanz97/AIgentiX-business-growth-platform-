@@ -1,8 +1,11 @@
 """Platform workflow engine: lifecycle, retries, cancellation, stale-run recovery, concurrency, usage."""
 
+import threading
+import time
 import uuid
 from datetime import timedelta
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 from sqlalchemy import update
@@ -17,7 +20,7 @@ from aigentix.platform.workflows.context import WorkflowContext, WorkflowResult
 from aigentix.platform.workflows.errors import TransientWorkflowError, WorkflowError
 from aigentix.platform.workflows.models import WorkflowRun, WorkflowStatus
 from aigentix.platform.workflows.registry import NOOP_WORKFLOW, WorkflowRegistry, build_registry
-from aigentix.worker.runner import GENERIC_FAILURE, WorkerSettings, housekeeping, run_once
+from aigentix.worker.runner import GENERIC_FAILURE, WorkerSettings, housekeeping, run_forever, run_once
 from tests.conftest import Tenant
 
 NO_DELAY = WorkerSettings(retry_base_delay=timedelta(0))
@@ -283,3 +286,27 @@ def test_progress_range_enforced_by_database(db: Session, tenant_a: Tenant) -> N
     with pytest.raises(IntegrityError):
         db.commit()
     db.rollback()
+
+
+def test_worker_loop_touches_heartbeat_file(tmp_path: Path, registry: WorkflowRegistry) -> None:
+    """The container healthcheck relies on this file being refreshed on every loop iteration."""
+    heartbeat = tmp_path / "worker.heartbeat"
+    stop = threading.Event()
+    worker = threading.Thread(
+        target=run_forever,
+        args=(get_session_factory(), registry, 0.05),
+        kwargs={"settings": WorkerSettings(heartbeat_file=heartbeat), "stop": stop},
+    )
+    worker.start()
+    try:
+        deadline = time.monotonic() + 5
+        while not heartbeat.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert heartbeat.exists()
+        first = heartbeat.stat().st_mtime_ns
+        time.sleep(0.2)
+        assert heartbeat.stat().st_mtime_ns > first  # refreshed while idle
+    finally:
+        stop.set()
+        worker.join(timeout=5)
+    assert not worker.is_alive()
