@@ -1,9 +1,13 @@
-"""robots.txt policy (RFC 9309): 4xx = no restrictions, 5xx/unreachable = assume everything is disallowed."""
+"""robots.txt policy (RFC 9309): 4xx = no restrictions, 5xx = assume everything is disallowed.
+
+Fetch errors (DNS failure, blocked destination, timeouts) propagate so the caller reports the real cause
+(and retries transient ones) instead of a misleading robots denial.
+"""
 
 from dataclasses import dataclass
 from urllib.robotparser import RobotFileParser
 
-from aigentix.modules.lead_intelligence.integrations.fetcher import FetchError, SafeFetcher
+from aigentix.modules.lead_intelligence.integrations.fetcher import SafeFetcher
 
 
 @dataclass
@@ -19,10 +23,7 @@ class RobotsPolicy:
 
 
 def load_robots(fetcher: SafeFetcher, origin: str, user_agent_token: str) -> RobotsPolicy:
-    try:
-        page = fetcher.get(origin.rstrip("/") + "/robots.txt")
-    except FetchError:
-        return RobotsPolicy(parser=None, disallow_all=True)
+    page = fetcher.get(origin.rstrip("/") + "/robots.txt")
     if 400 <= page.status < 500:
         return RobotsPolicy(parser=None)
     if not page.ok:

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
+import { LeadIntelligenceTabs } from "@/components/lead-intelligence-tabs";
 import { NAV_ITEMS } from "@/components/navigation";
 import { Badge } from "@/components/ui/surface";
 import { cn } from "@/components/ui/cn";
@@ -17,7 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const nav = (
     <nav aria-label="Main" className="flex flex-col gap-1">
       {NAV_ITEMS.map((item) => {
-        const active = pathname.startsWith(item.match);
+        const active = item.match.some((m) => pathname.startsWith(m));
         if (!item.enabled) {
           return (
             <span
@@ -108,7 +109,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8">
+          <LeadIntelligenceTabs />
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -17,18 +17,11 @@ from aigentix.modules.lead_intelligence.models import EvidenceType
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 _PHONE = re.compile(r"(?<!\w)\+?\d[\d\s().-]{6,}\d(?!\w)")
 _WS = re.compile(r"\s+")
+# Never remove <head> wholesale: with an unclosed <head>, html.parser nests the whole <body> inside it.
 _REMOVE_TAGS = (
-    "script",
-    "style",
-    "noscript",
-    "template",
-    "svg",
-    "canvas",
-    "iframe",
-    "object",
-    "embed",
-    "head",
-)
+    "script", "style", "noscript", "template", "svg", "canvas", "iframe", "object", "embed",
+    "title", "meta", "link", "base",
+)  # fmt: skip
 _FILE_EXTENSIONS = (
     ".pdf",
     ".doc",
@@ -57,7 +50,20 @@ _DOCUMENT_EXTENSIONS = (".pdf", ".doc", ".docx", ".xls", ".xlsx")
 # Category -> keywords matched against URL path segments and link text (lower-case).
 CATEGORY_KEYWORDS: dict[str, tuple[str, ...]] = {
     "about": ("about", "about-us", "company", "who-we-are", "our-story", "om-oss", "uber-uns", "meista"),
-    "services": ("services", "service", "solutions", "what-we-do", "treatments", "palvelut", "tjanster"),
+    "services": (
+        "services",
+        "service",
+        "solutions",
+        "what-we-do",
+        "treatments",
+        "palvelut",
+        "tjanster",
+        "gallery",
+        "portfolio",
+        "our-work",
+        "references",
+        "case-studies",
+    ),
     "products": ("products", "product", "shop", "store", "catalog", "catalogue"),
     "contact": ("contact", "contact-us", "kontakt", "get-in-touch", "request-quote", "quote", "yhteystiedot"),
     "careers": ("careers", "career", "jobs", "join-us", "vacancies", "work-with-us", "rekry"),
@@ -214,16 +220,20 @@ def _is_hidden(tag: Tag) -> bool:
 
 
 def _sentence_with(text: str, keywords: tuple[str, ...], limit: int = 300) -> str | None:
-    lower = text.lower()
     for keyword in keywords:
-        index = lower.find(keyword)
-        if index == -1:
+        match = re.search(rf"\b{re.escape(keyword)}", text, re.I)  # word start: "forms" must not match "Platforms"
+        if match is None:
             continue
+        index = match.start()
         start = max(text.rfind(". ", 0, index) + 2, index - limit // 2, 0)
         end = text.find(". ", index)
         end = len(text) if end == -1 else end + 1
         return text[start : min(end, start + limit)].strip()
     return None
+
+
+def _mentions(text: str, keywords: tuple[str, ...]) -> bool:
+    return any(re.search(rf"\b{re.escape(k)}", text, re.I) for k in keywords)
 
 
 def categorise(path: str, link_text: str = "") -> str | None:
@@ -259,6 +269,14 @@ def _repair_unclosed_title(body: bytes) -> bytes:
     return body[:cut] + b"</title>" + body[cut:]
 
 
+def _meta(soup: BeautifulSoup, *, name: str | None = None, property: str | None = None) -> str:
+    if name:
+        tag = soup.find("meta", attrs={"name": re.compile(f"^{re.escape(name)}$", re.I)})
+    else:
+        tag = soup.find("meta", attrs={"property": property or ""})
+    return normalise_space(str(tag.get("content", ""))) if isinstance(tag, Tag) else ""
+
+
 def _first_paragraph(root: Tag) -> str | None:
     for p in root.find_all("p"):
         if isinstance(p, Tag):
@@ -273,9 +291,10 @@ def extract_page(body: bytes, url: str, *, max_chars: int) -> PageContent:
 
     # Structural signals that live in markup we are about to remove.
     script_sources = [str(s.get("src", "")).lower() for s in soup.find_all(["script", "iframe"]) if isinstance(s, Tag)]
-    generator = soup.find("meta", attrs={"name": re.compile("^generator$", re.I)})
-    meta_description = soup.find("meta", attrs={"name": re.compile("^description$", re.I)})
-    og_site = soup.find("meta", attrs={"property": "og:site_name"})
+    # Read <meta> values as strings now: the tags themselves are removed below.
+    generator = _meta(soup, name="generator").lower()
+    meta_description = _meta(soup, name="description")
+    og_site = _meta(soup, property="og:site_name")
     title_tag = soup.find("title")
     title = normalise_space(title_tag.get_text()) if isinstance(title_tag, Tag) else None
 
@@ -288,8 +307,7 @@ def extract_page(body: bytes, url: str, *, max_chars: int) -> PageContent:
             tag.decompose()
 
     root = soup.body if isinstance(soup.body, Tag) else soup
-    text = _clean_text(root)[:max_chars]
-    headings = [h for h in (_clean_text(t) for t in root.find_all(["h1", "h2", "h3"]) if isinstance(t, Tag)) if h][:60]
+    full_text = _clean_text(root)
 
     links: list[Link] = []
     document_links: list[str] = []
@@ -305,13 +323,20 @@ def extract_page(body: bytes, url: str, *, max_chars: int) -> PageContent:
             document_links.append(label or absolute.rsplit("/", 1)[-1])
         links.append(Link(url=absolute, text=label))
 
+    # Links are collected above; site chrome (navigation, header, footer) is now dropped so text and evidence
+    # excerpts describe page content. Pages that are mostly chrome keep their full text.
+    for chrome in root.find_all(["nav", "header", "footer"]):
+        if isinstance(chrome, Tag) and not chrome.decomposed:
+            chrome.decompose()
+    main_text = _clean_text(root)
+    text = (main_text if len(main_text) >= 200 or len(main_text) >= len(full_text) // 2 else full_text)[:max_chars]
+    headings = [h for h in (_clean_text(t) for t in root.find_all(["h1", "h2", "h3"]) if isinstance(t, Tag)) if h][:60]
+
     content = PageContent(
         url=url,
         title=title[:500] if title else None,
-        description=normalise_space(str(meta_description.get("content", ""))) or None
-        if isinstance(meta_description, Tag)
-        else None,
-        site_name=normalise_space(str(og_site.get("content", ""))) or None if isinstance(og_site, Tag) else None,
+        description=meta_description or None,
+        site_name=og_site or None,
         text=text,
         headings=headings,
         links=links,
@@ -358,7 +383,7 @@ def _detect_signals(
     root: Tag,
     page: PageContent,
     script_sources: list[str],
-    generator: object,
+    generator: str,
     document_links: list[str],
 ) -> list[Signal]:
     signals: list[Signal] = []
@@ -367,7 +392,8 @@ def _detect_signals(
 
     description = page.description or page.site_name
     if description and category in ("home", "about"):
-        excerpt: str | None = description if description in page.text else page.text[:300]
+        # Descriptions from <meta> are not in the visible text: cite the metadata itself, never navigation text.
+        excerpt: str | None = description if description in page.text else f"[page metadata] {description[:300]}"
         signals.append(
             Signal(
                 EvidenceType.COMPANY_DESCRIPTION,
@@ -444,18 +470,17 @@ def _detect_signals(
                     excerpt,
                 )
             )
-    lower = page.text.lower()
-    if any(k in lower for k in ("add to cart", "add to basket", "checkout", "free shipping", "order status")):
+    if _mentions(page.text, ("add to cart", "add to basket", "checkout", "free shipping", "order status")):
         excerpt = _sentence_with(page.text, ("add to cart", "add to basket", "checkout", "shipping", "order"))
         signals.append(Signal(EvidenceType.ECOMMERCE, "The website sells products online.", excerpt or page.text[:200]))
-    if any(k in lower for k in ("upload", "invoices", "receipts", "documents", "paperwork", "forms")):
+    if _mentions(page.text, ("upload", "invoices", "receipts", "documents", "paperwork", "forms")):
         excerpt = _sentence_with(page.text, ("upload", "invoices", "receipts", "documents", "paperwork", "forms"))
         if excerpt and category in ("services", "support", "about", "home", "technology"):
             signals.append(
                 Signal(EvidenceType.DOCUMENT_WORKFLOW, "The website mentions document-based processes.", excerpt)
             )
-    if isinstance(generator, Tag):
-        content = str(generator.get("content", "")).lower()
+    if generator:
+        content = generator
         platform = next((g for g in _GENERATORS if g in content), None)
         if platform:
             signals.append(
@@ -473,7 +498,7 @@ def discover_relevant_links(links: list[Link], *, domain: str, limit: int) -> li
     by_category: dict[str, list[str]] = {}
     seen: set[str] = set()
     for link in links:
-        parts = urlsplit(link.url)
+        parts = urlsplit(urldefrag(link.url)[0])
         if parts.scheme not in ("http", "https") or not same_site(parts.hostname or "", domain):
             continue
         if is_excluded_path(parts.path) or parts.query:
@@ -485,7 +510,7 @@ def discover_relevant_links(links: list[Link], *, domain: str, limit: int) -> li
         if category is None:
             continue
         seen.add(key)
-        by_category.setdefault(category, []).append(link.url)
+        by_category.setdefault(category, []).append(parts.geturl())
     chosen: list[tuple[str, str]] = []
     for rnd in range(3):  # round-robin across categories so each gets a page before any gets a second
         for category in CATEGORY_PRIORITY:

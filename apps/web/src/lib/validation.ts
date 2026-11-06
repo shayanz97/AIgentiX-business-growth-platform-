@@ -22,6 +22,21 @@ export const organizationSchema = z.object({
   name: z.string().trim().min(2, "Use at least 2 characters").max(200),
 });
 
+/** Accepts "example.com" or a full http(s) URL; the backend normalises and re-validates (SSRF checks live there). */
+export const companyWebsiteSchema = z
+  .string()
+  .trim()
+  .min(1, "Enter the company website")
+  .max(2048, "Keep the website under 2048 characters")
+  .refine((v) => !/\s/.test(v), "The website must not contain spaces")
+  .refine((v) => !/^[a-z][a-z0-9+.-]*:\/\//i.test(v) || /^https?:\/\//i.test(v), "Only http and https websites are supported")
+  .refine((v) => /^(https?:\/\/)?[^\s/:]+\.[^\s/:]{2,}/i.test(v), "Enter a website such as example.com or https://example.com");
+
+export const companyCreateSchema = z.object({
+  website: companyWebsiteSchema,
+  name: z.string().trim().max(200, "Keep the name under 200 characters"),
+});
+
 export type FieldErrors<T> = Partial<Record<keyof T, string>>;
 
 export function fieldErrors<T>(error: z.ZodError<T>): FieldErrors<T> {

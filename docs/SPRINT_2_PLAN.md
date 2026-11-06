@@ -1,5 +1,7 @@
 # Sprint 2 Plan — Lead Intelligence: Research & Opportunity Discovery
 
+Status: implemented. Results and deviations: see the completion notes at the end of this file.
+
 ## 0. Baseline (inspected before changes)
 
 Sprint 1 green: ruff, mypy --strict, 90 backend tests, eslint, tsc, 18 Vitest tests. Branch not yet pushed

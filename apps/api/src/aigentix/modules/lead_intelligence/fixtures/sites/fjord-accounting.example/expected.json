@@ -12,9 +12,9 @@
     "company_description",
     "service_offering",
     "careers_hiring",
-    "document_download"
+    "document_workflow"
   ],
   "expect_opportunities": "strong",
   "expected_outcome": "completed",
-  "notes": "Document-heavy accounting firm with manual receipt and invoice handling and no forms. Tests inference of document-processing automation opportunities from prose."
+  "notes": "Document-heavy accounting firm with manual receipt and invoice handling and no forms. Tests inference of document-processing automation opportunities from prose. (Corrected by the lead: the site describes document uploads, it has no downloadable files.)"
 }

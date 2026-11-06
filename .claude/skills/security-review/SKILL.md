@@ -27,7 +27,13 @@ section of `CLAUDE.md` first; every finding should reference the invariant it br
 6. **Secrets** — `git ls-files | xargs grep -nEi "(password|secret|token|api[_-]?key)\s*[=:]"` and review hits;
    `.env` files are git-ignored; compose/CI use placeholders or generated values only.
 7. **Logging** — no cookies, passwords, tokens or request bodies logged (`api/middleware.py`, `structlog` calls).
-8. **Infrastructure** — containers run as non-root, ports bound to 127.0.0.1, no debug flags in production config.
+8. **Outbound fetching (SSRF)** — any new HTTP client must go through `SafeFetcher`
+   (`modules/lead_intelligence/integrations/fetcher.py`); run `uv run pytest -q tests/test_li_ssrf.py`.
+   Test doubles (`RESEARCH_FETCH_BACKEND=fixtures`, `LLM_PROVIDER=fixture`) must stay refused in production.
+9. **Untrusted content / LLM** — website text only enters prompts inside neutralised delimiters; model output
+   is validated (citations exist and are verbatim, unsupported claims flagged, foreign links stripped) and
+   rendered as plain text.
+10. **Infrastructure** — containers run as non-root, ports bound to 127.0.0.1, no debug flags in production config.
 
 ## Output
 

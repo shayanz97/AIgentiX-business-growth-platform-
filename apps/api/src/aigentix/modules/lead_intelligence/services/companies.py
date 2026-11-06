@@ -58,22 +58,17 @@ def link_companies(db: Session, tenant: TenantContext, project_id: uuid.UUID, co
     )
     if missing := [str(i) for i in ids if i not in owned]:
         raise NotFound("Company not found", details={"company_ids": missing})
+    rows = [
+        {"research_project_id": project_id, "company_id": cid, "organization_id": tenant.organization_id} for cid in ids
+    ]
     statement = (
         pg_insert(ResearchProjectCompany)
-        .values(
-            [
-                {
-                    "research_project_id": project_id,
-                    "company_id": cid,
-                    "organization_id": tenant.organization_id,
-                }
-                for cid in ids
-            ]
-        )
+        .values(rows)
         .on_conflict_do_nothing()
+        .returning(ResearchProjectCompany.company_id)
     )
-    result = db.execute(statement)
-    return int(result.rowcount)  # type: ignore[attr-defined]
+    # Count RETURNING rows: rowcount is not reliable for multi-row inserts.
+    return len(db.execute(statement).all())
 
 
 def create_company(

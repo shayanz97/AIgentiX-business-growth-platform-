@@ -32,7 +32,8 @@ test.describe.serial("Sprint 1 acceptance", () => {
     await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
     await expect(page.getByText("member@acme.example")).toBeVisible();
     await nav.getByRole("link", { name: "Lead Intelligence" }).click();
-    await expect(page.getByRole("heading", { name: "Research projects" })).toBeVisible();
+    await page.getByRole("navigation", { name: "Lead Intelligence sections" }).getByRole("link", { name: "Projects" }).click();
+    await expect(page.getByRole("heading", { name: "Research projects", exact: true })).toBeVisible();
 
     // Create a project.
     await page.getByRole("link", { name: "New project" }).click();
@@ -69,7 +70,7 @@ test.describe.serial("Sprint 1 acceptance", () => {
     await signIn(page, GLOBEX_OWNER);
     await expect(page.getByLabel("Active organization").locator("option:checked")).toHaveText("Globex Analytics");
     await page.goto("/projects");
-    await expect(page.getByRole("heading", { name: "Research projects" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Research projects", exact: true })).toBeVisible();
     await expect(page.getByText(projectName)).toHaveCount(0);
 
     await page.goto(projectPath);

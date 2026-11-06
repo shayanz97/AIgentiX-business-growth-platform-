@@ -39,7 +39,9 @@ def research_registry(
             transport=fixture_transport(),
         )
 
-    deps = ResearchDependencies(settings=settings, fetcher_factory=fetcher or default_fetcher, provider_factory=provider)
+    deps = ResearchDependencies(
+        settings=settings, fetcher_factory=fetcher or default_fetcher, provider_factory=provider
+    )
     registry = WorkflowRegistry()
     registry.register(RESEARCH_WORKFLOW, make_research_handler(lambda: deps), max_concurrent=2)
     return registry

@@ -1,8 +1,9 @@
 # AIgentiX Growth Platform
 
 Modular, multi-tenant SaaS platform that helps SMEs automate business growth with AI agents.
-**Status: Sprint 1 — platform foundation** (auth, organizations, research projects, workflow/worker skeleton).
-AI research and analysis start in Sprint 2.
+**Status: Sprint 2 — Lead Intelligence.** Add companies (single URL or CSV), research their public websites safely
+in the background, review evidence with sources, and review AI-proposed automation opportunities. Built on the
+Sprint 1 foundation (auth, organizations, tenant isolation, worker).
 
 | Component | Tech | Path |
 |---|---|---|
@@ -11,7 +12,7 @@ AI research and analysis start in Sprint 2.
 | Database | PostgreSQL 16 | Docker volume `pgdata` |
 | API contract | OpenAPI → TypeScript types | `packages/shared-contracts` |
 
-Docs: [Architecture](docs/ARCHITECTURE.md) · [Sprint 1 plan](docs/SPRINT_1_PLAN.md) · [Claude Code guide](CLAUDE.md)
+Docs: [Architecture](docs/ARCHITECTURE.md) · [Sprint 2 plan](docs/SPRINT_2_PLAN.md) · [Sprint 1 plan](docs/SPRINT_1_PLAN.md) · [Claude Code guide](CLAUDE.md)
 
 ## Quick start (Docker)
 
@@ -41,6 +42,31 @@ URLs: web http://localhost:3000 · API docs http://localhost:8000/api/v1/docs ·
 
 Stop with `docker compose down` (add `-v` to delete the database).
 
+### Lead Intelligence
+
+1. **Lead Intelligence → Companies → Add companies**: enter a website, or upload a CSV (`name,website` header,
+   max 100 rows; preview first, duplicates and invalid rows are reported). Sample:
+   `apps/api/src/aigentix/modules/lead_intelligence/fixtures/companies_sample.csv`.
+2. **Start research** on a company (or **Research all companies** on a project). Progress, steps, retries, errors,
+   tokens and estimated cost are on the research-run page.
+3. The company page shows the profile, evidence with source links, and AI opportunities to **Mark for review**,
+   **Approve for investigation** or **Reject** (with a note). The **Opportunities** tab is the review queue.
+
+AI analysis needs `ANTHROPIC_API_KEY` in `.env` (extraction: `claude-haiku-5-5`, audit: `claude-opus-5-5`,
+per-run cost cap `LLM_MAX_COST_PER_RUN_USD`). Without a key, research still runs and the UI states that AI analysis
+is unavailable — nothing is fabricated.
+
+**Offline demo / CI mode** (no internet, no key): bundled fixture websites under the reserved `.example` TLD and a
+rule-based LLM test double, clearly labelled in the UI:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build --wait
+# then add e.g. https://northwind-logistics.example or import the sample CSV
+```
+
+The research worker only fetches public websites (SSRF-protected), respects robots.txt, reads at most 8 pages per
+company and spaces requests per domain. Containers need outbound internet access for real websites.
+
 ## Local development (without Docker for the apps)
 
 Prerequisites: Python 3.12+, [uv](https://docs.astral.sh/uv/), Node 22, PostgreSQL 16 (or `docker compose up -d db`).
@@ -64,8 +90,11 @@ export TEST_DATABASE_URL=postgresql://aigentix:<password>@localhost:5432/aigenti
 make verify        # ruff, mypy --strict, pytest, eslint, tsc, vitest, next build
 make contracts     # regenerate OpenAPI + TS types after API changes (CI checks freshness)
 
-# End-to-end (stack running and seeded):
+# End-to-end (stack started with -f docker-compose.e2e.yml and seeded):
 E2E_PASSWORD=<seed password> make e2e
+
+# Research evaluation over 12 fixture companies (writes a Markdown report):
+cd apps/api && RESEARCH_EVAL_REPORT=/tmp/eval.md uv run pytest -q tests/test_li_eval.py
 ```
 
 CI (`.github/workflows/ci.yml`) runs backend, contract-freshness, frontend and a Docker Compose + Playwright
@@ -78,14 +107,16 @@ apps/api/src/aigentix/
   core/          config, database, logging, errors
   api/           FastAPI app, middleware, auth/tenant dependencies, platform routes
   platform/      identity (users, sessions), organizations (tenancy, roles), workflows (runs, registry)
-  modules/       business modules (lead_intelligence) + explicit registry
+  modules/       business modules + explicit registry
+    lead_intelligence/  domain/ (domains, CSV) · integrations/ (SafeFetcher, robots, HTML, LLM, fixture web) ·
+                        agents/ (researcher, auditor, prompts, test doubles) · services/ · routes/ · workflows/ · fixtures/
   worker/        background worker (PostgreSQL-backed queue)
   cli.py         create-user, seed-dev
 apps/api/migrations/   Alembic migrations
 apps/web/src/          app routes, components, typed API client, session context
 packages/shared-contracts/  generated API contract
 infra/docker/          Dockerfiles
-.claude/skills/        /verify, /architecture-review, /security-review, /handoff
+.claude/skills/        /verify, /architecture-review, /security-review, /handoff, /research-eval
 ```
 
 ## Configuration

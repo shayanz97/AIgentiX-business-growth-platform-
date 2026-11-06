@@ -41,6 +41,11 @@ jobs:
       - run: uv run ruff format --check src tests migrations
       - run: uv run mypy
       - run: uv run pytest
+        env:
+          RESEARCH_EVAL_REPORT: research-eval.md
+      - name: Research evaluation report
+        if: always()
+        run: cat research-eval.md >> "$GITHUB_STEP_SUMMARY" || true
 
   contracts:
     name: API contract is up to date
@@ -101,8 +106,8 @@ jobs:
           cp .env.example .env
           sed -i "s/replace-with-a-long-random-password/$(openssl rand -hex 24)/" .env
           echo "E2E_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
-      - name: Build and start the stack
-        run: docker compose up -d --build --wait --wait-timeout 300
+      - name: Build and start the stack (offline research fixtures + LLM test double)
+        run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build --wait --wait-timeout 300
       - name: Seed demo tenants
         run: docker compose run --rm -e AIGENTIX_PASSWORD="$E2E_PASSWORD" api python -m aigentix.cli seed-dev
       - name: Install Playwright
@@ -117,13 +122,19 @@ jobs:
         run: |
           count=$(docker compose exec -T db psql -U aigentix -d aigentix -tAc "SELECT count(*) FROM research_projects WHERE name LIKE 'E2E project %'")
           test "$count" -ge 1
+      - name: Verify research results persisted in PostgreSQL
+        run: |
+          docker compose exec -T db psql -U aigentix -d aigentix -tAc \
+            "SELECT count(*) FROM evidence" | xargs test 1 -le
+          docker compose exec -T db psql -U aigentix -d aigentix -tAc \
+            "SELECT count(*) FROM opportunity_evidence" | xargs test 1 -le
       - name: Service logs
         if: failure()
-        run: docker compose logs --no-color
+        run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml logs --no-color
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-report
           path: apps/web/playwright-report
       - if: always()
-        run: docker compose down -v
+        run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml down -v

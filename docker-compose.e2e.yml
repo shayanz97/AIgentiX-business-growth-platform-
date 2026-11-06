@@ -1,0 +1,17 @@
+# Overlay for CI/E2E and offline demos: research reads the bundled *.example fixture sites and uses the
+# deterministic LLM test double. Both are refused when ENVIRONMENT=production.
+#   docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build --wait
+x-offline-research: &offline
+  ENVIRONMENT: test
+  RESEARCH_FETCH_BACKEND: fixtures
+  LLM_PROVIDER: fixture
+  RESEARCH_DOMAIN_MIN_INTERVAL_SECONDS: "0"
+  WORKER_POLL_INTERVAL_SECONDS: "0.5"
+
+services:
+  migrate:
+    environment: *offline
+  api:
+    environment: *offline
+  worker:
+    environment: *offline

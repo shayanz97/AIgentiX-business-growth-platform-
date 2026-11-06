@@ -34,10 +34,11 @@ authorization decisions, and never import FastAPI. Routes validate input, call a
 - The client selects the active organization with the `X-Organization-Id` header. `api.deps.get_tenant` resolves it
   through `resolve_tenant`, which requires a membership row for the authenticated user — otherwise 403.
 - Services filter every query by `tenant.organization_id`. A foreign resource fetched by id returns 404.
-- Database-level guard: `workflow_runs (project_id, organization_id)` has a composite FK to
-  `research_projects (id, organization_id)`, so a run can never point to another tenant's project.
-- Future entities (`companies`, `evidence`, `opportunities`, `lead_scores`, `approvals`, `activities`) follow the
-  same pattern; child tables that reference a project should use the same composite-FK technique.
+- Database-level guard: every link between tenant-owned rows is a composite FK including `organization_id`
+  (`research_runs → workflow_runs/companies/research_projects`, `research_sources`, `evidence`, `opportunities`,
+  `opportunity_evidence`, `research_project_companies`), so the database rejects cross-tenant links even if a
+  service had a bug. Companies are deduplicated per organization (`organization_id, canonical_domain`).
+- Future entities (`lead_scores`, `approvals`, `activities`) follow the same pattern.
 
 ## Authentication
 
@@ -57,39 +58,64 @@ router, which lets the UI show them as disabled without pretending they work.
 
 ## Workflows and the worker
 
-- `workflow_runs`: `queued → running → succeeded | failed | cancelled`, with `started_at`, `completed_at`,
-  `error_type`, `error_message`, `attempts`, JSONB `metadata` (input and result).
-- The worker claims the oldest queued run with `SELECT … FOR UPDATE SKIP LOCKED` (safe with several workers),
-  commits the `running` state, runs the handler, then records success (result merged into metadata) or failure.
-- PostgreSQL is the queue: no Redis/Celery/Temporal until throughput or scheduling needs justify it.
-- Sprint 1 ships one platform workflow, `platform.noop`, used to prove the pipeline end to end. No API endpoint
-  enqueues runs yet; `GET /api/v1/workflows` lists them.
+- `workflow_runs` (platform, module-agnostic): `pending → running → completed | partial | failed | cancelled`,
+  `current_step`, `progress`, `attempts/max_attempts`, `next_attempt_at`, `heartbeat_at`, `cancel_requested_at`,
+  `error_type/error_message`, token counts, `estimated_cost_usd`, JSONB `metadata` (input, persisted step state,
+  result). Module tables link to runs with composite FKs (e.g. `research_runs`).
+- Claiming: `SELECT … FOR UPDATE SKIP LOCKED` under a transaction-scoped advisory lock, which also enforces
+  per-workflow-type concurrency limits across workers (`RESEARCH_MAX_CONCURRENT_RUNS`).
+- Handlers receive a `WorkflowContext`: `checkpoint(step, progress)` commits work, records the step, heart-beats
+  and raises on cancellation; `get_state/set_state` persist resumable state; `record_usage` adds model spend in
+  its own transaction so it is never lost.
+- Errors: `WorkflowError` → failed (message shown to users); `TransientWorkflowError` / DB `OperationalError` →
+  re-queued with exponential backoff until `max_attempts`; anything else → failed with a generic message (details
+  only in logs). Housekeeping re-queues runs whose heartbeat stopped (resume from the persisted step) or fails
+  them after the last attempt, and purges expired sessions.
+- PostgreSQL remains the queue: no Redis/Celery/Temporal/Kafka.
 
-### LangGraph integration plan (Sprint 2)
+## Lead Intelligence research (Sprint 2)
 
-1. `modules/lead_intelligence/workflows/company_research.py` builds a LangGraph `StateGraph`
-   (fetch site → extract evidence → opportunity audit → score). Graph state is a Pydantic model.
-2. A handler `def company_research(db, run) -> dict` compiles and invokes the graph with input from
-   `run.metadata`, persisting domain results (companies, evidence, opportunities, scores) via the module's service
-   functions, scoped by `run.organization_id`. It is registered under `COMPANY_RESEARCH_WORKFLOW`.
-3. An endpoint `POST /api/v1/projects/{id}/research` enqueues the run (tenant-checked) and the UI polls
-   `GET /api/v1/workflows?project_id=…`.
-4. If multi-step resumability or human approval is needed, add LangGraph's PostgreSQL checkpointer keyed by
-   `workflow_runs.id` — still no extra infrastructure.
-5. LLM/HTTP clients live in `aigentix/integrations/` behind small interfaces so they can be faked in tests.
+```
+VALIDATE_INPUT → FETCH_WEBSITE → DISCOVER_RELEVANT_PAGES → EXTRACT_INFORMATION → SAVE_EVIDENCE
+              → AI_OPPORTUNITY_AUDIT → PERSIST_RESULTS → completed | partial
+```
 
-### Decision: `workflow_runs.project_id` (accepted trade-off)
+| Step | What happens | Failure handling |
+|---|---|---|
+| validate | `parse_website` (http/https, ports 80/443, no IP literals/internal TLDs/credentials) | permanent |
+| fetch | robots.txt, homepage via `SafeFetcher`, readable text + signals, source stored | blocked/robots/4xx permanent; timeouts/5xx/429 transient |
+| discover | ≤ `RESEARCH_MAX_PAGES`-1 same-site pages, one per category first (about, services, contact, support, booking, FAQ, products, careers, technology); excludes login/cart/legal/personal-profile/file URLs; robots + crawl-delay honoured | per-page failures recorded, run continues |
+| extract | deterministic signals (forms, booking/chat widgets, FAQ, careers, documents, e-commerce, support, description) + optional LLM extraction (`claude-haiku-5-5`) whose assertions are kept only if their excerpt is found verbatim in the cited source | AI errors: transient → retry, last attempt → `partial` |
+| save evidence | evidence replaced for the run; company profile fields updated only from observed or ≥medium-confidence assertions | — |
+| audit | `claude-opus-5-5` proposes ≤3 opportunities citing evidence IDs; validation drops uncited ones, flags unsupported negative claims, caps confidence, strips foreign links | as extract; per-run cost cap |
+| persist | opportunities + evidence links replaced for the run | — |
 
-`workflow_runs` (platform) has a composite FK to `research_projects` (Lead Intelligence). This couples a platform
-table to one module's table at the schema level, but buys a database-enforced same-tenant guarantee for the only
-run subject that exists. **Revisit before a second module needs runs**: either a generic
-`subject_type`/`subject_id` (integrity enforced in services + tests) or module-owned link tables
-(`lead_intelligence_project_runs(run_id, project_id, organization_id)` with composite FKs to both sides).
-Python code is unaffected either way: the platform never imports module models.
+**SSRF protection (`SafeFetcher`)**: resolve once; every address must be global unicast (blocks loopback, RFC1918,
+link-local/metadata, CGNAT, multicast, reserved, IPv4-mapped, NAT64, 6to4, Teredo); connect to the validated IP with
+the original Host header and TLS SNI (no DNS-rebinding window); redirects followed manually (≤5) and re-validated;
+environment proxies ignored; responses streamed with a byte cap applied after decompression; connect/read timeouts;
+per-domain request spacing.
 
-Worker failure handling: handler exceptions are recorded in a fresh session (so a broken transaction cannot leave a
-run in `running`); only `WorkflowError` messages are shown to tenant users, other exception text stays in the worker
-log; housekeeping fails runs stuck in `running` longer than `WORKER_STALE_RUN_MINUTES` and purges expired sessions.
+**Untrusted content**: hidden elements, comments, scripts, `<meta>`/`<title>` and site chrome (nav/header/footer)
+are removed from text; e-mail addresses and phone numbers are redacted before storage. Prompts wrap content in
+`<website_content>`/`<evidence>` blocks with `<`/`>` neutralised so page text cannot close them, and the system
+prompt states that block content is data. Output is never trusted: see validation above. The UI renders all model
+text as plain text.
+
+**AI availability**: no `ANTHROPIC_API_KEY` → deterministic research only, run ends `partial` with "AI analysis
+unavailable"; no opportunities are generated. `LLM_PROVIDER=fixture` (rule-based test double) and
+`RESEARCH_FETCH_BACKEND=fixtures` (bundled `*.example` sites) exist for CI/E2E/demos and are refused in production.
+Models used and prompt versions are stored with every run and shown in the UI.
+
+**Retention**: page text is truncated (`RESEARCH_MAX_TEXT_CHARS`) and kept only as provenance for evidence; no
+full-site copies, no personal profiles crawled, contact details redacted.
+
+### Decision: no LangGraph in Sprint 2
+
+The workflow is a fixed linear sequence; step outputs are persisted in PostgreSQL, which already gives resume,
+retry, cancellation and observability. LangGraph would add a dependency and a second state store without a
+concrete benefit. Revisit when a workflow needs branching/looping agent graphs or human-in-the-loop interrupts —
+the handler boundary (`WorkflowContext` → `WorkflowResult`) is where a graph would be invoked.
 
 ## API conventions
 
@@ -100,15 +126,15 @@ log; housekeeping fails runs stuck in `running` longer than `WORKER_STALE_RUN_MI
   `too_many_attempts` (429), `service_busy` (503).
 - Contract: `make contracts` regenerates `packages/shared-contracts`; the web client is typed from it.
 
-## Known limitations (Sprint 1)
+## Known limitations
 
 - No public sign-up, invitations, password reset or e-mail verification (users are created via CLI).
-- Login throttling (10 failures / 15 min per account, max 4 concurrent Argon2 hashes) is **in-process**: correct for
-  one API process. With several processes/replicas, add an IP-based limit at the reverse proxy and/or move the
-  counters to PostgreSQL.
-- Stuck runs are failed (not retried) after `WORKER_STALE_RUN_MINUTES`; retries/backoff come with real workflows.
-- `target_url` is only syntax-validated. Before Sprint 2 fetches it, resolve the host and block private,
-  loopback and link-local ranges (re-check after each redirect) to prevent SSRF.
-- No member management UI/API beyond listing; no project update/archive endpoints.
+- Login throttling and per-domain request spacing are in-process: correct for one API / one worker process. With
+  several, add an IP limit at the reverse proxy and move counters/spacing to PostgreSQL.
+- Research covers static HTML only (no JavaScript rendering), English-centric page categories and signal keywords.
+- The concurrency limit counts `running` runs only; the advisory lock makes the check exact across workers.
+- Re-researching a company creates a new run; the company page shows the latest finished run (older runs and
+  their reviewed opportunities stay available by run id).
+- Opportunity quality has been evaluated with fixture sites and a rule-based test double; no live-model
+  evaluation has been run (no API key in the build environment). See `/research-eval`.
 - `API_INTERNAL_URL` is fixed at web build time (Next.js rewrites are compiled).
-- The active organization lives in `localStorage`; the server never trusts it without membership checks.

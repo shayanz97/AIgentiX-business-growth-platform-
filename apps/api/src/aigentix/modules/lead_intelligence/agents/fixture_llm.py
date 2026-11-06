@@ -182,7 +182,7 @@ class ScriptedLLMProvider:
         if not self.steps:
             raise AssertionError("ScriptedLLMProvider ran out of scripted responses")
         step = self.steps.pop(0)
-        if isinstance(step, Exception):
+        if isinstance(step, BaseException):
             raise step
         output = step(str(messages[-1]["content"])) if callable(step) and not isinstance(step, BaseModel) else step
         usage = LLMUsage(model=f"scripted-{task}", input_tokens=100, output_tokens=50, cost_usd=self.cost_per_call)

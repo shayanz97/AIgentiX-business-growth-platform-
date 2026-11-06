@@ -288,10 +288,10 @@ class _Research:
         homepage: str = self.ctx.get_state("homepage")
         if any(s.page_category == "home" for s in self._sources()):
             return
-        robots = self._robots(homepage)
-        if not robots.allows(self.settings.research_robots_token, homepage):
-            raise WorkflowError("The website's robots.txt does not allow automated research.")
         try:
+            robots = self._robots(homepage)
+            if not robots.allows(self.settings.research_robots_token, homepage):
+                raise WorkflowError("The website's robots.txt does not allow automated research.")
             page = self._fetch(self._fetcher, homepage)
         except BlockedDestination as exc:
             raise WorkflowError(f"The website was blocked for safety reasons: {exc}") from exc
@@ -329,7 +329,12 @@ class _Research:
         candidates = discover_relevant_links(links, domain=domain, limit=self.settings.research_max_pages - 1)
         existing = {s.source_url for s in self._sources()}
         homepage: str = self.ctx.get_state("homepage")
-        robots = self._robots(homepage)
+        try:
+            robots = self._robots(homepage)
+        except FetchError as exc:
+            if exc.transient:
+                raise TransientWorkflowError(f"Could not load robots.txt: {exc}") from exc
+            raise WorkflowError(f"Could not load robots.txt: {exc}") from exc
         delay = min(robots.crawl_delay or 0.0, _CRAWL_DELAY_CAP_SECONDS)
         for index, (url, category) in enumerate(candidates):
             if url in existing:
@@ -511,7 +516,8 @@ class _Research:
             "website_description": meta.get("description"),
             "fields": fields,
             "unknown_fields": sorted(
-                set(self.ctx.get_state("unknown_fields", [])) | {f for f in all_fields if f not in fields}
+                (set(self.ctx.get_state("unknown_fields", [])) | {f for f in all_fields if f not in fields})
+                - ({"description"} if meta.get("description") else set())
             ),
             "observed_signals": signals,
             "generated_by": {
