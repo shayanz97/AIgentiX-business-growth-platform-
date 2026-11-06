@@ -11,9 +11,9 @@ from aigentix.modules.lead_intelligence.agents.fixture_llm import FixtureLLMProv
 from aigentix.modules.lead_intelligence.config import ResearchSettings
 from aigentix.modules.lead_intelligence.integrations.fetcher import FetcherConfig, SafeFetcher
 from aigentix.modules.lead_intelligence.integrations.fixture_web import fixture_resolver, fixture_transport
-from aigentix.modules.lead_intelligence.integrations.llm import LLMProvider
 from aigentix.modules.lead_intelligence.workflows.constants import RESEARCH_WORKFLOW
 from aigentix.modules.lead_intelligence.workflows.research import ResearchDependencies, make_research_handler
+from aigentix.platform.llm import LLMProvider
 from aigentix.platform.workflows.registry import WorkflowRegistry
 from aigentix.worker.runner import WorkerSettings, run_once
 from tests.conftest import Tenant

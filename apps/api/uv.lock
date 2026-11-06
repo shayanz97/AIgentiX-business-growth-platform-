@@ -18,6 +18,7 @@ dependencies = [
     { name = "email-validator" },
     { name = "fastapi" },
     { name = "httpx2" },
+    { name = "openai" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pwdlib", extra = ["argon2"] },
     { name = "pydantic" },
@@ -43,6 +44,7 @@ requires-dist = [
     { name = "email-validator", specifier = ">=2.3" },
     { name = "fastapi", specifier = ">=0.162,<1" },
     { name = "httpx2", specifier = ">=2.16" },
+    { name = "openai", specifier = ">=3.46,<4" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3" },
     { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3" },
     { name = "pydantic", specifier = ">=2.14,<3" },
@@ -944,6 +946,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d0/6f/43edf3be2748d0e40974a5ee046a8bb4c9961a4bdd3e7d5c6dcbf32d1af6/mypy_extensions-1.2.0.tar.gz", hash = "sha256:c6e275a07f1c2fc096b62940452d0eaa3f3af7de45d704787866240a7c6d5a51", size = 6566, upload-time = "2026-11-03T16:26:33.692Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b5/99/7b1adac7e97ce7bbda34792dc6e9b2f5cc5cffd1875883f78a818b2a2687/mypy_extensions-1.2.0-py3-none-any.whl", hash = "sha256:993e7a20aa5671eb41a7132cf555af30062da99729601601b9a8382b11cae768", size = 5114, upload-time = "2026-11-03T16:26:32.731Z" },
+]
+
+[[package]]
+name = "openai"
+version = "3.46.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "httpx2" },
+    { name = "jiter" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/34/b6/23cddcb571d6eafe7b4bb58c7e0a068076121b7b001b776179994cca6a03/openai-3.46.0.tar.gz", hash = "sha256:fb34cd8cab6809ad0aa8dc42493fa622aaa87c814fd8e67a6fb3fa1f1e5d952d", size = 2408622, upload-time = "2026-11-05T00:55:55.463Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f4/63/454e6faad68ac903e7669932db8d0a91c95dfca829ec9476e52045b17684/openai-3.46.0-py3-none-any.whl", hash = "sha256:7b650117e9bf539029bf880c2eff94a26f281394f6572284efa5d068d4b1c98e", size = 2438918, upload-time = "2026-11-05T00:55:53.301Z" },
 ]
 
 [[package]]

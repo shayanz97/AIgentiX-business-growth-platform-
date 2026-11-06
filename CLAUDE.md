@@ -15,7 +15,8 @@ FastAPI + Pydantic v2 + SQLAlchemy 2 (sync, psycopg 3) + Alembic + PostgreSQL 16
 Next.js 16 App Router + React 19 + Tailwind 4 + TypeScript 5.9 + Zod · openapi-typescript/openapi-fetch ·
 Docker Compose · GitHub Actions. Auth: pwdlib (Argon2id) + server-side DB sessions. Worker: PostgreSQL-backed queue
 (`SELECT … FOR UPDATE SKIP LOCKED`) with step checkpoints, retries, cancellation. Research: httpx2 `SafeFetcher`
-(SSRF-safe) + BeautifulSoup; LLM via `anthropic` SDK behind `LLMProvider` (Haiku extraction, Opus audit).
+(SSRF-safe) + BeautifulSoup. LLMs via the shared `aigentix.platform.llm` layer: `LLMProvider` protocol, vendor
+clients for Anthropic and OpenAI, per-task `provider:model` routes from config (default Haiku extraction, Opus audit).
 LangGraph deliberately not used yet (linear workflow; see docs/ARCHITECTURE.md).
 
 ## Repository structure
@@ -67,5 +68,7 @@ New migration: `cd apps/api && uv run alembic revision --autogenerate -m "..."` 
   idempotent (resume after crash/retry), raise `WorkflowError` (permanent, user-safe message) or
   `TransientWorkflowError` (retried), and report model spend with `ctx.record_usage`.
 - External providers (LLM, search, fetching) stay behind small interfaces with test doubles; prompts are versioned.
+- Modules never import a vendor SDK: call `aigentix.platform.llm.LLMProvider` and expose a route setting per task.
+  New vendors are a `ModelClient` in `platform/llm/providers/` plus an entry in `router.PROVIDERS`.
 - Do not show unimplemented features as functional in the UI; planned modules stay disabled.
 - Changing an API contract → `make contracts` and commit both generated files in the same change.

@@ -3,13 +3,10 @@
 import time
 import uuid
 from decimal import Decimal
-from types import SimpleNamespace
 from typing import Any
 
-import anthropic
 import httpx2
 import pytest
-from pydantic import BaseModel, ValidationError
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 
@@ -26,14 +23,7 @@ from aigentix.modules.lead_intelligence.agents.schemas import (
 )
 from aigentix.modules.lead_intelligence.agents.text_safety import strip_foreign_urls
 from aigentix.modules.lead_intelligence.integrations.fetcher import FetcherConfig, SafeFetcher, TransientFetchError
-from aigentix.modules.lead_intelligence.integrations.llm import (
-    AnthropicProvider,
-    LLMBudgetExceeded,
-    LLMInvalidOutput,
-    LLMPermanentError,
-    LLMTransientError,
-    max_output_tokens_within,
-)
+from aigentix.platform.llm import LLMBudgetExceeded, LLMInvalidOutput, max_output_tokens_within
 from aigentix.platform.organizations.service import resolve_tenant
 from aigentix.platform.workflows import service
 from aigentix.platform.workflows.context import WorkflowContext, WorkflowResult
@@ -316,81 +306,6 @@ def test_research_skips_ai_when_remaining_budget_cannot_cover_output(tenant_a: T
     assert run["ai_status"] == "skipped"
     assert len(provider.calls) == 0  # scripted models are unknown → priced pessimistically → no room for output
     assert run["estimated_cost_usd"] <= 0.0015
-
-
-# --- AnthropicProvider mapping (fake SDK client, no network) ---------------------------------------
-
-
-class _Out(BaseModel):
-    value: str
-
-
-def _provider(behaviour: Any) -> AnthropicProvider:
-    messages = SimpleNamespace(parse=behaviour)
-    client = SimpleNamespace(messages=messages, beta=SimpleNamespace(messages=messages))
-    return AnthropicProvider(
-        api_key="test",
-        extraction_model="claude-haiku-5-5",
-        audit_model="claude-opus-5-5",
-        timeout_seconds=5,
-        client=client,  # type: ignore[arg-type]
-    )
-
-
-def _response(stop_reason: str, parsed: Any) -> Any:
-    usage = SimpleNamespace(input_tokens=1_000_000, output_tokens=100_000)
-    return SimpleNamespace(model="claude-haiku-5-5", usage=usage, stop_reason=stop_reason, parsed_output=parsed)
-
-
-def test_anthropic_success_reports_usage_and_cost() -> None:
-    result = _provider(lambda **kw: _response("end_turn", _Out(value="x"))).structured(
-        task="extraction", system="s", messages=[], output_model=_Out, max_tokens=100
-    )
-    assert result.output.value == "x"
-    assert result.usage.cost_usd == Decimal("0.15")  # 1M in * $0.10 + 0.1M out * $0.50
-
-
-def test_anthropic_refusal_is_permanent_and_billed() -> None:
-    with pytest.raises(LLMPermanentError) as info:
-        _provider(lambda **kw: _response("refusal", None)).structured(
-            task="extraction", system="s", messages=[], output_model=_Out, max_tokens=100
-        )
-    assert info.value.usage is not None
-
-
-def test_anthropic_connection_error_is_transient() -> None:
-    def boom(**kw: Any) -> Any:
-        raise anthropic.APIConnectionError(request=httpx2.Request("POST", "https://api.anthropic.com/v1/messages"))
-
-    with pytest.raises(LLMTransientError):
-        _provider(boom).structured(task="audit", system="s", messages=[], output_model=_Out, max_tokens=100)
-
-
-def test_anthropic_schema_failure_records_worst_case_usage() -> None:
-    def invalid(**kw: Any) -> Any:
-        try:
-            _Out.model_validate({})
-        except ValidationError as exc:
-            raise exc
-        raise AssertionError
-
-    with pytest.raises(LLMInvalidOutput) as info:
-        _provider(invalid).structured(task="extraction", system="s", messages=[], output_model=_Out, max_tokens=2_000)
-    assert info.value.usage is not None
-    assert info.value.usage.output_tokens == 2_000
-    assert info.value.usage.cost_usd > 0
-
-
-def test_audit_model_uses_server_side_fallback() -> None:
-    calls: list[dict[str, Any]] = []
-
-    def record(**kw: Any) -> Any:
-        calls.append(kw)
-        return _response("end_turn", _Out(value="x"))
-
-    _provider(record).structured(task="audit", system="s", messages=[], output_model=_Out, max_tokens=100)
-    assert calls[0]["fallbacks"] == "default"
-    assert calls[0]["betas"] == ["server-side-fallback-2026-07-01"]
 
 
 # --- L3: robots.txt 5xx is temporary -------------------------------------------------------------

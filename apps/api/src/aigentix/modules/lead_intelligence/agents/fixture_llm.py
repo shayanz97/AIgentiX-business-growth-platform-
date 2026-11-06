@@ -21,7 +21,7 @@ from aigentix.modules.lead_intelligence.agents.schemas import (
     ExtractionOutput,
     ProposedOpportunity,
 )
-from aigentix.modules.lead_intelligence.integrations.llm import LLMResponse, LLMUsage, Task
+from aigentix.platform.llm import LLMResponse, LLMUsage, Task
 
 FIXTURE_MODEL = "fixture-rules-v1"
 _SOURCE = re.compile(r'<website_content source_id="(S\d+)" page_type="(\w+)"[^>]*>\n(.*?)\n</website_content>', re.S)

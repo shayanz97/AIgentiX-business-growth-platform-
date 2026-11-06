@@ -15,7 +15,7 @@ from aigentix.modules.lead_intelligence.agents.text_safety import (
     neutralise_markup,
     strip_foreign_urls,
 )
-from aigentix.modules.lead_intelligence.integrations.llm import LLMProvider
+from aigentix.platform.llm import LLMProvider
 
 MAX_OPPORTUNITIES = 3
 _LABEL = re.compile(r"^E(\d+)$")

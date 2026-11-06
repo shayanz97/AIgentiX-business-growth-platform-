@@ -16,6 +16,8 @@ Suite: `apps/api/tests/test_li_eval.py`. Needs the test PostgreSQL (`TEST_DATABA
    `uv run pytest -q tests/test_li_research.py -k "injection or compromised or invalid"`.
 3. Live model run — **only if the user asks**, costs money:
    `RESEARCH_EVAL_LIVE=1 RESEARCH_EVAL_MAX_COST_USD=0.50 ANTHROPIC_API_KEY=… uv run pytest -q -s tests/test_li_eval.py -k live`
+   To compare providers, run once per configuration, e.g. with `LLM_ROUTE_EXTRACTION=openai:<model>
+   LLM_ROUTE_AUDIT=openai:<model> OPENAI_API_KEY=… LLM_PRICES_JSON=…`, and report both tables side by side.
    Stops starting new companies once the cap is spent. Report the exact cost from the report table.
 
 ## Report

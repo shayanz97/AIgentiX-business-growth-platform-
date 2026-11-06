@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from aigentix.modules.lead_intelligence.integrations.llm import (
+from aigentix.platform.llm import (
     LLMBudgetExceeded,
     LLMError,
     LLMInvalidOutput,

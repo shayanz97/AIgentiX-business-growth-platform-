@@ -121,6 +121,27 @@ negative characterisations without textual support are dropped.
 **Retention**: page text is truncated (`RESEARCH_MAX_TEXT_CHARS`) and kept only as provenance for evidence; no
 full-site copies, no personal profiles crawled, contact details redacted.
 
+### AI providers and model routing
+
+`aigentix/platform/llm/` is the shared LLM layer for every module:
+
+| File | Role |
+|---|---|
+| `base.py` | `LLMProvider` protocol (what modules call), `ModelClient` (one vendor), `LLMUsage`, error taxonomy (`LLMTransientError`, `LLMPermanentError`, `LLMUnavailable`, `LLMInvalidOutput`, `LLMBudgetExceeded`) |
+| `providers/anthropic.py` | Messages API `messages.parse` (+ server-side refusal fallback on supported models) |
+| `providers/openai.py` | Responses API `responses.parse` with Pydantic `text_format`, `store=False`; refusal / incomplete / failed statuses mapped to the error taxonomy |
+| `router.py` | `Route` (`provider:model`), `RoutedProvider` (task → vendor client + model), `PROVIDERS` registry |
+| `pricing.py` | built-in prices + `LLM_PRICES_JSON` overrides; unknown models priced pessimistically so budgets fail safe |
+| `config.py` | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, timeout, fallback flag, price overrides |
+
+Modules choose models per task. Lead Intelligence uses `LLM_ROUTE_EXTRACTION` and `LLM_ROUTE_AUDIT`
+(e.g. `anthropic:claude-haiku-5-5`, `openai:<model-id>`), falling back to `LLM_PROVIDER` + `LLM_*_MODEL`.
+Invalid routes fail at startup; a route whose provider has no key makes that task unavailable (extraction
+skipped → audit still runs on deterministic evidence; audit unavailable → run ends `partial`). Every run stores
+the `provider:model` labels it used. Adding a vendor = one `ModelClient` + one entry in `PROVIDERS`.
+Per-organization provider choice / bring-your-own-key is deliberately not implemented (needs encrypted
+secret storage).
+
 ### Decision: no LangGraph in Sprint 2
 
 The workflow is a fixed linear sequence; step outputs are persisted in PostgreSQL, which already gives resume,
@@ -148,4 +169,5 @@ the handler boundary (`WorkflowContext` → `WorkflowResult`) is where a graph w
   their reviewed opportunities stay available by run id).
 - Opportunity quality has been evaluated with fixture sites and a rule-based test double; no live-model
   evaluation has been run (no API key in the build environment). See `/research-eval`.
+- OpenAI models have no built-in prices: set `LLM_PRICES_JSON` for accurate cost estimates and budgets.
 - `API_INTERNAL_URL` is fixed at web build time (Next.js rewrites are compiled).
