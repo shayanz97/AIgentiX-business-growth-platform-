@@ -1,0 +1,17 @@
+{
+  "scenario": "weak",
+  "expected_company_name": "Oakridge Carpentry",
+  "expected_relevant_paths": [
+    "/gallery"
+  ],
+  "excluded_paths": [
+    "/img/kitchen.jpg",
+    "/img/stairs.jpg"
+  ],
+  "expected_signals": [
+    "service_offering"
+  ],
+  "expect_opportunities": "weak",
+  "expected_outcome": "completed",
+  "notes": "Tiny site with phone and email only and no forms. Auditor should return few or low-confidence opportunities and not invent evidence."
+}

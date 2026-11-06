@@ -1,0 +1,12 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/treatments": "treatments.html",
+    "/book-appointment": "book.html",
+    "/new-patients": "new-patients.html",
+    "/faq": "faq.html",
+    "/contact": "contact.html",
+    "/privacy": "privacy.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

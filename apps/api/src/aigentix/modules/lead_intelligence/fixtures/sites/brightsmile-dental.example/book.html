@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Book an appointment | BrightSmile Dental</title>
+  
+</head>
+<body>
+<header><a href="/" class="logo">BrightSmile Dental</a>
+  <nav aria-label="Main">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/treatments">Treatments</a></li>
+      <li><a href="/book-appointment">Book appointment</a></li>
+      <li><a href="/new-patients">New patients</a></li>
+      <li><a href="/faq">FAQ</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+<main>
+<h1>Book an appointment online</h1>
+<p>Choose a treatment, pick a time that suits you and we will send a confirmation by email and text message. Cancellations are free up to 24 hours before your visit.</p>
+<div id="booking-widget" class="booking-calendar" data-provider="widgetprovider">
+<form action="/book-appointment/submit" method="post" id="appointment-calendar">
+  <fieldset><legend>Appointment details</legend>
+  <p><label for="patient_name">Full name</label> <input type="text" id="patient_name" name="patient_name"></p>
+  <p><label for="email">Email</label> <input type="email" id="email" name="email"></p>
+  <p><label for="phone">Mobile</label> <input type="tel" id="phone" name="phone"></p>
+  <p><label for="treatment">Treatment</label> <select id="treatment" name="treatment"><option value="check-up">Check-up</option><option value="hygiene">Hygiene</option><option value="emergency">Emergency</option><option value="whitening">Whitening</option><option value="consultation">Consultation</option></select></p>
+  <p><label for="dentist">Preferred dentist</label> <select id="dentist" name="dentist"><option value="any_available">Any available</option><option value="dr._alder">Dr. Alder</option><option value="dr._birch">Dr. Birch</option><option value="dr._cedar">Dr. Cedar</option></select></p>
+  <p><label for="preferred_date">Preferred date</label> <input type="date" id="preferred_date" name="preferred_date"></p>
+  <p><label for="time_slot">Time slot</label> <select id="time_slot" name="time_slot"><option value="09:00">09:00</option><option value="10:30">10:30</option><option value="13:00">13:00</option><option value="15:30">15:30</option></select></p>
+  <button type="submit">Book appointment</button>
+  </fieldset>
+</form>
+</div>
+<script src="https://booking.widgetprovider.example/embed.js" async></script>
+<p>Prefer to talk? Call +1-555-0110.</p>
+</main>
+<footer>
+  <p>&copy; 2026 BrightSmile Dental. <a href="/privacy">Privacy</a></p>
+</footer>
+
+</body>
+</html>

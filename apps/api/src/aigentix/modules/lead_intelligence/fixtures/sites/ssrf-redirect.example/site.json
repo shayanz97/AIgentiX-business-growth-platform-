@@ -1,0 +1,7 @@
+{
+  "pages": {},
+  "robots": "User-agent: *\nAllow: /\n",
+  "redirects": {
+    "/": "http://169.254.169.254/latest/meta-data/"
+  }
+}

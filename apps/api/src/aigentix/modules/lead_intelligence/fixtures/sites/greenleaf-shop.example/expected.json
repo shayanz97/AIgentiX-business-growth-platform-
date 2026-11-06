@@ -1,0 +1,26 @@
+{
+  "scenario": "strong",
+  "expected_company_name": "Greenleaf Plant Shop",
+  "expected_relevant_paths": [
+    "/shop",
+    "/shipping-returns",
+    "/support",
+    "/faq",
+    "/about"
+  ],
+  "excluded_paths": [
+    "/cart",
+    "/account",
+    "/product/monstera"
+  ],
+  "expected_signals": [
+    "company_description",
+    "ecommerce",
+    "customer_support",
+    "live_chat",
+    "faq"
+  ],
+  "expect_opportunities": "strong",
+  "expected_outcome": "completed",
+  "notes": "Online shop with manual order-status handling and a live-chat widget script. Tests ecommerce, live_chat and exclusion of cart and account pages."
+}

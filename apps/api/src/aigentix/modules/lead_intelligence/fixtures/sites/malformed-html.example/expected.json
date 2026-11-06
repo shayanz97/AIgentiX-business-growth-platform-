@@ -1,0 +1,17 @@
+{
+  "scenario": "malformed",
+  "expected_company_name": "Pipewise Plumbing",
+  "expected_relevant_paths": [
+    "/services",
+    "/request-quote"
+  ],
+  "excluded_paths": [],
+  "expected_signals": [
+    "company_description",
+    "service_offering",
+    "quote_request_form"
+  ],
+  "expect_opportunities": "weak",
+  "expected_outcome": "completed",
+  "notes": "Broken HTML (unclosed and mis-nested tags, duplicate body, stray closers, script containing closing div strings, odd entities). Extraction must still recover services text and the quote form without crashing."
+}

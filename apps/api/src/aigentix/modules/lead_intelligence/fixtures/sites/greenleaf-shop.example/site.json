@@ -1,0 +1,13 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/shop": "shop.html",
+    "/shipping-returns": "shipping.html",
+    "/support": "support.html",
+    "/faq": "faq.html",
+    "/about": "about.html",
+    "/cart": "cart.html",
+    "/account": "account.html"
+  },
+  "robots": "User-agent: *\nAllow: /\nDisallow: /cart\nDisallow: /account\n"
+}

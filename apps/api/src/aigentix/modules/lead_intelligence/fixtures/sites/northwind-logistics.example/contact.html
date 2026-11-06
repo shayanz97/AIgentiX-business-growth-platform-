@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | Northwind Logistics</title>
+  
+</head>
+<body>
+<header><a href="/" class="logo">Northwind Logistics</a>
+  <nav aria-label="Main">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about-us">About us</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/track-shipment">Track a shipment</a></li>
+      <li><a href="/customer-service">Customer service</a></li>
+      <li><a href="/faq">FAQ</a></li>
+      <li><a href="/careers">Careers</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+<main>
+<h1>Contact us</h1>
+<p>Northwind Logistics, Example Quay 12, 3011 AA Rotterdam. Phone +1-555-0100. Email <a href="mailto:hello@northwind-logistics.example">hello@northwind-logistics.example</a>.</p>
+<form action="/contact/submit" method="post" id="contact-form">
+  <fieldset><legend>Contact form</legend>
+  <p><label for="name">Name</label> <input type="text" id="name" name="name"></p>
+  <p><label for="email">Email</label> <input type="email" id="email" name="email"></p>
+  <p><label for="phone">Phone</label> <input type="tel" id="phone" name="phone"></p>
+  <p><label for="topic">Topic</label> <select id="topic" name="topic"><option value="request_a_quote">Request a quote</option><option value="customer_service">Customer service</option><option value="partnership">Partnership</option><option value="other">Other</option></select></p>
+  <p><label for="message">How can we help?</label><br><textarea id="message" name="message" rows="5"></textarea></p>
+  <button type="submit">Send message</button>
+  </fieldset>
+</form>
+</main>
+<footer>
+  <p>&copy; 2026 Northwind Logistics. <a href="/privacy-policy">Privacy policy</a> | <a href="/login">Customer login</a> | <a href="https://www.linkedin.com/company/x">LinkedIn</a></p>
+</footer>
+
+</body>
+</html>

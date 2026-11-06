@@ -1,0 +1,20 @@
+{
+  "scenario": "strong",
+  "expected_company_name": "Fjord Accounting",
+  "expected_relevant_paths": [
+    "/about",
+    "/services",
+    "/client-portal-info",
+    "/careers"
+  ],
+  "excluded_paths": [],
+  "expected_signals": [
+    "company_description",
+    "service_offering",
+    "careers_hiring",
+    "document_workflow"
+  ],
+  "expect_opportunities": "strong",
+  "expected_outcome": "completed",
+  "notes": "Document-heavy accounting firm with manual receipt and invoice handling and no forms. Tests inference of document-processing automation opportunities from prose. (Corrected by the lead: the site describes document uploads, it has no downloadable files.)"
+}

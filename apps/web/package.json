@@ -1,0 +1,44 @@
+{
+  "name": "@aigentix/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "gen:api": "openapi-typescript --default-non-nullable false ../../packages/shared-contracts/openapi.json -o ../../packages/shared-contracts/schema.d.ts"
+  },
+  "dependencies": {
+    "next": "^16.4.5",
+    "openapi-fetch": "^0.17.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/postcss": "^4.3.4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.5",
+    "jsdom": "^31.0.0",
+    "openapi-typescript": "^7.13.0",
+    "tailwindcss": "^4.3.4",
+    "typescript": "~5.9.3",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/gallery": "gallery.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

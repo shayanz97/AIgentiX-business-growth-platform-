@@ -1,0 +1,12 @@
+{
+  "scenario": "ssrf_redirect",
+  "expected_company_name": "",
+  "expected_relevant_paths": [],
+  "excluded_paths": [
+    "/"
+  ],
+  "expected_signals": [],
+  "expect_opportunities": "none",
+  "expected_outcome": "failed",
+  "notes": "Homepage redirects to the cloud metadata IP address. The SSRF guard must block the redirect target and fail the run."
+}
