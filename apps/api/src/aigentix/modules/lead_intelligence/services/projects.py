@@ -25,9 +25,7 @@ def create_project(db: Session, tenant: TenantContext, data: ProjectCreate) -> R
     return project
 
 
-def list_projects(
-    db: Session, tenant: TenantContext, *, limit: int, offset: int
-) -> tuple[list[ResearchProject], int]:
+def list_projects(db: Session, tenant: TenantContext, *, limit: int, offset: int) -> tuple[list[ResearchProject], int]:
     scope = ResearchProject.organization_id == tenant.organization_id
     total = db.scalar(select(func.count()).select_from(ResearchProject).where(scope)) or 0
     rows = db.scalars(

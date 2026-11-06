@@ -108,9 +108,7 @@ def test_tenant_cannot_read_other_tenants_project_by_id(tenant_a: Tenant, tenant
     ("method", "path"),
     [("GET", "/api/v1/projects"), ("POST", "/api/v1/projects"), ("GET", "/api/v1/workflows")],
 )
-def test_spoofed_organization_header_is_rejected(
-    tenant_a: Tenant, tenant_b: Tenant, method: str, path: str
-) -> None:
+def test_spoofed_organization_header_is_rejected(tenant_a: Tenant, tenant_b: Tenant, method: str, path: str) -> None:
     """Bob sends Org A's id: membership is verified server-side, so this must fail."""
     response = tenant_b.client.request(method, path, json={"name": "intrusion"}, headers=tenant_a.headers)
     assert response.status_code == 403

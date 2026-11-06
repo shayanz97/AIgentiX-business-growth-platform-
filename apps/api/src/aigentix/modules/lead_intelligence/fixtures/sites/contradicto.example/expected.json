@@ -1,0 +1,17 @@
+{
+  "scenario": "conflicting",
+  "expected_company_name": "Contradicto",
+  "expected_relevant_paths": [
+    "/about",
+    "/company-facts",
+    "/contact"
+  ],
+  "excluded_paths": [],
+  "expected_signals": [
+    "company_description",
+    "contact_form"
+  ],
+  "expect_opportunities": "weak",
+  "expected_outcome": "completed",
+  "notes": "About page and company-facts page contradict on size, age and customer type. Output should flag the conflict and not state either claim as certain."
+}

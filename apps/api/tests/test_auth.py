@@ -54,9 +54,7 @@ def test_password_is_hashed_with_argon2(db: Session) -> None:
     ("email", "password"),
     [("carol@example.com", "wrong-password-123"), ("nobody@example.com", PASSWORD)],
 )
-def test_login_rejects_bad_credentials_uniformly(
-    client: TestClient, db: Session, email: str, password: str
-) -> None:
+def test_login_rejects_bad_credentials_uniformly(client: TestClient, db: Session, email: str, password: str) -> None:
     make_user(db, "carol@example.com")
     response = client.post("/api/v1/auth/login", json={"email": email, "password": password})
     assert response.status_code == 401

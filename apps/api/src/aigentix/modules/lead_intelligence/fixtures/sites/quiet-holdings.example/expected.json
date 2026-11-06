@@ -1,0 +1,10 @@
+{
+  "scenario": "none",
+  "expected_company_name": "Quiet Holdings",
+  "expected_relevant_paths": [],
+  "excluded_paths": [],
+  "expected_signals": [],
+  "expect_opportunities": "none",
+  "expected_outcome": "completed",
+  "notes": "Placeholder homepage with no usable information. The engine must complete and report insufficient evidence rather than fabricate opportunities."
+}

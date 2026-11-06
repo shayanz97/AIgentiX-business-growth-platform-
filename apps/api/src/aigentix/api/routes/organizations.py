@@ -37,15 +37,11 @@ def list_organizations(user: CurrentUser, db: DbSession) -> list[MembershipRead]
     ]
 
 
-@router.post(
-    "", response_model=MembershipRead, status_code=status.HTTP_201_CREATED, operation_id="createOrganization"
-)
+@router.post("", response_model=MembershipRead, status_code=status.HTTP_201_CREATED, operation_id="createOrganization")
 def create_organization(body: OrganizationCreate, user: CurrentUser, db: DbSession) -> MembershipRead:
     membership = orgs.create_organization(db, name=body.name, owner=user)
     db.commit()
-    return MembershipRead(
-        organization=OrganizationRead.model_validate(membership.organization), role=membership.role
-    )
+    return MembershipRead(organization=OrganizationRead.model_validate(membership.organization), role=membership.role)
 
 
 @router.patch("/{organization_id}", response_model=OrganizationRead, operation_id="updateOrganization")
@@ -61,6 +57,4 @@ def update_organization(
 @router.get("/{organization_id}/members", response_model=list[MemberRead], operation_id="listMembers")
 def list_members(organization_id: uuid.UUID, user: CurrentUser, db: DbSession) -> list[MemberRead]:
     tenant = orgs.resolve_tenant(db, user=user, organization_id=organization_id)
-    return [
-        MemberRead(user=UserRead.model_validate(m.user), role=m.role) for m in orgs.list_members(db, tenant)
-    ]
+    return [MemberRead(user=UserRead.model_validate(m.user), role=m.role) for m in orgs.list_members(db, tenant)]

@@ -1,0 +1,10 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/about": "about.html",
+    "/services": "services.html",
+    "/client-portal-info": "portal.html",
+    "/careers": "careers.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

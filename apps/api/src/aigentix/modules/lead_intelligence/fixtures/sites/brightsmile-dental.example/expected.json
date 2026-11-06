@@ -1,0 +1,27 @@
+{
+  "scenario": "strong",
+  "expected_company_name": "BrightSmile Dental",
+  "expected_relevant_paths": [
+    "/treatments",
+    "/book-appointment",
+    "/new-patients",
+    "/faq",
+    "/contact"
+  ],
+  "excluded_paths": [
+    "/privacy",
+    "/downloads/adult-intake-form.pdf",
+    "/downloads/child-intake-form.pdf"
+  ],
+  "expected_signals": [
+    "company_description",
+    "service_offering",
+    "online_booking",
+    "document_download",
+    "faq",
+    "contact_form"
+  ],
+  "expect_opportunities": "strong",
+  "expected_outcome": "completed",
+  "notes": "Clinic with an embedded booking widget script and manual PDF intake forms. Tests online_booking and document_download detection."
+}

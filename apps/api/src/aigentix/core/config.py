@@ -28,7 +28,8 @@ class Settings(BaseSettings):
 
     worker_poll_interval_seconds: float = Field(default=2.0, gt=0)
     # RUNNING runs older than this are failed by worker housekeeping (crash recovery).
-    worker_stale_run_minutes: int = Field(default=30, ge=1)
+    worker_stale_run_minutes: int = Field(default=10, ge=1)
+    worker_retry_base_seconds: float = Field(default=30.0, ge=0)
 
     @field_validator("cors_origins", mode="before")
     @classmethod

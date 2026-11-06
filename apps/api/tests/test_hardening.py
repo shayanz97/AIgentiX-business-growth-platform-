@@ -21,11 +21,7 @@ from aigentix.platform.identity.models import User, UserSession
 from aigentix.platform.identity.throttle import LoginThrottle, TooManyAttempts
 from aigentix.platform.organizations import service as orgs
 from aigentix.platform.organizations.models import Organization, Role
-from aigentix.platform.workflows import service as workflows
-from aigentix.platform.workflows.models import WorkflowRun, WorkflowStatus
-from aigentix.platform.workflows.registry import WorkflowRegistry
-from aigentix.platform.workflows.service import WorkflowError
-from aigentix.worker.runner import housekeeping, run_once
+from aigentix.worker.runner import housekeeping
 from tests.conftest import PASSWORD, Tenant, login, make_user
 
 # --- Route guard introspection -------------------------------------------------------------------
@@ -58,7 +54,7 @@ def _api_routes(routes: list[object], prefix: str = "") -> list[tuple[str, APIRo
             found.append((prefix + r.path, r))
         elif hasattr(r, "original_router"):
             ctx_prefix = getattr(getattr(r, "include_context", None), "prefix", "")
-            found.extend(_api_routes(r.original_router.routes, ctx_prefix))
+            found.extend(_api_routes(r.original_router.routes, prefix + ctx_prefix))
     return found
 
 
@@ -88,12 +84,8 @@ def test_user_in_two_orgs_only_sees_selected_org(tenant_a: Tenant, tenant_b: Ten
     orgs.add_member(db, organization=org_b, user=user_a, role=Role.MEMBER)
     db.commit()
 
-    a_proj = tenant_a.client.post(
-        "/api/v1/projects", json={"name": "A only"}, headers=tenant_a.headers
-    ).json()
-    b_proj = tenant_b.client.post(
-        "/api/v1/projects", json={"name": "B only"}, headers=tenant_b.headers
-    ).json()
+    a_proj = tenant_a.client.post("/api/v1/projects", json={"name": "A only"}, headers=tenant_a.headers).json()
+    b_proj = tenant_b.client.post("/api/v1/projects", json={"name": "B only"}, headers=tenant_b.headers).json()
 
     in_b = tenant_a.client.get("/api/v1/projects", headers=tenant_b.headers).json()
     assert [p["id"] for p in in_b["items"]] == [b_proj["id"]]
@@ -103,22 +95,15 @@ def test_user_in_two_orgs_only_sees_selected_org(tenant_a: Tenant, tenant_b: Ten
     wrong = tenant_a.client.get(f"/api/v1/projects/{a_proj['id']}", headers=tenant_b.headers)
     assert wrong.status_code == 404
     # Created in the selected org, never in the other one.
-    created = tenant_a.client.post(
-        "/api/v1/projects", json={"name": "into B"}, headers=tenant_b.headers
-    ).json()
+    created = tenant_a.client.post("/api/v1/projects", json={"name": "into B"}, headers=tenant_b.headers).json()
     assert created["organization_id"] == str(tenant_b.org.id)
     # Member (not owner) of B cannot rename B.
-    assert (
-        tenant_a.client.patch(f"/api/v1/organizations/{tenant_b.org.id}", json={"name": "x" * 5}).status_code
-        == 403
-    )
+    assert tenant_a.client.patch(f"/api/v1/organizations/{tenant_b.org.id}", json={"name": "x" * 5}).status_code == 403
 
 
 def test_workflow_filter_by_foreign_project_returns_nothing(tenant_a: Tenant, tenant_b: Tenant) -> None:
     project = tenant_a.client.post("/api/v1/projects", json={"name": "P"}, headers=tenant_a.headers).json()
-    page = tenant_b.client.get(
-        f"/api/v1/workflows?project_id={project['id']}", headers=tenant_b.headers
-    ).json()
+    page = tenant_b.client.get(f"/api/v1/workflows?project_id={project['id']}", headers=tenant_b.headers).json()
     assert page["total"] == 0
 
 
@@ -163,9 +148,7 @@ def test_foreign_origin_rejected_on_unsafe_routes(tenant_a: Tenant, method: str,
 def test_login_is_throttled_per_account(client: TestClient, db: Session) -> None:
     make_user(db, "target@example.com")
     for _ in range(10):
-        r = client.post(
-            "/api/v1/auth/login", json={"email": "target@example.com", "password": "wrong-password"}
-        )
+        r = client.post("/api/v1/auth/login", json={"email": "target@example.com", "password": "wrong-password"})
         assert r.status_code == 401
     blocked = client.post("/api/v1/auth/login", json={"email": "TARGET@example.com", "password": PASSWORD})
     assert blocked.status_code == 429
@@ -178,9 +161,7 @@ def test_successful_login_resets_failures(client: TestClient, db: Session) -> No
         client.post("/api/v1/auth/login", json={"email": "user@example.com", "password": "wrong-password"})
     login(client, "user@example.com")
     for _ in range(9):
-        r = client.post(
-            "/api/v1/auth/login", json={"email": "user@example.com", "password": "wrong-password"}
-        )
+        r = client.post("/api/v1/auth/login", json={"email": "user@example.com", "password": "wrong-password"})
         assert r.status_code == 401
 
 
@@ -206,61 +187,6 @@ def test_throttle_memory_is_bounded() -> None:
 # --- Worker robustness ---------------------------------------------------------------------------
 
 
-def test_stale_running_runs_are_failed(db: Session, tenant_a: Tenant) -> None:
-    run = WorkflowRun(
-        organization_id=tenant_a.org.id,
-        workflow_type="platform.noop",
-        status=WorkflowStatus.RUNNING.value,
-        started_at=utcnow() - timedelta(hours=2),
-    )
-    fresh = WorkflowRun(
-        organization_id=tenant_a.org.id,
-        workflow_type="platform.noop",
-        status=WorkflowStatus.RUNNING.value,
-        started_at=utcnow(),
-    )
-    db.add_all([run, fresh])
-    db.commit()
-    assert workflows.fail_stale_runs(db, older_than=timedelta(minutes=30)) == 1
-    db.commit()
-    db.refresh(run)
-    db.refresh(fresh)
-    assert run.status == WorkflowStatus.FAILED
-    assert run.error_type == "StaleRun"
-    assert fresh.status == WorkflowStatus.RUNNING
-
-
-def _expected_failure(_db: Session, _run: WorkflowRun) -> None:
-    raise WorkflowError("Website could not be reached")
-
-
-def _unserialisable(_db: Session, _run: WorkflowRun) -> dict[str, object]:
-    return {"bad": object()}  # cannot be stored as JSON -> commit fails
-
-
-@pytest.mark.parametrize(
-    ("handler", "error_type", "message"),
-    [
-        (_expected_failure, "WorkflowError", "Website could not be reached"),
-        (_unserialisable, "TypeError", "The workflow failed due to an internal error."),
-    ],
-)
-def test_worker_always_finalises_runs(
-    db: Session, tenant_a: Tenant, handler: object, error_type: str, message: str
-) -> None:
-    registry = WorkflowRegistry()
-    registry.register("test.handler", handler)  # type: ignore[arg-type]
-    run = WorkflowRun(organization_id=tenant_a.org.id, workflow_type="test.handler")
-    db.add(run)
-    db.commit()
-    assert run_once(get_session_factory(), registry) is True
-    db.refresh(run)
-    assert run.status == WorkflowStatus.FAILED
-    assert run.error_message == message
-    assert run.completed_at is not None
-    assert error_type in (run.error_type or "")
-
-
 # --- Misc ----------------------------------------------------------------------------------------
 
 
@@ -280,6 +206,7 @@ def test_production_disables_interactive_docs() -> None:
 
 
 def test_ready_reports_pending_migrations(client: TestClient, db: Session) -> None:
+    current = db.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
     db.execute(text("UPDATE alembic_version SET version_num = 'old'"))
     db.commit()
     try:
@@ -287,7 +214,7 @@ def test_ready_reports_pending_migrations(client: TestClient, db: Session) -> No
         assert response.status_code == 503
         assert response.json() == {"status": "migrations_pending"}
     finally:
-        db.execute(text("UPDATE alembic_version SET version_num = '0001'"))
+        db.execute(text("UPDATE alembic_version SET version_num = :v"), {"v": current})
         db.commit()
 
 

@@ -26,9 +26,7 @@ class LoginRequest(BaseModel):
     operation_id="login",
     responses={401: {"model": ErrorResponse}, 429: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
 )
-def login(
-    body: LoginRequest, request: Request, response: Response, db: DbSession, settings: AppSettings
-) -> UserRead:
+def login(body: LoginRequest, request: Request, response: Response, db: DbSession, settings: AppSettings) -> UserRead:
     account = identity.normalise_email(body.email)
     login_throttle.check(account)
     with login_throttle.hashing_slot():

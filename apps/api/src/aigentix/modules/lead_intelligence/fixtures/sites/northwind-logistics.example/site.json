@@ -1,0 +1,16 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/about-us": "about.html",
+    "/services": "services.html",
+    "/track-shipment": "track.html",
+    "/customer-service": "customer-service.html",
+    "/faq": "faq.html",
+    "/careers": "careers.html",
+    "/contact": "contact.html",
+    "/team/jane-doe": "jane.html",
+    "/login": "login.html",
+    "/privacy-policy": "privacy.html"
+  },
+  "robots": "User-agent: *\nAllow: /\nDisallow: /login\n"
+}

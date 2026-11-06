@@ -75,7 +75,8 @@ def _clean_tables(request: pytest.FixtureRequest) -> Iterator[None]:
         with get_engine().begin() as conn:
             conn.execute(
                 text(
-                    "TRUNCATE workflow_runs, research_projects, user_sessions, "
+                    "TRUNCATE opportunity_evidence, opportunities, evidence, research_sources, research_runs, "
+                    "research_project_companies, companies, workflow_runs, research_projects, user_sessions, "
                     "organization_memberships, organizations, users CASCADE"
                 )
             )

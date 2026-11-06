@@ -4,8 +4,8 @@ from fastapi import APIRouter, status
 
 from aigentix.api.deps import DbSession, Pagination, Tenant
 from aigentix.api.schemas import Page
-from aigentix.modules.lead_intelligence import service
 from aigentix.modules.lead_intelligence.schemas import ProjectCreate, ProjectRead
+from aigentix.modules.lead_intelligence.services import projects as service
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -21,9 +21,7 @@ def list_projects(db: DbSession, tenant: Tenant, page: Pagination) -> Page[Proje
     )
 
 
-@router.post(
-    "", response_model=ProjectRead, status_code=status.HTTP_201_CREATED, operation_id="createProject"
-)
+@router.post("", response_model=ProjectRead, status_code=status.HTTP_201_CREATED, operation_id="createProject")
 def create_project(db: DbSession, tenant: Tenant, body: ProjectCreate) -> ProjectRead:
     project = service.create_project(db, tenant, body)
     db.commit()

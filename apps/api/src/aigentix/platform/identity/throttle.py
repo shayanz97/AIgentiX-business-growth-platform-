@@ -61,9 +61,7 @@ class LoginThrottle:
             self._failures[key] = attempts
             if len(self._failures) > self.max_tracked:
                 # Drop the entry with the oldest latest failure to keep memory bounded.
-                oldest = min(
-                    self._failures, key=lambda k: self._failures[k][-1] if self._failures[k] else 0.0
-                )
+                oldest = min(self._failures, key=lambda k: self._failures[k][-1] if self._failures[k] else 0.0)
                 self._failures.pop(oldest, None)
 
     def reset(self, key: str) -> None:

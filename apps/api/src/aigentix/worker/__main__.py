@@ -6,7 +6,7 @@ from aigentix.core.config import get_settings
 from aigentix.core.db import get_session_factory
 from aigentix.core.logging import configure_logging
 from aigentix.platform.workflows.registry import build_registry
-from aigentix.worker.runner import run_forever
+from aigentix.worker.runner import WorkerSettings, run_forever
 
 
 def main() -> None:
@@ -16,7 +16,10 @@ def main() -> None:
         get_session_factory(),
         build_registry(),
         settings.worker_poll_interval_seconds,
-        stale_after=timedelta(minutes=settings.worker_stale_run_minutes),
+        settings=WorkerSettings(
+            retry_base_delay=timedelta(seconds=settings.worker_retry_base_seconds),
+            stale_after=timedelta(minutes=settings.worker_stale_run_minutes),
+        ),
     )
 
 

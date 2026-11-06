@@ -1,0 +1,10 @@
+{
+  "scenario": "missing_info",
+  "expected_company_name": "Sparse Info Partners",
+  "expected_relevant_paths": [],
+  "excluded_paths": [],
+  "expected_signals": [],
+  "expect_opportunities": "none",
+  "expected_outcome": "completed",
+  "notes": "Homepage has one vague sentence and all nav pages return 404 or 500. Tests partial-fetch resilience and low-confidence reporting."
+}

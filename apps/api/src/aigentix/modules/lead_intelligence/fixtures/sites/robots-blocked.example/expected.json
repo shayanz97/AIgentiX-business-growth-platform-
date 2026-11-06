@@ -1,0 +1,12 @@
+{
+  "scenario": "robots_blocked",
+  "expected_company_name": "",
+  "expected_relevant_paths": [],
+  "excluded_paths": [
+    "/"
+  ],
+  "expected_signals": [],
+  "expect_opportunities": "none",
+  "expected_outcome": "failed",
+  "notes": "robots.txt disallows everything. The engine must not fetch any page and must fail with a clear robots error."
+}

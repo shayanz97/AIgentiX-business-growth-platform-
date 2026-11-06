@@ -48,9 +48,7 @@ def upgrade() -> None:
         sa.Column("role", sa.String(length=20), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
-        sa.CheckConstraint(
-            "role IN ('owner', 'member')", name=op.f("ck_organization_memberships_role_valid")
-        ),
+        sa.CheckConstraint("role IN ('owner', 'member')", name=op.f("ck_organization_memberships_role_valid")),
         sa.ForeignKeyConstraint(
             ["organization_id"],
             ["organizations.id"],
@@ -68,9 +66,7 @@ def upgrade() -> None:
             "organization_id", "user_id", name=op.f("uq_organization_memberships_organization_id_user_id")
         ),
     )
-    op.create_index(
-        op.f("ix_organization_memberships_user_id"), "organization_memberships", ["user_id"], unique=False
-    )
+    op.create_index(op.f("ix_organization_memberships_user_id"), "organization_memberships", ["user_id"], unique=False)
     op.create_table(
         "research_projects",
         sa.Column("id", sa.Uuid(), nullable=False),
@@ -82,9 +78,7 @@ def upgrade() -> None:
         sa.Column("status", sa.String(length=20), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
-        sa.CheckConstraint(
-            "status IN ('draft', 'active', 'archived')", name=op.f("ck_research_projects_status_valid")
-        ),
+        sa.CheckConstraint("status IN ('draft', 'active', 'archived')", name=op.f("ck_research_projects_status_valid")),
         sa.ForeignKeyConstraint(
             ["created_by_user_id"],
             ["users.id"],
@@ -158,9 +152,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_workflow_runs")),
     )
-    op.create_index(
-        "ix_workflow_runs_org_created", "workflow_runs", ["organization_id", "created_at"], unique=False
-    )
+    op.create_index("ix_workflow_runs_org_created", "workflow_runs", ["organization_id", "created_at"], unique=False)
     op.create_index("ix_workflow_runs_project", "workflow_runs", ["project_id"], unique=False)
     op.create_index(
         "ix_workflow_runs_queued",
@@ -172,9 +164,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index(
-        "ix_workflow_runs_queued", table_name="workflow_runs", postgresql_where=sa.text("status = 'queued'")
-    )
+    op.drop_index("ix_workflow_runs_queued", table_name="workflow_runs", postgresql_where=sa.text("status = 'queued'"))
     op.drop_index("ix_workflow_runs_project", table_name="workflow_runs")
     op.drop_index("ix_workflow_runs_org_created", table_name="workflow_runs")
     op.drop_table("workflow_runs")

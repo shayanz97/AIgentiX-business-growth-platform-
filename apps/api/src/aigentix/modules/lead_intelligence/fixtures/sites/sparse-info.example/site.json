@@ -1,0 +1,11 @@
+{
+  "pages": {
+    "/": "index.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n",
+  "status": {
+    "/about": 404,
+    "/services": 500,
+    "/contact": 404
+  }
+}

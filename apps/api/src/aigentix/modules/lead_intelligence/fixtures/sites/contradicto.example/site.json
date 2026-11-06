@@ -1,0 +1,9 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/about": "about.html",
+    "/company-facts": "facts.html",
+    "/contact": "contact.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

@@ -14,6 +14,9 @@ dependencies = [
     "psycopg[binary]>=3.3",
     "pwdlib[argon2]>=0.3",
     "structlog>=26.1",
+    "anthropic>=2.6,<3",
+    "beautifulsoup4>=4.13",
+    "httpx2>=2.16",
 ]
 
 [dependency-groups]
@@ -32,7 +35,7 @@ build-backend = "hatchling.build"
 packages = ["src/aigentix"]
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
@@ -42,6 +45,8 @@ ignore = ["B008", "N818"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S105", "S106"]
 "migrations/**" = ["E501"]
+# Typographic characters are intentional (prompt-delimiter neutralisation, quote normalisation).
+"src/aigentix/modules/lead_intelligence/agents/text_safety.py" = ["RUF001"]
 
 [tool.mypy]
 python_version = "3.12"

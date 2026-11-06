@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from fastapi import APIRouter
 
-from aigentix.platform.workflows.registry import WorkflowHandler
+from aigentix.platform.workflows.registry import WorkflowSpec
 
 
 class ModuleStatus(enum.StrEnum):
@@ -26,4 +26,4 @@ class ModuleDescriptor:
     description: str
     status: ModuleStatus
     router: APIRouter | None = None
-    workflow_handlers: dict[str, WorkflowHandler] = field(default_factory=dict)
+    workflows: dict[str, WorkflowSpec] = field(default_factory=dict)

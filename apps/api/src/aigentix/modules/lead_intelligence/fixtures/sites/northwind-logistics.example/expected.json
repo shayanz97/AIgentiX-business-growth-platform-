@@ -1,0 +1,31 @@
+{
+  "scenario": "strong",
+  "expected_company_name": "Northwind Logistics",
+  "expected_relevant_paths": [
+    "/about-us",
+    "/services",
+    "/track-shipment",
+    "/customer-service",
+    "/faq",
+    "/careers",
+    "/contact"
+  ],
+  "excluded_paths": [
+    "/team/jane-doe",
+    "/login",
+    "/privacy-policy",
+    "/downloads/customs-declaration.pdf"
+  ],
+  "expected_signals": [
+    "company_description",
+    "service_offering",
+    "contact_form",
+    "customer_support",
+    "faq",
+    "careers_hiring",
+    "document_download"
+  ],
+  "expect_opportunities": "strong",
+  "expected_outcome": "completed",
+  "notes": "Full-featured freight forwarder with high inbound inquiry volume handled manually. Tests page discovery, exclusion of personal profile, login, privacy, PDF and external links, and www same-site handling."
+}

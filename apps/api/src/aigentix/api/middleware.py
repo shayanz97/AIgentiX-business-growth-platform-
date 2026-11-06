@@ -30,9 +30,7 @@ def origin_check(allowed_origins: list[str]) -> Callable[[Request, Handler], Awa
             log.warning("request.origin_rejected", origin=origin, path=request.url.path)
             return JSONResponse(
                 status_code=403,
-                content={
-                    "error": {"code": "origin_not_allowed", "message": "Origin not allowed", "details": None}
-                },
+                content={"error": {"code": "origin_not_allowed", "message": "Origin not allowed", "details": None}},
             )
         return await call_next(request)
 

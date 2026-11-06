@@ -32,9 +32,7 @@ def test_owner_can_rename_organization(tenant_a: Tenant) -> None:
 
 
 def test_member_cannot_rename_organization(member_of_a: Tenant) -> None:
-    response = member_of_a.client.patch(
-        f"/api/v1/organizations/{member_of_a.org.id}", json={"name": "Hijack"}
-    )
+    response = member_of_a.client.patch(f"/api/v1/organizations/{member_of_a.org.id}", json={"name": "Hijack"})
     assert response.status_code == 403
 
 

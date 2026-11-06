@@ -1,0 +1,8 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/services": "services.html",
+    "/request-quote": "quote.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

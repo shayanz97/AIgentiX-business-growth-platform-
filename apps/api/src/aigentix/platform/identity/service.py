@@ -34,9 +34,7 @@ def normalise_email(email: str) -> str:
 def create_user(db: Session, *, email: str, password: str, full_name: str = "") -> User:
     if len(password) < MIN_PASSWORD_LENGTH:
         raise InvalidInput(f"Password must be at least {MIN_PASSWORD_LENGTH} characters")
-    user = User(
-        email=normalise_email(email), full_name=full_name.strip(), password_hash=hash_password(password)
-    )
+    user = User(email=normalise_email(email), full_name=full_name.strip(), password_hash=hash_password(password))
     try:
         with db.begin_nested():  # savepoint: a duplicate must not roll back the caller's transaction
             db.add(user)

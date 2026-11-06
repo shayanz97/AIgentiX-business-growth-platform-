@@ -1,15 +1,17 @@
-"""Lead Intelligence module.
+"""Lead Intelligence module: companies, website research, evidence and AI opportunity audits."""
 
-Sprint 1: research projects (CRUD foundation).
-Sprint 2+: company research, opportunity audit and scoring workflows (LangGraph), registered via
-`workflow_handlers` below.
-"""
+from fastapi import APIRouter
 
 from aigentix.modules.base import ModuleDescriptor, ModuleStatus
-from aigentix.modules.lead_intelligence.router import router
+from aigentix.modules.lead_intelligence.config import get_research_settings
+from aigentix.modules.lead_intelligence.routes import companies, opportunities, projects, research_runs
+from aigentix.modules.lead_intelligence.workflows.constants import RESEARCH_WORKFLOW
+from aigentix.modules.lead_intelligence.workflows.research import make_research_handler
+from aigentix.platform.workflows.registry import WorkflowSpec
 
-# Declared now so the type name is stable; no handler until the workflow is implemented in Sprint 2.
-COMPANY_RESEARCH_WORKFLOW = "lead_intelligence.company_research"
+router = APIRouter()
+for _sub in (projects.router, companies.router, research_runs.router, opportunities.router):
+    router.include_router(_sub)
 
 descriptor = ModuleDescriptor(
     key="lead_intelligence",
@@ -17,5 +19,10 @@ descriptor = ModuleDescriptor(
     description="Company research, AI opportunity audits and lead scoring.",
     status=ModuleStatus.AVAILABLE,
     router=router,
-    workflow_handlers={},
+    workflows={
+        RESEARCH_WORKFLOW: WorkflowSpec(
+            handler=make_research_handler(),
+            max_concurrent=get_research_settings().research_max_concurrent_runs,
+        )
+    },
 )
