@@ -14,8 +14,8 @@ from aigentix.modules.lead_intelligence.agents.text_safety import (
     strip_foreign_urls,
     supports,
 )
-from aigentix.modules.lead_intelligence.integrations.llm import LLMProvider
 from aigentix.modules.lead_intelligence.models import EvidenceType
+from aigentix.platform.llm import LLMProvider
 
 FIELD_TO_EVIDENCE: dict[str, EvidenceType] = {
     "description": EvidenceType.COMPANY_DESCRIPTION,

@@ -52,9 +52,19 @@ Stop with `docker compose down` (add `-v` to delete the database).
 3. The company page shows the profile, evidence with source links, and AI opportunities to **Mark for review**,
    **Approve for investigation** or **Reject** (with a note). The **Opportunities** tab is the review queue.
 
-AI analysis needs `ANTHROPIC_API_KEY` in `.env` (extraction: `claude-haiku-5-5`, audit: `claude-opus-5-5`,
-per-run cost cap `LLM_MAX_COST_PER_RUN_USD`). Without a key, research still runs and the UI states that AI analysis
-is unavailable — nothing is fabricated.
+AI analysis needs an API key for the provider each task is routed to. Choose provider and model per task in `.env`:
+
+```env
+LLM_ROUTE_EXTRACTION=anthropic:claude-haiku-5-5   # extraction from website text
+LLM_ROUTE_AUDIT=openai:<model-id>                  # AI Opportunity Audit
+ANTHROPIC_API_KEY=...
+OPENAI_API_KEY=...
+LLM_PRICES_JSON={"<model-id>": [input_usd_per_mtok, output_usd_per_mtok]}   # for models without built-in prices
+```
+
+Without routes, `LLM_PROVIDER` (`anthropic` | `openai`) with `LLM_EXTRACTION_MODEL` / `LLM_AUDIT_MODEL` is used
+(default: Anthropic, `claude-haiku-5-5` / `claude-opus-5-5`). `LLM_MAX_COST_PER_RUN_USD` caps spend per run.
+Without a key for a task's provider, that task reports AI as unavailable — nothing is fabricated.
 
 **Offline demo / CI mode** (no internet, no key): bundled fixture websites under the reserved `.example` TLD and a
 rule-based LLM test double, clearly labelled in the UI:

@@ -17,6 +17,7 @@ dependencies = [
     "anthropic>=2.6,<3",
     "beautifulsoup4>=4.13",
     "httpx2>=2.16",
+    "openai>=3.46,<4",
 ]
 
 [dependency-groups]

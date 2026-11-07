@@ -4,7 +4,7 @@ from decimal import Decimal
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,14 +31,15 @@ class ResearchSettings(BaseSettings):
     # Stop reading further pages after this long (each request is separately capped by a 30 s deadline).
     research_max_discovery_seconds: float = Field(default=180.0, gt=0)
 
-    # LLM
-    llm_provider: Literal["anthropic", "fixture", "none"] = "anthropic"
-    anthropic_api_key: SecretStr | None = None
+    # LLM — task routes "provider:model" (provider: anthropic | openai). Keys and client settings live in
+    # aigentix.platform.llm.config (ANTHROPIC_API_KEY, OPENAI_API_KEY, LLM_TIMEOUT_SECONDS, LLM_PRICES_JSON).
+    llm_route_extraction: str | None = None
+    llm_route_audit: str | None = None
+    # Used when no explicit route is set: provider for both tasks, plus a model per task.
+    llm_provider: Literal["anthropic", "openai", "fixture", "none"] = "anthropic"
     llm_extraction_model: str = "claude-haiku-5-5"
     llm_audit_model: str = "claude-opus-5-5"
-    llm_timeout_seconds: float = Field(default=120.0, gt=0)
     llm_max_repairs: int = Field(default=2, ge=0, le=5)
-    llm_server_side_fallback: bool = True
     llm_max_cost_per_run_usd: Decimal = Field(default=Decimal("0.50"), ge=0)
 
     @model_validator(mode="after")
@@ -48,7 +49,25 @@ class ResearchSettings(BaseSettings):
                 raise ValueError("RESEARCH_FETCH_BACKEND=fixtures is not allowed in production")
             if self.llm_provider == "fixture":
                 raise ValueError("LLM_PROVIDER=fixture is not allowed in production")
+        self._validate_routes()
         return self
+
+    def _validate_routes(self) -> None:
+        from aigentix.platform.llm import Route
+
+        for value in (self.llm_route_extraction, self.llm_route_audit):
+            if value:
+                Route.parse(value)
+        if self.llm_provider == "openai":
+            for task, route, model in (
+                ("extraction", self.llm_route_extraction, self.llm_extraction_model),
+                ("audit", self.llm_route_audit, self.llm_audit_model),
+            ):
+                if not route and model.startswith("claude-"):
+                    raise ValueError(
+                        f"LLM_PROVIDER=openai needs an OpenAI model for the {task} task: set "
+                        f"LLM_ROUTE_{task.upper()}=openai:<model> or LLM_{task.upper()}_MODEL"
+                    )
 
 
 @lru_cache

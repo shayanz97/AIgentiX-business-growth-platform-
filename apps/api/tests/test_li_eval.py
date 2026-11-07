@@ -1,8 +1,9 @@
 """Research evaluation over the fixture companies (see .claude/skills/research-eval).
 
-Default: deterministic pipeline + FixtureLLMProvider (CI-safe, free). The optional live mode runs the real
-Anthropic provider and is only enabled with RESEARCH_EVAL_LIVE=1 and ANTHROPIC_API_KEY; it stops starting new
-companies once RESEARCH_EVAL_MAX_COST_USD (default 1.00) is spent.
+Default: deterministic pipeline + FixtureLLMProvider (CI-safe, free). The optional live mode uses the configured
+routes (LLM_ROUTE_EXTRACTION / LLM_ROUTE_AUDIT or LLM_PROVIDER + models, with ANTHROPIC_API_KEY / OPENAI_API_KEY)
+and is only enabled with RESEARCH_EVAL_LIVE=1; it stops starting new companies once RESEARCH_EVAL_MAX_COST_USD
+(default 1.00) is spent.
 
 Set RESEARCH_EVAL_REPORT=<path> to write a Markdown report.
 """
@@ -178,18 +179,17 @@ def test_fixture_suite_with_deterministic_double(tenant_a: Tenant, db: Session) 
     assert sum(c.signal_recall for c in finished) / len(finished) >= 0.8
 
 
-@pytest.mark.skipif(not LIVE, reason="live LLM evaluation is opt-in (RESEARCH_EVAL_LIVE=1 + ANTHROPIC_API_KEY)")
+@pytest.mark.skipif(not LIVE, reason="live LLM evaluation is opt-in (RESEARCH_EVAL_LIVE=1 + a provider API key)")
 def test_fixture_suite_live(tenant_a: Tenant, db: Session) -> None:  # pragma: no cover - needs credentials
     settings = ResearchSettings(
         environment="test",
         research_fetch_backend="fixtures",
-        llm_provider="anthropic",
         research_domain_min_interval_seconds=0,
         llm_max_cost_per_run_usd=MAX_LIVE_COST,
-    )
+    )  # routes and keys come from the environment
     provider = build_provider(settings)
     if provider is None:
-        pytest.skip("ANTHROPIC_API_KEY is not set")
+        pytest.skip("No API key is configured for the routed provider(s)")
     cases = _run_suite(tenant_a, db, {"provider": lambda: provider, "settings": settings}, "live")
     hard = (
         "outcome",

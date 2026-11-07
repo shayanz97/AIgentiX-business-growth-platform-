@@ -46,16 +46,7 @@ from aigentix.modules.lead_intelligence.integrations.html import (
     extract_page,
     name_from_title,
 )
-from aigentix.modules.lead_intelligence.integrations.llm import (
-    LLMBudgetExceeded,
-    LLMError,
-    LLMProvider,
-    LLMTransientError,
-    LLMUsage,
-    Task,
-    build_provider,
-    max_output_tokens_within,
-)
+from aigentix.modules.lead_intelligence.integrations.llm import build_provider
 from aigentix.modules.lead_intelligence.integrations.robots import RobotsPolicy, load_robots
 from aigentix.modules.lead_intelligence.models import (
     Basis,
@@ -69,6 +60,16 @@ from aigentix.modules.lead_intelligence.models import (
     ResearchSource,
 )
 from aigentix.modules.lead_intelligence.workflows.constants import STEPS
+from aigentix.platform.llm import (
+    LLMBudgetExceeded,
+    LLMError,
+    LLMProvider,
+    LLMTransientError,
+    LLMUnavailable,
+    LLMUsage,
+    Task,
+    max_output_tokens_within,
+)
 from aigentix.platform.workflows.context import WorkflowContext, WorkflowResult
 from aigentix.platform.workflows.errors import TransientWorkflowError, WorkflowError
 
@@ -125,6 +126,12 @@ def default_dependencies() -> ResearchDependencies:
     )
 
 
+def _task_available(provider: LLMProvider, task: Task) -> bool:
+    """Routed providers know per task whether a key exists; test doubles are always available."""
+    check = getattr(provider, "available", None)
+    return bool(check(task)) if callable(check) else True
+
+
 def make_research_handler(
     deps_factory: Callable[[], ResearchDependencies] = default_dependencies,
 ) -> Callable[[WorkflowContext], WorkflowResult]:
@@ -164,7 +171,7 @@ class _Research:
             input_tokens=usage.input_tokens, output_tokens=usage.output_tokens, cost_usd=usage.cost_usd
         )
         models = set(self.ctx.get_state("models_used", []))
-        models.add(usage.model)
+        models.add(usage.label)
         self.ctx.set_state("models_used", sorted(models))
 
     def _last_attempt(self) -> bool:
@@ -174,6 +181,10 @@ class _Research:
         """Transient AI errors are retried unless this is the last attempt; otherwise AI is marked failed."""
         if isinstance(exc, LLMTransientError) and not self._last_attempt():
             raise TransientWorkflowError("The AI provider is temporarily unavailable; the run will retry.") from exc
+        if isinstance(exc, LLMUnavailable):
+            self.ctx.set_state("ai_status", "unavailable")
+            self.ctx.set_state("ai_message", f"AI analysis unavailable: {exc}.")
+            return
         if isinstance(exc, LLMBudgetExceeded):
             self.ctx.set_state("ai_status", "skipped")
             self.ctx.set_state("ai_message", f"AI analysis stopped: {exc}.")
@@ -414,6 +425,11 @@ class _Research:
             return
         if not sources:
             return
+        if not _task_available(provider, "extraction"):
+            # Only the extraction route is unusable (e.g. its provider has no key): keep going so the audit
+            # can still run on deterministic evidence; the run notes it.
+            self.ctx.set_state("extraction_note", "AI extraction skipped: no API key for its configured provider.")
+            return
         max_tokens = self._token_budget(provider, "extraction", 8_000)
         if max_tokens is None:
             return
@@ -584,6 +600,12 @@ class _Research:
             if provider is None:
                 self.ctx.set_state("ai_status", "unavailable")
                 self.ctx.set_state("ai_message", "AI analysis unavailable: no AI provider is configured.")
+            return
+        if not _task_available(provider, "audit"):
+            self.ctx.set_state("ai_status", "unavailable")
+            self.ctx.set_state(
+                "ai_message", "AI analysis unavailable: no API key is configured for the opportunity audit's provider."
+            )
             return
         max_tokens = self._token_budget(provider, "audit", 16_000)
         if max_tokens is None:

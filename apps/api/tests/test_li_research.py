@@ -15,13 +15,13 @@ from aigentix.modules.lead_intelligence.agents.schemas import AuditOutput, Extra
 from aigentix.modules.lead_intelligence.config import ResearchSettings
 from aigentix.modules.lead_intelligence.integrations.fetcher import FetcherConfig, SafeFetcher, TransientFetchError
 from aigentix.modules.lead_intelligence.integrations.fixture_web import fixture_resolver, fixture_transport
-from aigentix.modules.lead_intelligence.integrations.llm import (
+from aigentix.modules.lead_intelligence.models import Company, Evidence, ResearchSource
+from aigentix.platform.llm import (
     LLMInvalidOutput,
     LLMPermanentError,
     LLMTransientError,
     LLMUsage,
 )
-from aigentix.modules.lead_intelligence.models import Company, Evidence, ResearchSource
 from aigentix.platform.workflows.models import WorkflowRun
 from aigentix.worker.runner import housekeeping, run_once
 from tests.conftest import Tenant
