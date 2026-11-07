@@ -19,10 +19,6 @@ x-api-env: &api-env
   LLM_AUDIT_MODEL: ${LLM_AUDIT_MODEL:-claude-opus-5-5}
   LLM_MAX_COST_PER_RUN_USD: ${LLM_MAX_COST_PER_RUN_USD:-0.50}
 
-x-api-build: &api-build
-  context: apps/api
-  dockerfile: ../../infra/docker/api.Dockerfile
-
 services:
   db:
     image: postgres:16-alpine
@@ -42,7 +38,11 @@ services:
 
   # One-shot: applies Alembic migrations, then exits. api/worker start only after it succeeds.
   migrate:
-    build: *api-build
+    # The only service that builds the API image; api and worker reuse it. Several services building the same
+    # tag race on export with BuildKit's containerd image store ("image ... already exists").
+    build:
+      context: apps/api
+      dockerfile: ../../infra/docker/api.Dockerfile
     image: aigentix-api:dev
     command: ["alembic", "upgrade", "head"]
     environment: *api-env
@@ -51,8 +51,8 @@ services:
     restart: "no"
 
   api:
-    build: *api-build
     image: aigentix-api:dev
+    pull_policy: never  # built by the migrate service; never look for it in a registry
     environment: *api-env
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000"
@@ -61,8 +61,8 @@ services:
     restart: unless-stopped
 
   worker:
-    build: *api-build
     image: aigentix-api:dev
+    pull_policy: never  # built by the migrate service; never look for it in a registry
     command: ["python", "-m", "aigentix.worker"]
     environment: *api-env
     depends_on:
