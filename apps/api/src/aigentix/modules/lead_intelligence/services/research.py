@@ -39,7 +39,7 @@ class StartResult:
     skipped: list[tuple[uuid.UUID, str]] = field(default_factory=list)  # (company_id, reason)
 
 
-def _active_run_exists(db: Session, company_id: uuid.UUID) -> bool:
+def _active_run_exists(db: Session, company_id: uuid.UUID, kind: str = "research") -> bool:
     return (
         db.scalar(
             select(func.count())
@@ -47,6 +47,7 @@ def _active_run_exists(db: Session, company_id: uuid.UUID) -> bool:
             .join(WorkflowRun, WorkflowRun.id == ResearchRun.workflow_run_id)
             .where(
                 ResearchRun.company_id == company_id,
+                ResearchRun.kind == kind,
                 WorkflowRun.status.in_([s.value for s in ACTIVE_STATUSES]),
             )
         )
@@ -138,8 +139,11 @@ def list_runs(
     offset: int,
     company_id: uuid.UUID | None = None,
     project_id: uuid.UUID | None = None,
+    kind: str | None = None,
 ) -> tuple[list[RunView], int]:
     conditions = [ResearchRun.organization_id == tenant.organization_id]
+    if kind is not None:
+        conditions.append(ResearchRun.kind == kind)
     if company_id is not None:
         conditions.append(ResearchRun.company_id == company_id)
     if project_id is not None:
@@ -171,6 +175,7 @@ def latest_finished_run_id(db: Session, tenant: TenantContext, company_id: uuid.
         .where(
             ResearchRun.company_id == company_id,
             ResearchRun.organization_id == tenant.organization_id,
+            ResearchRun.kind == "research",
             WorkflowRun.status.in_([WorkflowStatus.COMPLETED.value, WorkflowStatus.PARTIAL.value]),
         )
         .order_by(WorkflowRun.created_at.desc())
@@ -240,7 +245,7 @@ def summary(db: Session, tenant: TenantContext) -> Summary:
         select(func.count())
         .select_from(ResearchRun)
         .join(WorkflowRun, WorkflowRun.id == ResearchRun.workflow_run_id)
-        .where(ResearchRun.organization_id == org)
+        .where(ResearchRun.organization_id == org, ResearchRun.kind == "research")
     )
     by_status = dict(
         db.execute(
@@ -257,6 +262,7 @@ def summary(db: Session, tenant: TenantContext) -> Summary:
             .join(WorkflowRun, WorkflowRun.id == ResearchRun.workflow_run_id)
             .where(
                 ResearchRun.organization_id == org,
+                ResearchRun.kind == "research",
                 WorkflowRun.status.in_([WorkflowStatus.COMPLETED.value, WorkflowStatus.PARTIAL.value]),
             )
         )

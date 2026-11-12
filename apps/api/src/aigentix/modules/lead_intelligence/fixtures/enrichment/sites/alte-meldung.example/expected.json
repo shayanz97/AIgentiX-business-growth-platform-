@@ -1,0 +1,34 @@
+{
+  "scenario": "old_announcement",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "expansion",
+    "product_launch"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "expansion": 1,
+    "product_launch": 1
+  },
+  "expected_dates": {
+    "expansion": "2023-03-14",
+    "product_launch": "2024-06-20"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "expansion": "historical",
+    "product_launch": "historical"
+  },
+  "expected_intent_strength": "none_verified",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Verpackung",
+    "packaging"
+  ],
+  "expected_fit": "medium",
+  "expected_score_band": "low",
+  "notes": "Only historical announcements (>180 days); they must not count as current triggers.",
+  "calibration_notes": [
+    "expected_fit high -> medium (fit band = conservative fit score (unpublished employee count counts as 0 of 20 points))"
+  ]
+}

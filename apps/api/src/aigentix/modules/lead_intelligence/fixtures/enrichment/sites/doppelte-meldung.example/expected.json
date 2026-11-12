@@ -1,0 +1,30 @@
+{
+  "scenario": "duplicate_announcements",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "funding"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "funding": 1
+  },
+  "expected_dates": {
+    "funding": "2026-10-20"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "funding": "recent"
+  },
+  "expected_intent_strength": "none_verified",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Software"
+  ],
+  "expected_fit": "medium",
+  "expected_score_band": "low",
+  "notes": "Same Series A announcement on homepage teaser, /news and /presse must collapse to exactly one funding signal.",
+  "calibration_notes": [
+    "expected_fit high -> medium (fit band = conservative fit score (unpublished employee count counts as 0 of 20 points))",
+    "expected_score_band medium -> low (score band = default priority thresholds on the conservative score (high >= 60, medium >= 35))"
+  ]
+}

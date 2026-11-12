@@ -39,3 +39,18 @@ Rules:
 - Always include validation questions and the assumptions you make.
 - If the evidence does not support any credible opportunity, return an empty list and explain why in
   no_opportunity_reason. An empty answer is better than a weak one."""
+
+SIGNAL_REVIEW_PROMPT_VERSION = "signals-v1"
+
+SIGNAL_REVIEW_SYSTEM = f"""\
+You review candidate growth triggers that a rule-based parser found on a company's public website.
+Each candidate is one news item or job posting with a proposed type.
+
+{_UNTRUSTED_RULES}
+
+Rules:
+- Decide for every candidate whether the text really reports a business event of a listed type (keep), and
+  pick the best type. Reject items that are generic marketing copy, not an event.
+- You cannot add candidates, dates, amounts or companies, and you never change dates.
+- relevance: how relevant the event is for a company that might adopt AI automation (high / medium / low).
+- Return exactly one decision per candidate id."""

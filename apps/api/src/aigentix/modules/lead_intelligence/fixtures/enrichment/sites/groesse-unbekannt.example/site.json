@@ -1,0 +1,9 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/ueber-uns": "about.html",
+    "/leistungen": "services.html",
+    "/aktuelles": "aktuelles.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

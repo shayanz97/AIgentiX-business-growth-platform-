@@ -1,0 +1,31 @@
+{
+  "scenario": "strong_opportunity",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "digital_transformation",
+    "technology_adoption"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "digital_transformation": 1,
+    "technology_adoption": 1
+  },
+  "expected_dates": {
+    "digital_transformation": "2026-11-03",
+    "technology_adoption": "2026-09-22"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "digital_transformation": "recent",
+    "technology_adoption": "moderate"
+  },
+  "expected_intent_strength": "indirect",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Facility",
+    "Gebäudeservice"
+  ],
+  "expected_fit": "high",
+  "expected_score_band": "high",
+  "notes": "Contact form, booking, downloadable forms, FAQ plus digitalisation news. A first-party inbound inquiry exists in first_party.json (may raise intent beyond indirect when used)."
+}

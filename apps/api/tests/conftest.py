@@ -20,6 +20,8 @@ os.environ["SESSION_COOKIE_SECURE"] = "false"
 os.environ["CORS_ORIGINS"] = "http://localhost:3000"
 os.environ["LOG_JSON"] = "false"
 os.environ["LOG_LEVEL"] = "WARNING"
+# Freshness bands are relative to "today": pin it so fixture dates keep their meaning (see enrichment fixtures).
+os.environ["SCORING_REFERENCE_DATE"] = "2026-11-12"
 
 from alembic import command  # noqa: E402
 from alembic.config import Config  # noqa: E402
@@ -75,7 +77,9 @@ def _clean_tables(request: pytest.FixtureRequest) -> Iterator[None]:
         with get_engine().begin() as conn:
             conn.execute(
                 text(
-                    "TRUNCATE opportunity_evidence, opportunities, evidence, research_sources, research_runs, "
+                    "TRUNCATE lead_reviews, lead_score_evidence, lead_scores, scoring_profiles, icp_profiles, "
+                    "buying_intent_evidence, buying_intent_signals, business_signal_evidence, business_signals, "
+                    "opportunity_evidence, opportunities, evidence, research_sources, research_runs, "
                     "research_project_companies, companies, workflow_runs, research_projects, user_sessions, "
                     "organization_memberships, organizations, users CASCADE"
                 )

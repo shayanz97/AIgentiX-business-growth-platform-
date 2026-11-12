@@ -1,0 +1,9 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/ueber-uns": "about.html",
+    "/projektanfragen": "projects.html",
+    "/karriere": "careers.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

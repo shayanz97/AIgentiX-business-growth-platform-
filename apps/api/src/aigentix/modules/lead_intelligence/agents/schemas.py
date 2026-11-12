@@ -55,3 +55,30 @@ class AuditOutput(BaseModel):
     no_opportunity_reason: str | None = Field(
         description="If the list is empty (or short), explain what evidence is missing."
     )
+
+
+SignalTypeName = Literal[
+    "hiring",
+    "expansion",
+    "funding",
+    "product_launch",
+    "leadership_change",
+    "technology_adoption",
+    "digital_transformation",
+    "operational_change",
+    "public_project_request",
+    "procurement_tender",
+    "other",
+]
+
+
+class SignalDecision(BaseModel):
+    candidate_id: str = Field(description="ID of the candidate being reviewed, e.g. C2.")
+    keep: bool = Field(description="false if the text does not actually report this kind of business event.")
+    signal_type: SignalTypeName = Field(description="The best type for the event the text reports.")
+    relevance: Level = Field(description="How relevant the event is for adopting AI automation.")
+    reason: str = Field(description="One short sentence.")
+
+
+class SignalReviewOutput(BaseModel):
+    decisions: list[SignalDecision]
