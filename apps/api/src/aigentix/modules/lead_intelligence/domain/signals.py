@@ -88,7 +88,7 @@ _STOPWORDS = {
     "with", "our", "new", "neue", "neuer", "neues", "neuen", "into", "from", "this", "that",
 }  # fmt: skip
 _WORD = re.compile(r"[\wäöüß]+", re.I)
-_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])(?<!\d\.)\s+")  # "3. November" is not a sentence end
 
 
 def _matches(text: str, keyword: str) -> bool:

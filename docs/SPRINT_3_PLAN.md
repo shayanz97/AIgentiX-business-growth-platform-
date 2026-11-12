@@ -122,6 +122,6 @@ production), `LLM_ROUTE_SIGNALS` (defaults to the extraction route), `RESEARCH_S
 
 ## Pilot
 
-No live dataset is available in this environment, so the pilot is the deterministic fixture pilot
+No live dataset is available in this environment, so the pilot is the deterministic fixture pilot ([SPRINT_3_PILOT.md](SPRINT_3_PILOT.md))
 (`/lead-scoring-eval`). Live validation with real companies, real tender feeds and real reviewer feedback is
 **not done**; no accuracy or conversion figures are claimed.

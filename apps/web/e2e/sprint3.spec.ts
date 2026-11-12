@@ -96,12 +96,10 @@ test.describe.serial("Sprint 3 — Growth intelligence & lead scoring", () => {
     await page.goto(`/leads/${companyId}`);
     await page.getByRole("button", { name: "Re-score" }).click();
     await expect(page.getByText(/Re-scored 1 company/)).toBeVisible();
-    await expect
-      .poll(async () => {
-        await page.reload();
-        return page.getByTestId("history-entry").count();
-      }, { timeout: 30_000 })
-      .toBeGreaterThanOrEqual(2);
+    // Initial snapshot (enrichment) + the re-score with the new profile version; re-scoring reloads the history.
+    await expect(page.getByTestId("history-entry")).toHaveCount(2, { timeout: 30_000 });
+    await page.reload();
+    await expect(page.getByTestId("history-entry")).toHaveCount(2, { timeout: 30_000 });
 
     await page.goto("/leads");
     await expect(page.getByTestId("lead-row").filter({ hasText: DOMAIN })).toBeVisible();

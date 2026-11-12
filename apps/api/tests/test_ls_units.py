@@ -500,3 +500,12 @@ def test_industry_is_assessed_only_with_evidence(tenant_a: Tenant) -> None:
     for criterion in fit["criteria"]:
         if criterion["state"] == "assessed" and criterion["key"] in ("country", "industry", "company_size"):
             assert criterion["evidence_ids"], criterion
+
+
+def test_german_ordinal_dates_do_not_split_sentences() -> None:
+    from aigentix.modules.lead_intelligence.domain.signals import supporting_sentence
+
+    text = (
+        "Projektanfrage: Automatisierung 3. November 2026 Wir suchen einen externen Partner. Angebote bis 4. Dezember."
+    )
+    assert supporting_sentence(text, ["wir suchen einen externen partner"]).endswith("externen Partner.")

@@ -19,7 +19,7 @@ COUNTRIES: dict[str, tuple[str, ...]] = {
     "US": ("usa", "united states", "u.s.", "vereinigte staaten"),
 }
 _HQ_HINTS = ("sitz in", "based in", "headquartered", "hauptsitz", "located in", "ansässig")
-_SENTENCES = re.compile(r"(?<=[.!?])\s+")
+_SENTENCES = re.compile(r"(?<=[.!?])(?<!\d\.)\s+")  # "3. November" is not a sentence end
 _SIZE = re.compile(
     r"(?i)(?P<qual>rund|ca\.|circa|etwa|über|mehr als|knapp|around|about|approximately|over|more than)?\s*"
     r"(?P<n>\d{1,3}(?:[.,]\d{3})*|\d+)\s*"
