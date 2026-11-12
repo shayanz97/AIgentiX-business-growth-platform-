@@ -98,7 +98,7 @@ def evaluate(t: Tenant, domain: str, company_id: str, view: dict[str, Any], db: 
     by_type: dict[str, list[dict[str, Any]]] = {}
     for s in signals:
         by_type.setdefault(s["signal_type"], []).append(s)
-    case.signals = ", ".join(f"{k}×{len(v)}" for k, v in sorted(by_type.items())) or "none"
+    case.signals = ", ".join(f"{k} x{len(v)}" for k, v in sorted(by_type.items())) or "none"
     missing = set(exp["expected_signal_types"]) - set(by_type)
     _check(case, "expected_signals", not missing, f"missing {sorted(missing)}")
     forbidden = set(exp["forbidden_signal_types"]) & set(by_type)
