@@ -13,7 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Lead Intelligence",
     href: "/lead-intelligence",
     enabled: true,
-    match: ["/lead-intelligence", "/companies", "/projects", "/opportunities", "/research-runs"],
+    match: ["/lead-intelligence", "/companies", "/projects", "/opportunities", "/research-runs", "/leads", "/scoring"],
   },
   { label: "Sales", href: "#", enabled: false, match: ["/sales"] },
   { label: "Marketing", href: "#", enabled: false, match: ["/marketing"] },
@@ -26,6 +26,8 @@ export const LEAD_INTELLIGENCE_TABS: { label: string; href: string }[] = [
   { label: "Companies", href: "/companies" },
   { label: "Projects", href: "/projects" },
   { label: "Opportunities", href: "/opportunities" },
+  { label: "Ranked leads", href: "/leads" },
+  { label: "Scoring", href: "/scoring" },
 ];
 
 export function isLeadIntelligencePath(pathname: string): boolean {

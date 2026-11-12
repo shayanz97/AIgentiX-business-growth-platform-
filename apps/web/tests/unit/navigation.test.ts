@@ -29,12 +29,17 @@ describe("navigation", () => {
       ["Companies", "/companies"],
       ["Projects", "/projects"],
       ["Opportunities", "/opportunities"],
+      ["Ranked leads", "/leads"],
+      ["Scoring", "/scoring"],
     ]);
   });
 
   it("recognises Lead Intelligence paths and the active tab", () => {
     expect(isLeadIntelligencePath("/companies/abc")).toBe(true);
     expect(isLeadIntelligencePath("/research-runs/abc")).toBe(true);
+    expect(isLeadIntelligencePath("/leads/abc")).toBe(true);
+    expect(isLeadIntelligencePath("/scoring")).toBe(true);
+    expect(isTabActive("/leads/abc", "/leads")).toBe(true);
     expect(isLeadIntelligencePath("/settings")).toBe(false);
     expect(isTabActive("/companies/abc", "/companies")).toBe(true);
     expect(isTabActive("/companies", "/lead-intelligence")).toBe(false);

@@ -1,9 +1,10 @@
 # AIgentiX Growth Platform
 
 Modular, multi-tenant SaaS platform that helps SMEs automate business growth with AI agents.
-**Status: Sprint 2 — Lead Intelligence.** Add companies (single URL or CSV), research their public websites safely
-in the background, review evidence with sources, and review AI-proposed automation opportunities. Built on the
-Sprint 1 foundation (auth, organizations, tenant isolation, worker).
+**Status: Sprint 3 — Growth Intelligence, Buying Intent & Lead Scoring.** Add companies (single URL or CSV),
+research their public websites safely, review evidence and AI-proposed automation opportunities, then enrich them
+with dated growth triggers and verified buying intent and work a ranked, explainable lead list scored against your
+ICP. Built on the Sprint 1 foundation (auth, organizations, tenant isolation, worker).
 
 | Component | Tech | Path |
 |---|---|---|
@@ -12,7 +13,7 @@ Sprint 1 foundation (auth, organizations, tenant isolation, worker).
 | Database | PostgreSQL 16 | Docker volume `pgdata` |
 | API contract | OpenAPI → TypeScript types | `packages/shared-contracts` |
 
-Docs: [Architecture](docs/ARCHITECTURE.md) · [Sprint 2 plan](docs/SPRINT_2_PLAN.md) · [Sprint 1 plan](docs/SPRINT_1_PLAN.md) · [Claude Code guide](CLAUDE.md)
+Docs: [Architecture](docs/ARCHITECTURE.md) · [Sprint 3 plan](docs/SPRINT_3_PLAN.md) · [Sprint 2 plan](docs/SPRINT_2_PLAN.md) · [Sprint 1 plan](docs/SPRINT_1_PLAN.md) · [Claude Code guide](CLAUDE.md)
 
 ## Quick start (Docker)
 
@@ -51,6 +52,24 @@ Stop with `docker compose down` (add `-v` to delete the database).
    tokens and estimated cost are on the research-run page.
 3. The company page shows the profile, evidence with source links, and AI opportunities to **Mark for review**,
    **Approve for investigation** or **Reject** (with a note). The **Opportunities** tab is the review queue.
+
+### Growth triggers, buying intent and lead scoring (Sprint 3)
+
+4. **Enrich** a company (company page) or **Enrich all** (project page). The worker reads news / press / careers /
+   tender / project-request pages and records dated growth triggers (hiring, expansion, funding, …) with verbatim
+   evidence, buying intent from the company's own requests, a configured tender source or inquiries you record
+   (first-party), and a deterministic score.
+5. **Ranked leads** lists companies by their conservative score with the upper bound, coverage and a
+   *provisional* label when data is missing; filter by review status, priority, intent, trigger type, freshness or
+   project and export the shortlist as CSV. The lead page explains every criterion with its evidence, shows the
+   trigger timeline (unknown dates are never shown as current), intent, score history and the review workflow
+   (new → needs research → qualified for review → reviewed / rejected).
+6. **Scoring** holds versioned scoring profiles (weights 35/25/20/20 by default, freshness bands 30/90/180 days)
+   and ICP profiles (default: Germany, B2B + B2C, 1–249 employees, excluded industries, AI solution categories).
+   Owners edit them; **Re-score** recomputes from stored data — no crawling, no AI cost.
+
+Intent is never invented: without a request, tender or inquiry the lead shows *no verified intent*. No live tender
+feed or intent-data provider is bundled (interfaces only); AIgentiX never contacts prospects.
 
 AI analysis needs an API key for the provider each task is routed to. Choose provider and model per task in `.env`:
 
@@ -105,6 +124,8 @@ E2E_PASSWORD=<seed password> make e2e
 
 # Research evaluation over 12 fixture companies (writes a Markdown report):
 cd apps/api && RESEARCH_EVAL_REPORT=/tmp/eval.md uv run pytest -q tests/test_li_eval.py
+# Lead-scoring evaluation over 16 enrichment scenarios:
+cd apps/api && LEAD_SCORING_EVAL_REPORT=/tmp/scoring.md uv run pytest -q tests/test_lead_scoring_eval.py
 ```
 
 CI (`.github/workflows/ci.yml`) runs backend, contract-freshness, frontend and a Docker Compose + Playwright

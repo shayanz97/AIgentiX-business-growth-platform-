@@ -43,9 +43,10 @@ jobs:
       - run: uv run pytest
         env:
           RESEARCH_EVAL_REPORT: research-eval.md
-      - name: Research evaluation report
+          LEAD_SCORING_EVAL_REPORT: lead-scoring-eval.md
+      - name: Evaluation reports
         if: always()
-        run: cat research-eval.md >> "$GITHUB_STEP_SUMMARY" || true
+        run: cat research-eval.md lead-scoring-eval.md >> "$GITHUB_STEP_SUMMARY" || true
 
   contracts:
     name: API contract is up to date
