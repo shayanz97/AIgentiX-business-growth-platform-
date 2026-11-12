@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 
 from sqlalchemy import func, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from aigentix.core.db import utcnow
@@ -144,12 +145,21 @@ def evidence_links(db: Session, table: type, key: str, ids: Sequence[uuid.UUID])
     return result
 
 
-def signals_for_company(db: Session, tenant: TenantContext, company_id: uuid.UUID) -> list[BusinessSignal]:
+def signals_for_company(
+    db: Session, tenant: TenantContext, company_id: uuid.UUID, enrichment_run_id: uuid.UUID | None
+) -> list[BusinessSignal]:
+    """Current signals: those observed by the latest finished enrichment run (the ones that are scored)."""
     get_company(db, tenant, company_id)
+    if enrichment_run_id is None:
+        return []
     return list(
         db.scalars(
             select(BusinessSignal)
-            .where(BusinessSignal.organization_id == tenant.organization_id, BusinessSignal.company_id == company_id)
+            .where(
+                BusinessSignal.organization_id == tenant.organization_id,
+                BusinessSignal.company_id == company_id,
+                BusinessSignal.enrichment_run_id == enrichment_run_id,
+            )
             .order_by(BusinessSignal.occurred_on.desc().nulls_last(), BusinessSignal.signal_type, BusinessSignal.id)
         )
     )
@@ -195,28 +205,35 @@ def record_first_party_intent(
     if solution_category is not None and solution_category not in SOLUTION_CATEGORIES:
         raise InvalidInput("Unknown solution category")
     key = first_party_key(channel, received_on, summary)
-    existing = db.scalar(
+    # Insert-or-ignore: concurrent identical submissions cannot race into a constraint error.
+    new_id = db.scalar(
+        insert(BuyingIntentSignal)
+        .values(
+            id=uuid.uuid4(),
+            organization_id=tenant.organization_id,
+            company_id=company.id,
+            strength=IntentStrength.EXPLICIT.value,
+            source_type=IntentSourceType.FIRST_PARTY.value,
+            title=f"Inbound inquiry via {channel.replace('_', ' ')}",
+            summary=summary.strip(),
+            solution_category=solution_category,
+            observed_on=received_on,
+            reliability="high",
+            dedupe_key=key,
+            recorded_by_user_id=tenant.user.id,
+            created_at=utcnow(),
+            last_seen_at=utcnow(),
+        )
+        .on_conflict_do_nothing(constraint="uq_buying_intent_signals_dedupe")
+        .returning(BuyingIntentSignal.id)
+    )
+    row = db.scalar(
         select(BuyingIntentSignal).where(
             BuyingIntentSignal.organization_id == tenant.organization_id,
             BuyingIntentSignal.company_id == company.id,
             BuyingIntentSignal.dedupe_key == key,
         )
     )
-    if existing is not None:
-        return existing, False
-    row = BuyingIntentSignal(
-        organization_id=tenant.organization_id,
-        company_id=company.id,
-        strength=IntentStrength.EXPLICIT.value,
-        source_type=IntentSourceType.FIRST_PARTY.value,
-        title=f"Inbound inquiry via {channel.replace('_', ' ')}",
-        summary=summary.strip(),
-        solution_category=solution_category,
-        observed_on=received_on,
-        reliability="high",
-        dedupe_key=key,
-        recorded_by_user_id=tenant.user.id,
-    )
-    db.add(row)
-    db.flush()
-    return row, True
+    if row is None:  # pragma: no cover - the row exists after insert-or-ignore
+        raise InvalidInput("Could not record the inquiry")
+    return row, new_id is not None

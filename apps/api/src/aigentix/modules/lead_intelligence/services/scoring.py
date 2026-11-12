@@ -102,6 +102,22 @@ def _links(db: Session, table: Any, key: Any, ids: Sequence[uuid.UUID]) -> dict[
     return {k: sorted(v) for k, v in result.items()}
 
 
+def current_signals(
+    db: Session, org: uuid.UUID, company_id: uuid.UUID, enrichment_run_id: uuid.UUID
+) -> list[BusinessSignal]:
+    return list(
+        db.scalars(
+            select(BusinessSignal)
+            .where(
+                BusinessSignal.organization_id == org,
+                BusinessSignal.company_id == company_id,
+                BusinessSignal.enrichment_run_id == enrichment_run_id,
+            )
+            .order_by(BusinessSignal.id)
+        )
+    )
+
+
 def gather_inputs(
     db: Session, org: uuid.UUID, company: Company, reference: date, current_enrichment: ResearchRun | None = None
 ) -> tuple[ScoringInputs, RunStates]:
@@ -131,12 +147,12 @@ def gather_inputs(
             )
             for o in opps
         ]
-    signal_rows = list(
-        db.scalars(
-            select(BusinessSignal)
-            .where(BusinessSignal.organization_id == org, BusinessSignal.company_id == company.id)
-            .order_by(BusinessSignal.id)
-        )
+    # Only signals (re-)observed by the latest finished enrichment count: older ones that were not seen again or
+    # were rejected by the review stay in the history but no longer score.
+    signal_rows = (
+        current_signals(db, org, company.id, states.enrichment_run.workflow_run_id)
+        if states.enrichment_run is not None
+        else []
     )
     signal_links = _links(db, BusinessSignalEvidence, BusinessSignalEvidence.signal_id, [s.id for s in signal_rows])
     signals = [
@@ -150,6 +166,7 @@ def gather_inputs(
             mention_count=s.mention_count,
             evidence_ids=signal_links.get(s.id, []),
             text=f"{s.title} {s.summary}",
+            deadline_on=s.deadline_on,
         )
         for s in signal_rows
     ]

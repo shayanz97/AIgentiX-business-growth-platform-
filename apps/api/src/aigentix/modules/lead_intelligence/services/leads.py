@@ -131,6 +131,7 @@ def _query(
             exists().where(
                 BusinessSignal.company_id == Company.id,
                 BusinessSignal.organization_id == org,
+                BusinessSignal.enrichment_run_id == score.enrichment_run_id,  # signals that are part of the score
                 BusinessSignal.signal_type == filters.signal_type,
             )
         )

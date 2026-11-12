@@ -248,6 +248,13 @@ def upgrade() -> None:
         ),
         sa.CheckConstraint("coverage >= 0 AND coverage <= 1", name=op.f("ck_lead_scores_coverage_range")),
         sa.CheckConstraint(
+            "priority_band IN ('high', 'medium', 'low', 'excluded')", name=op.f("ck_lead_scores_priority_band_valid")
+        ),
+        sa.CheckConstraint(
+            "intent_status IN ('explicit', 'strong', 'indirect', 'none_verified', 'unknown')",
+            name=op.f("ck_lead_scores_intent_status_valid"),
+        ),
+        sa.CheckConstraint(
             "score_low >= 0 AND score_low <= score_high AND score_high <= 100", name=op.f("ck_lead_scores_score_bounds")
         ),
         sa.ForeignKeyConstraint(
@@ -291,9 +298,16 @@ def upgrade() -> None:
     )
     op.create_index("ix_lead_scores_company_created", "lead_scores", ["company_id", "created_at"], unique=False)
     op.create_index(
-        "ix_lead_scores_org_profiles",
+        "ix_lead_scores_ranked",
         "lead_scores",
-        ["organization_id", "scoring_profile_id", "icp_profile_id"],
+        [
+            "organization_id",
+            "scoring_profile_id",
+            "icp_profile_id",
+            "company_id",
+            sa.literal_column("created_at DESC"),
+            sa.literal_column("id DESC"),
+        ],
         unique=False,
     )
     op.create_table(
@@ -414,7 +428,7 @@ def downgrade() -> None:
     op.drop_table("business_signal_evidence")
     op.drop_index("ix_lead_reviews_company_created", table_name="lead_reviews")
     op.drop_table("lead_reviews")
-    op.drop_index("ix_lead_scores_org_profiles", table_name="lead_scores")
+    op.drop_index("ix_lead_scores_ranked", table_name="lead_scores")
     op.drop_index("ix_lead_scores_company_created", table_name="lead_scores")
     op.drop_table("lead_scores")
     op.drop_index("ix_buying_intent_signals_company", table_name="buying_intent_signals")

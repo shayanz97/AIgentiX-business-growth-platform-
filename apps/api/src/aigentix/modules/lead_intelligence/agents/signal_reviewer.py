@@ -11,11 +11,13 @@ from dataclasses import dataclass, field
 from aigentix.modules.lead_intelligence.agents.calls import UsageSink, call_with_repair
 from aigentix.modules.lead_intelligence.agents.prompts import SIGNAL_REVIEW_SYSTEM
 from aigentix.modules.lead_intelligence.agents.schemas import SignalReviewOutput
-from aigentix.modules.lead_intelligence.agents.text_safety import neutralise_markup
+from aigentix.modules.lead_intelligence.agents.text_safety import neutralise_markup, strip_foreign_urls
 from aigentix.modules.lead_intelligence.domain.signals import DetectedSignal
 from aigentix.platform.llm import LLMProvider
 
-INTENT_TYPES = {"public_project_request", "procurement_tender", "inbound_inquiry"}
+# Types that can produce buying intent (directly or as INDIRECT intent): the model may never re-type into or
+# out of them, so neither injected text nor a model mistake can create intent.
+INTENT_TYPES = {"public_project_request", "procurement_tender", "inbound_inquiry", "digital_transformation"}
 MAX_CANDIDATES = 30
 
 
@@ -31,6 +33,12 @@ class ReviewDecision:
 class ReviewResult:
     decisions: dict[int, ReviewDecision] = field(default_factory=dict)  # index into the signals list
     ignored: list[str] = field(default_factory=list)
+
+
+def _reason(text: str) -> str:
+    """Model text is shown to users: no links to other sites, bounded length."""
+    cleaned, _ = strip_foreign_urls(text, None)
+    return " ".join(cleaned.split())[:300]
 
 
 def _prompt(signals: list[DetectedSignal]) -> str:
@@ -82,9 +90,9 @@ def review_signals(
             # Request/tender classification is deterministic only (no intent from model output).
             result.ignored.append(f"{label}: type change {original} → {new_type} not allowed")
             new_type = original
-        if original in INTENT_TYPES and not decision.keep:
+        if original in INTENT_TYPES - {"digital_transformation"} and not decision.keep:
             result.ignored.append(f"{label}: requests/tenders are kept for human review")
-            result.decisions[index] = ReviewDecision(True, original, decision.relevance, decision.reason[:300])
+            result.decisions[index] = ReviewDecision(True, original, decision.relevance, _reason(decision.reason))
             continue
-        result.decisions[index] = ReviewDecision(decision.keep, new_type, decision.relevance, decision.reason[:300])
+        result.decisions[index] = ReviewDecision(decision.keep, new_type, decision.relevance, _reason(decision.reason))
     return result

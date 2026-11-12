@@ -68,6 +68,7 @@ class SignalInput:
     mention_count: int
     evidence_ids: list[str]
     text: str = ""
+    deadline_on: date | None = None
 
 
 @dataclass(frozen=True)
@@ -323,6 +324,8 @@ def _signal_value(signal: SignalInput, config: ScoringConfig, reference: date) -
         if signal.date_conflict
         else freshness(signal.occurred_on, reference, config.freshness_bands.model_dump())
     )
+    if signal.deadline_on is not None and signal.deadline_on < reference:
+        return 0.0, "expired"  # a request / tender whose deadline passed is no longer a live trigger
     factor = getattr(config.freshness_factors, band)
     value = TRIGGER_TYPE_VALUE.get(signal.signal_type, 0.3) * factor * CONFIDENCE_FACTOR.get(signal.confidence, 0.6)
     return value, band

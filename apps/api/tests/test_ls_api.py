@@ -312,3 +312,14 @@ def test_ranking_is_deterministic_and_export_is_formula_safe(tenant_a: Tenant) -
     names = [r[1] for r in rows[1:]]
     assert '\'=HYPERLINK("http://x")' in names
     assert not any(n.startswith("=") for n in names)
+
+
+def test_foreign_profile_ids_are_rejected(enriched_a: dict[str, Any], tenant_b: Tenant) -> None:
+    for param in ("scoring_profile_id", "icp_profile_id"):
+        for path in ("/api/v1/leads/ranked", "/api/v1/leads/export"):
+            url = f"{path}?{param}={enriched_a[param]}"
+            assert tenant_b.client.get(url, headers=tenant_b.headers).status_code == 404, url
+        body = {param: enriched_a[param]}
+        company = add_company(tenant_b, "https://b-company.example/")
+        url = f"/api/v1/companies/{company['id']}/score"
+        assert tenant_b.client.post(url, json=body, headers=tenant_b.headers).status_code == 404

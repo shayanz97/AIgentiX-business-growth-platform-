@@ -160,9 +160,10 @@ def company_signals(db: DbSession, tenant: Tenant, company_id: uuid.UUID) -> Com
     reference = settings.reference_date()
     scoring = profile_service.ensure_default(db, tenant.organization_id, ScoringProfile)
     config = ScoringConfig.model_validate(scoring.config)
-    signals = enrichment_service.signals_for_company(db, tenant, company_id)
     intents = enrichment_service.intents_for_company(db, tenant, company_id)
     states = scoring_service.run_states(db, tenant.organization_id, company_id)
+    current_run = states.enrichment_run.workflow_run_id if states.enrichment_run else None
+    signals = enrichment_service.signals_for_company(db, tenant, company_id, current_run)
     run = None
     profile: dict[str, Any] = {}
     if states.latest_enrichment_run is not None:

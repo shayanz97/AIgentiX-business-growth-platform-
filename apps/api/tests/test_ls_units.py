@@ -420,3 +420,83 @@ def test_enrichment_with_rejecting_ai_review(tenant_a: Tenant, db: Session) -> N
     assert row.origin == "llm_reviewed"
     assert row.relevance == "high"
     assert view["enrichment_run"]["estimated_cost_usd"] > 0
+
+
+# --- review regressions --------------------------------------------------------------------------------
+
+
+class _Retyper(_Reviewer):
+    """Tries to turn every candidate into digital_transformation (which would create INDIRECT intent)."""
+
+    def structured(
+        self, *, task: str, system: str, messages: list[dict[str, Any]], output_model: Any, max_tokens: int
+    ) -> Any:
+        from aigentix.platform.llm import LLMResponse
+
+        count = str(messages[-1]["content"]).count("<website_content")
+        decisions = [
+            SignalDecision(
+                candidate_id=f"C{i}",
+                keep=True,
+                signal_type="digital_transformation",
+                relevance="high",
+                reason="See https://evil.example/x for details",
+            )
+            for i in range(1, count + 1)
+        ]
+        usage = LLMUsage(model="scripted-signals", input_tokens=1, output_tokens=1, cost_usd=Decimal("0.0001"))
+        return LLMResponse(output=SignalReviewOutput(decisions=decisions), usage=usage)
+
+
+def test_ai_review_cannot_retype_into_indirect_intent() -> None:
+    signals = detect(
+        [_segment("Einführung eines neuen ERP-Systems", "Neue Software für den Kundenservice im Echtbetrieb.")],
+        reference=REF,
+    ).signals
+    assert signals[0].signal_type == SignalType.TECHNOLOGY_ADOPTION
+    review = review_signals(_Retyper(), signals, max_repairs=0, record_usage=lambda u: None, max_tokens=1000)
+    assert review.decisions[0].signal_type == "technology_adoption"
+    assert "evil.example" not in review.decisions[0].reason
+
+
+def test_enrichment_retype_attempt_creates_no_intent(tenant_a: Tenant) -> None:
+    company = add_company(tenant_a, "https://rhein-logistik-expansion.example/")
+    view = enrich(tenant_a, company["id"], research_registry(provider=_Retyper, settings=FIXTURE_SETTINGS))  # type: ignore[arg-type]
+    assert view["intent_status"] == "none_verified"
+    assert view["intents"] == []
+    assert "digital_transformation" not in {s["signal_type"] for s in view["signals"]}
+
+
+def test_expired_request_is_not_a_live_trigger() -> None:
+    icp, config = IcpConfig(), ScoringConfig()
+    expired = _signal(1, "public_project_request", deadline_on=date(2026, 11, 1))
+    live = _signal(2, "public_project_request", deadline_on=date(2026, 12, 1))
+    triggers = {
+        name: next(c for c in score_lead(_inputs(signals=[s]), icp, config).components if c.key == "triggers")
+        for name, s in (("expired", expired), ("live", live))
+    }
+    assert triggers["expired"].score_low == 0
+    assert "expired" in triggers["expired"].criteria[0].explanation
+    assert triggers["live"].score_low > 0
+
+
+def test_stale_signals_stop_scoring_after_rejection(tenant_a: Tenant, db: Session) -> None:
+    company = add_company(tenant_a, "https://rhein-logistik-expansion.example/")
+    first = enrich(tenant_a, company["id"], research_registry())  # fixture review keeps everything
+    assert len(first["signals"]) == 2
+    second = enrich(tenant_a, company["id"], research_registry(provider=_Reviewer, settings=FIXTURE_SETTINGS))  # type: ignore[arg-type]
+    assert len(second["signals"]) == 1  # one rejected by the review in the newer run
+    score = tenant_a.client.get(f"/api/v1/companies/{company['id']}/scores", headers=tenant_a.headers).json()
+    triggers = next(c for c in score["items"][0]["components"] if c["key"] == "triggers")
+    assert len(triggers["criteria"][0]["references"]) == 1
+    assert len(list(db.scalars(select(BusinessSignal)))) == 2  # history is kept, only the current one scores
+
+
+def test_industry_is_assessed_only_with_evidence(tenant_a: Tenant) -> None:
+    company = add_company(tenant_a, "https://kleinbetrieb-minimal.example/")
+    enrich(tenant_a, company["id"], research_registry())
+    score = tenant_a.client.get(f"/api/v1/companies/{company['id']}/scores", headers=tenant_a.headers).json()
+    fit = next(c for c in score["items"][0]["components"] if c["key"] == "fit")
+    for criterion in fit["criteria"]:
+        if criterion["state"] == "assessed" and criterion["key"] in ("country", "industry", "company_size"):
+            assert criterion["evidence_ids"], criterion

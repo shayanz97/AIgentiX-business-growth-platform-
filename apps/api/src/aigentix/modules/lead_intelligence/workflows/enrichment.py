@@ -234,7 +234,7 @@ class _Enrichment(_Research):
                     continue
                 signal.signal_type = SignalType(str(decision["signal_type"]))
                 signal.details["ai_relevance"] = decision["relevance"]
-                signal.details["ai_reason"] = decision["reason"]
+                signal.details["ai_reason"] = str(decision["reason"])[:300]
             kept.append(signal)
         return kept
 
@@ -408,18 +408,18 @@ class _Enrichment(_Research):
             for f in facts.sizes[: MAX_FIRMOGRAPHIC_EVIDENCE + 2]
             if (e := cite(EvidenceType.COMPANY_SIZE, f"About {f.employees} employees", f.excerpt, f.source_index))
         ]
-        descriptions = [s.extracted_text[:600] for s in pool if s.page_category in ("about", "home")][:3]
-        if self.company.short_description:
-            descriptions.append(self.company.short_description[:600])
-        if self.company.industry:
-            descriptions.append(self.company.industry)
-        about_ids = [
-            e
-            for s in pool
-            if s.page_category == "about" and s.extracted_text
-            for e in [cite(EvidenceType.COMPANY_DESCRIPTION, "About page", s.extracted_text[:300], pool.index(s))]
-            if e
-        ][:1]
+        # Industry is judged only on cited website text (industry statements + the cited start of the about /
+        # home page); user-supplied CSV fields are not evidence.
+        descriptions: list[str] = []
+        about_ids: list[str] = []
+        for index, s in enumerate(pool):
+            if s.page_category not in ("about", "home") or len(s.extracted_text) < 20 or len(descriptions) >= 2:
+                continue
+            excerpt = s.extracted_text[:300]
+            label = "About page" if s.page_category == "about" else "Homepage"
+            if e := cite(EvidenceType.COMPANY_DESCRIPTION, f"{label} describes the company", excerpt, index):
+                descriptions.append(excerpt)
+                about_ids.append(e)
         self.research.profile = {
             **(self.research.profile or {}),
             "firmographics": {

@@ -660,8 +660,22 @@ class LeadScore(Base):
         CheckConstraint("score_low >= 0 AND score_low <= score_high AND score_high <= 100", name="score_bounds"),
         CheckConstraint("coverage >= 0 AND coverage <= 1", name="coverage_range"),
         _enum_check("confidence_level", Confidence, "confidence_level_valid"),
+        CheckConstraint("priority_band IN ('high', 'medium', 'low', 'excluded')", name="priority_band_valid"),
+        CheckConstraint(
+            "intent_status IN ('explicit', 'strong', 'indirect', 'none_verified', 'unknown')",
+            name="intent_status_valid",
+        ),
         Index("ix_lead_scores_company_created", "company_id", "created_at"),
-        Index("ix_lead_scores_org_profiles", "organization_id", "scoring_profile_id", "icp_profile_id"),
+        # Serves the ranked list: latest snapshot per company for one (scoring, ICP) profile pair.
+        Index(
+            "ix_lead_scores_ranked",
+            "organization_id",
+            "scoring_profile_id",
+            "icp_profile_id",
+            "company_id",
+            text("created_at DESC"),
+            text("id DESC"),
+        ),
     )
 
 
