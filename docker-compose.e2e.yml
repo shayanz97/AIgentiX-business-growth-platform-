@@ -1,10 +1,13 @@
-# Overlay for CI/E2E and offline demos: research reads the bundled *.example fixture sites and uses the
-# deterministic LLM test double. Both are refused when ENVIRONMENT=production.
+# Overlay for CI/E2E and offline demos: research reads the bundled *.example fixture sites, uses the
+# deterministic LLM test double and the offline tender fixtures. All are refused when ENVIRONMENT=production.
 #   docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build --wait
 x-offline-research: &offline
   ENVIRONMENT: test
   RESEARCH_FETCH_BACKEND: fixtures
   LLM_PROVIDER: fixture
+  # Sprint 3: offline tender records and a fixed "today" so the fixture dates keep their freshness.
+  RESEARCH_TENDER_SOURCE: fixtures
+  SCORING_REFERENCE_DATE: "2026-11-12"
   RESEARCH_DOMAIN_MIN_INTERVAL_SECONDS: "0"
   WORKER_POLL_INTERVAL_SECONDS: "0.5"
 

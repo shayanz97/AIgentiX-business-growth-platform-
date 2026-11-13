@@ -1,0 +1,35 @@
+{
+  "scenario": "multiple_opportunities",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "product_launch",
+    "leadership_change",
+    "hiring"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "product_launch": 1,
+    "leadership_change": 1,
+    "hiring": 1
+  },
+  "expected_dates": {
+    "product_launch": "2026-11-04",
+    "leadership_change": "2026-09-10",
+    "hiring": "2026-10-27"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "product_launch": "recent",
+    "leadership_change": "moderate",
+    "hiring": "recent"
+  },
+  "expected_intent_strength": "explicit",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Werbetechnik",
+    "print"
+  ],
+  "expected_fit": "high",
+  "expected_score_band": "high",
+  "notes": "Contact and quote forms, support page, careers and two news items. A first-party inbound inquiry exists in first_party.json. First-party inquiry (first_party.json) makes intent explicit."
+}

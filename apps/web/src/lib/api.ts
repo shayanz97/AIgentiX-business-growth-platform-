@@ -24,6 +24,23 @@ export type ImportResult = Schemas["CompanyImportResult"];
 export type ImportRow = Schemas["CompanyImportRow"];
 export type LeadIntelligenceSummary = Schemas["LeadIntelligenceSummary"];
 
+export type Profile = Schemas["ProfileRead"];
+export type ProfileCreate = Schemas["ProfileCreate"];
+export type ProfileUpdate = Schemas["ProfileUpdate"];
+export type EnrichmentStartResult = Schemas["EnrichmentStartResult"];
+export type CompanySignals = Schemas["CompanySignals"];
+export type Signal = Schemas["SignalRead"];
+export type Intent = Schemas["IntentRead"];
+export type FirstPartyIntentCreate = Schemas["FirstPartyIntentCreate"];
+export type LeadScore = Schemas["LeadScoreRead"];
+export type ScoreComponent = Schemas["ComponentRead"];
+export type ScoreCriterion = Schemas["CriterionRead"];
+export type Lead = Schemas["LeadRead"];
+export type LeadDetail = Schemas["LeadDetail"];
+export type LeadReview = Schemas["LeadReviewRead"];
+export type ReviewStatus = Schemas["ReviewStatus"];
+export type ScoreRunResult = Schemas["ScoreRunResult"];
+
 export const ORG_HEADER = "X-Organization-Id";
 const ORG_STORAGE_KEY = "aigx.activeOrganization";
 

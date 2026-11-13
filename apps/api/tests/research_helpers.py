@@ -1,6 +1,7 @@
 """Shared helpers for Lead Intelligence tests: offline research dependencies and a worker driver."""
 
 from collections.abc import Callable
+from datetime import date
 from decimal import Decimal
 from typing import Any
 
@@ -11,19 +12,24 @@ from aigentix.modules.lead_intelligence.agents.fixture_llm import FixtureLLMProv
 from aigentix.modules.lead_intelligence.config import ResearchSettings
 from aigentix.modules.lead_intelligence.integrations.fetcher import FetcherConfig, SafeFetcher
 from aigentix.modules.lead_intelligence.integrations.fixture_web import fixture_resolver, fixture_transport
-from aigentix.modules.lead_intelligence.workflows.constants import RESEARCH_WORKFLOW
+from aigentix.modules.lead_intelligence.integrations.tenders import FixtureTenderSource, TenderSource
+from aigentix.modules.lead_intelligence.workflows.constants import ENRICHMENT_WORKFLOW, RESEARCH_WORKFLOW
+from aigentix.modules.lead_intelligence.workflows.enrichment import EnrichmentDependencies, make_enrichment_handler
 from aigentix.modules.lead_intelligence.workflows.research import ResearchDependencies, make_research_handler
 from aigentix.platform.llm import LLMProvider
 from aigentix.platform.workflows.registry import WorkflowRegistry
 from aigentix.worker.runner import WorkerSettings, run_once
 from tests.conftest import Tenant
 
+REFERENCE_DATE = date(2026, 11, 12)  # the enrichment fixtures are written relative to this "today"
 FIXTURE_SETTINGS = ResearchSettings(
     environment="test",
     research_fetch_backend="fixtures",
     llm_provider="fixture",
     research_domain_min_interval_seconds=0,
     llm_max_cost_per_run_usd=Decimal("1.00"),
+    research_tender_source="fixtures",
+    scoring_reference_date=REFERENCE_DATE,
 )
 
 
@@ -31,6 +37,7 @@ def research_registry(
     provider: Callable[[], LLMProvider | None] = FixtureLLMProvider,
     settings: ResearchSettings = FIXTURE_SETTINGS,
     fetcher: Callable[[], SafeFetcher] | None = None,
+    tender_source: Callable[[], TenderSource | None] = FixtureTenderSource,
 ) -> WorkflowRegistry:
     def default_fetcher() -> SafeFetcher:
         return SafeFetcher(
@@ -44,6 +51,13 @@ def research_registry(
     )
     registry = WorkflowRegistry()
     registry.register(RESEARCH_WORKFLOW, make_research_handler(lambda: deps), max_concurrent=2)
+    enrichment = EnrichmentDependencies(
+        settings=settings,
+        fetcher_factory=fetcher or default_fetcher,
+        provider_factory=provider,
+        tender_source_factory=tender_source,
+    )
+    registry.register(ENRICHMENT_WORKFLOW, make_enrichment_handler(lambda: enrichment), max_concurrent=2)
     return registry
 
 
@@ -80,3 +94,17 @@ def client_get(client: TestClient, url: str, headers: dict[str, str]) -> Any:
     response = client.get(url, headers=headers)
     assert response.status_code == 200, response.text
     return response.json()
+
+
+def enrich(t: Tenant, company_id: str, registry: WorkflowRegistry, *, force: bool = True) -> dict[str, Any]:
+    """Enrich a company to completion (force: never reuse a cached enrichment) and return its signals view."""
+    response = t.client.post(f"/api/v1/companies/{company_id}/enrich", json={"force": force}, headers=t.headers)
+    assert response.status_code == 202, response.text
+    drain(registry)
+    return client_get(t.client, f"/api/v1/companies/{company_id}/signals", t.headers)  # type: ignore[no-any-return]
+
+
+def latest_score(t: Tenant, company_id: str) -> dict[str, Any]:
+    page = client_get(t.client, f"/api/v1/companies/{company_id}/scores", t.headers)
+    assert page["items"], "no score"
+    return page["items"][0]  # type: ignore[no-any-return]

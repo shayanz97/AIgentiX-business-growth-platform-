@@ -330,6 +330,7 @@ def test_default_routes_keep_sprint2_behaviour() -> None:
     assert routes == {
         "extraction": Route("anthropic", "claude-haiku-5-5"),
         "audit": Route("anthropic", "claude-opus-5-5"),
+        "signals": Route("anthropic", "claude-haiku-5-5"),  # Sprint 3: follows the extraction route by default
     }
 
 

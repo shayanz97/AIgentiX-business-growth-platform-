@@ -1,0 +1,7 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/kontakt": "kontakt.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

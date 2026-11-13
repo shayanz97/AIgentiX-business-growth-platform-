@@ -1,0 +1,36 @@
+{
+  "scenario": "no_verified_intent",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "funding",
+    "expansion"
+  ],
+  "forbidden_signal_types": [
+    "public_project_request",
+    "procurement_tender"
+  ],
+  "expected_signal_count": {
+    "funding": 1,
+    "expansion": 1
+  },
+  "expected_dates": {
+    "funding": "2026-10-28",
+    "expansion": "2026-11-02"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "funding": "recent",
+    "expansion": "recent"
+  },
+  "expected_intent_strength": "none_verified",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "food"
+  ],
+  "expected_fit": "medium",
+  "expected_score_band": "medium",
+  "notes": "Strong triggers but no request or tender anywhere: intent must be none_verified, never invented.",
+  "calibration_notes": [
+    "expected_fit high -> medium (fit band = conservative fit score (unpublished employee count counts as 0 of 20 points))"
+  ]
+}

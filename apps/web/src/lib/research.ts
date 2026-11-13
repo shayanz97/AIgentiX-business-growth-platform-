@@ -14,6 +14,12 @@ export const STEP_LABELS: Record<string, string> = {
   save_evidence: "Save evidence",
   ai_opportunity_audit: "AI opportunity audit",
   persist_results: "Persist results",
+  collect_sources: "Collect sources",
+  extract_signals: "Extract growth signals",
+  review_signals: "Review signals",
+  verify_evidence: "Verify evidence",
+  research_intent: "Research buying intent",
+  score_lead: "Score lead",
 };
 
 export const SKIP_REASONS: Record<SkippedCompany["reason"], string> = {

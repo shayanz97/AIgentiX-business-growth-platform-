@@ -1,0 +1,26 @@
+{
+  "scenario": "low_icp_fit",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "expansion"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "expansion": 1
+  },
+  "expected_dates": {
+    "expansion": "2026-10-28"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "expansion": "recent"
+  },
+  "expected_intent_strength": "none_verified",
+  "expected_country": "USA",
+  "expected_industry_keywords": [
+    "tobacco"
+  ],
+  "expected_fit": "excluded",
+  "expected_score_band": "low",
+  "notes": "Excluded industry (tobacco, when configured) and wrong country; recent expansion must not lift ICP fit."
+}

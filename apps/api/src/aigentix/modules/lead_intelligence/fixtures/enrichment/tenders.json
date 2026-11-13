@@ -1,0 +1,57 @@
+[
+  {
+    "id": "T-2026-001",
+    "title": "Einführung einer KI-gestützten Dokumentenverarbeitung",
+    "buyer_name": "Stadtwerke Musterstadt",
+    "buyer_domain": "stadtwerke-vergabe.example",
+    "published_at": "2026-10-28",
+    "deadline": "2026-12-15",
+    "url": "https://tenders.example/T-2026-001",
+    "description": "Offenes Verfahren zur Einführung einer KI-gestützten Dokumentenverarbeitung für Posteingang, Rechnungen und Verträge.",
+    "category": "document_processing"
+  },
+  {
+    "id": "T-2026-002",
+    "title": "Automatisierung des Kundenservice für Sendungsanfragen",
+    "buyer_name": "Rhein Logistik GmbH",
+    "buyer_domain": "rhein-logistik-expansion.example",
+    "published_at": "2026-09-20",
+    "deadline": "2026-10-31",
+    "url": "https://tenders.example/T-2026-002",
+    "description": "Ausschreibung zur Automatisierung von Sendungsanfragen im Kundenservice. Frist bereits abgelaufen.",
+    "category": "customer_service_automation"
+  },
+  {
+    "id": "T-2026-003",
+    "title": "Straßenbauarbeiten Gewerbegebiet Nord, Los 2",
+    "buyer_name": "Nordwerk Maschinenbau GmbH",
+    "buyer_domain": "nordwerk-hiring.example",
+    "published_at": "2026-10-10",
+    "deadline": "2026-12-01",
+    "url": "https://tenders.example/T-2026-003",
+    "description": "Erschließungs- und Straßenbauarbeiten im Gewerbegebiet; keine Software- oder Automatisierungsleistung.",
+    "category": "other"
+  },
+  {
+    "id": "T-2026-004",
+    "title": "Workflow-Automatisierung für das Bürgerbüro",
+    "buyer_name": "Gemeinde Beispielhausen",
+    "buyer_domain": "gemeinde-beispielhausen.example",
+    "published_at": "2026-11-03",
+    "deadline": "2027-01-20",
+    "url": "https://tenders.example/T-2026-004",
+    "description": "Digitalisierung und Automatisierung von Antragsprozessen im Bürgerbüro.",
+    "category": "workflow_automation"
+  },
+  {
+    "id": "T-2026-005",
+    "title": "Wissensassistent für die Verwaltung",
+    "buyer_name": "Landkreis Musterland",
+    "buyer_domain": "landkreis-musterland.example",
+    "published_at": "2026-10-15",
+    "deadline": "2026-12-10",
+    "url": "https://tenders.example/T-2026-005",
+    "description": "Beschaffung eines KI-Wissensassistenten für interne Verwaltungsdokumente.",
+    "category": "knowledge_assistant"
+  }
+]

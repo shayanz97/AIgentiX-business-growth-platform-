@@ -149,6 +149,32 @@ retry, cancellation and observability. LangGraph would add a dependency and a se
 concrete benefit. Revisit when a workflow needs branching/looping agent graphs or human-in-the-loop interrupts —
 the handler boundary (`WorkflowContext` → `WorkflowResult`) is where a graph would be invoked.
 
+## Growth intelligence and lead scoring (Sprint 3)
+
+Details: [SPRINT_3_PLAN.md](SPRINT_3_PLAN.md). Everything lives in the Lead Intelligence module.
+
+```
+enrich ─▶ workflow lead_intelligence.company_enrichment (same worker, same _Research fetch machinery)
+           collect_sources ─▶ segments (articles / job posts) ─▶ detect (classify · dates · dedupe · quarantine)
+           ─▶ optional AI review (keep/reject/re-type only) ─▶ evidence (verbatim) ─▶ business_signals
+           ─▶ intent (website · TenderSource · IntentProvider · first-party) ─▶ buying_intent_signals
+           ─▶ score_lead ─▶ lead_scores (append-only, evidence-linked)
+re-score ─▶ services.scoring (stored data only: no fetch, no model call)
+```
+
+* **Pure domain code** (`domain/dates.py`, `signals.py`, `firmographics.py`, `intent.py`, `scoring.py`,
+  `profiles.py`) has no I/O and is unit-tested directly; services gather inputs and persist results.
+* **Enrichment runs reuse `research_runs`** (`kind = 'enrichment'`) so sources and evidence keep one provenance
+  model. Research views (`latest_finished_run_id`, summary, results) only consider `kind = 'research'`.
+* **Dedupe**: one signal per `(organization, company, dedupe_key)`; repeated mentions raise `mention_count` and
+  add evidence links; scores use diminishing returns over distinct signals only.
+* **Profiles** are JSON configs validated by Pydantic (`IcpConfig`, `ScoringConfig`) on versioned rows; a score
+  snapshot stores the profile versions and configs it used, and the inputs hash suppresses identical snapshots.
+* **Ranked leads** = latest snapshot per company for a (scoring, ICP) profile pair (`DISTINCT ON`), joined with
+  the latest review; SQL ordering with deterministic tie-breaks (score_low, coverage, name, id).
+* **External intent sources** are interfaces: `TenderSource` (offline fixture adapter only) and `IntentProvider`
+  (none). Buying or scraping intent data is out of scope.
+
 ## API conventions
 
 - Versioned under `/api/v1`; OpenAPI at `/api/v1/openapi.json`, Swagger UI at `/api/v1/docs`.
@@ -163,7 +189,12 @@ the handler boundary (`WorkflowContext` → `WorkflowResult`) is where a graph w
 - No public sign-up, invitations, password reset or e-mail verification (users are created via CLI).
 - Login throttling and per-domain request spacing are in-process: correct for one API / one worker process. With
   several, add an IP limit at the reverse proxy and move counters/spacing to PostgreSQL.
-- Research covers static HTML only (no JavaScript rendering), English-centric page categories and signal keywords.
+- Research covers static HTML only (no JavaScript rendering). Page categories and signal keywords cover German
+  and English; other languages are not detected.
+- Growth-trigger detection is keyword-based (DE/EN) with an optional AI review; it misses events phrased without
+  the listed terms, and job postings collapse into one hiring trigger per company.
+- Lead scoring is calibrated on 16 fixture scenarios only; weights and thresholds are defaults, not validated
+  against real conversion data. No live tender feed or intent provider is integrated.
 - The concurrency limit counts `running` runs only; the advisory lock makes the check exact across workers.
 - Re-researching a company creates a new run; the company page shows the latest finished run (older runs and
   their reviewed opportunities stay available by run id).

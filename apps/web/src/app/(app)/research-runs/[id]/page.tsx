@@ -61,14 +61,23 @@ function RunPage() {
   return (
     <>
       <PageHeader
-        title={`Research: ${current.company_name}`}
-        description="Website research and AI opportunity audit"
+        title={`${current.kind === "enrichment" ? "Enrichment" : "Research"}: ${current.company_name}`}
+        description={
+          current.kind === "enrichment"
+            ? "Growth triggers, buying intent and lead score"
+            : "Website research and AI opportunity audit"
+        }
         actions={
           <>
             {active ? (
               <Button variant="secondary" onClick={() => void cancel()} disabled={cancelling || current.cancel_requested}>
                 Cancel research
               </Button>
+            ) : null}
+            {current.kind === "enrichment" ? (
+              <ButtonLink href={`/leads/${current.company_id}`} variant="secondary">
+                View lead
+              </ButtonLink>
             ) : null}
             <ButtonLink href={`/companies/${current.company_id}`}>View company results</ButtonLink>
           </>

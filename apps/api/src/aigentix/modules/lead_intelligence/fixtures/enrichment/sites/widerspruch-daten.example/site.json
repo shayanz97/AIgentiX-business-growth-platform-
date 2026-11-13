@@ -1,0 +1,10 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/ueber-uns": "about.html",
+    "/news": "news.html",
+    "/presse": "presse.html",
+    "/karriere": "careers.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}
