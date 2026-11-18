@@ -122,7 +122,9 @@ def suggest(state: DealState) -> list[Suggestion]:
                 else f"The last recorded contact was {state.days_since_contact} days ago."
             )
             out.append(
-                Suggestion("check_customer_reply", "Check status of customer reply", f"{age} See if a reply arrived.", 1)
+                Suggestion(
+                    "check_customer_reply", "Check status of customer reply", f"{age} See if a reply arrived.", 1
+                )
             )
         if state.days_since_contact is not None and state.days_since_contact >= 7:
             out.append(

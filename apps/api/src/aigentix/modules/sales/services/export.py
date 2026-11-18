@@ -167,8 +167,16 @@ def export_csv(db: Session, tenant: TenantContext, entity: str, *, stage: str | 
         return to_csv(
             ACTIVITY_COLUMNS,
             [
-                (a.id, a.sales_opportunity_id, title, a.activity_type, a.description, a.occurred_at)
-                + (a.created_by_user_id, a.created_at)
+                [
+                    a.id,
+                    a.sales_opportunity_id,
+                    title,
+                    a.activity_type,
+                    a.description,
+                    a.occurred_at,
+                    a.created_by_user_id,
+                    a.created_at,
+                ]
                 for a, title in pairs
             ],
         )
@@ -189,8 +197,18 @@ def export_csv(db: Session, tenant: TenantContext, entity: str, *, stage: str | 
     return to_csv(
         TASK_COLUMNS,
         [
-            (t.id, t.sales_opportunity_id, title, t.title, t.description, t.due_at, t.status)
-            + (t.assigned_user_id, t.completed_at, t.created_at)
+            [
+                t.id,
+                t.sales_opportunity_id,
+                title,
+                t.title,
+                t.description,
+                t.due_at,
+                t.status,
+                t.assigned_user_id,
+                t.completed_at,
+                t.created_at,
+            ]
             for t, title in task_rows
         ],
     )

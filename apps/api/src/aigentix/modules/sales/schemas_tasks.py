@@ -122,5 +122,3 @@ class CRMMappingRead(BaseModel):
     last_error: str | None
     last_synced_at: datetime | None
     updated_at: datetime
-
-

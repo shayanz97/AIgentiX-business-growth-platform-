@@ -111,9 +111,6 @@ def list_tasks(
     return list(rows), int(total)
 
 
-_UNSET = object()
-
-
 def update_task(
     db: Session,
     tenant: TenantContext,
@@ -122,7 +119,8 @@ def update_task(
     title: str | None = None,
     description: str | None = None,
     due_at: datetime | None = None,
-    assigned_user_id: uuid.UUID | None | object = _UNSET,
+    assigned_user_id: uuid.UUID | None = None,
+    set_assignee: bool = False,  # True: apply assigned_user_id even when None (unassign)
     status: str | None = None,
 ) -> SalesTask:
     task = get_task(db, tenant, task_id, for_update=True)
@@ -132,8 +130,7 @@ def update_task(
         task.title = title.strip()
     if description is not None:
         task.description = description.strip()
-    if assigned_user_id is not _UNSET:
-        assert assigned_user_id is None or isinstance(assigned_user_id, uuid.UUID)
+    if set_assignee:
         require_member(db, tenant, assigned_user_id)
         task.assigned_user_id = assigned_user_id
     if due_at is not None and due_at != task.due_at:
@@ -181,9 +178,7 @@ def summary(db: Session, tenant: TenantContext, tz: ZoneInfo) -> dict[str, int]:
     }
 
 
-def deal_suggestions(
-    db: Session, tenant: TenantContext, deal_id: uuid.UUID
-) -> list[tuple[Suggestion, datetime]]:
+def deal_suggestions(db: Session, tenant: TenantContext, deal_id: uuid.UUID) -> list[tuple[Suggestion, datetime]]:
     """Deterministic suggestions from recorded state. Nothing is created; suggestions already open are omitted."""
     deal: SalesOpportunity = get_deal(db, tenant, deal_id)
     org = tenant.organization_id

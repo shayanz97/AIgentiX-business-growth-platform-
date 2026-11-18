@@ -8,9 +8,9 @@ Contract (every adapter must satisfy it):
 | Method                              | Behaviour                                                                      |
 |-------------------------------------|--------------------------------------------------------------------------------|
 | `health()`                          | cheap reachability / credential check; never raises, never returns secrets    |
-| `upsert_company(payload, ext_id)`   | create when `ext_id` is None, otherwise update that record; returns external id |
+| `upsert_company(payload, ext_id)`   | create when `ext_id` is None, else update that record; returns external id     |
 | `upsert_contact(payload, ext_id)`   | same; only called for contacts that are neither suppressed nor restricted      |
-| `upsert_deal(payload, ext_id)`      | same; `payload.company_external_id` links the deal to the company               |
+| `upsert_deal(payload, ext_id)`      | same; `payload.company_external_id` links the deal to the company              |
 
 Idempotency: re-sending the same payload with the stored external id updates in place and returns the same id.
 Failures raise `CRMProviderError` (message must not contain credentials); the caller records a failed mapping.
