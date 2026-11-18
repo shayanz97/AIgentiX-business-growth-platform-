@@ -1,7 +1,8 @@
 # AIgentiX Growth Platform
 
 Modular, multi-tenant SaaS platform that helps SMEs automate business growth with AI agents.
-**Status: Sprint 3 — Growth Intelligence, Buying Intent & Lead Scoring.** Add companies (single URL or CSV),
+**Status: Sprint 4 — Sales Intelligence, CRM & Proposal Automation** (on top of Sprint 3 — Growth Intelligence,
+Buying Intent & Lead Scoring). Add companies (single URL or CSV),
 research their public websites safely, review evidence and AI-proposed automation opportunities, then enrich them
 with dated growth triggers and verified buying intent and work a ranked, explainable lead list scored against your
 ICP. Built on the Sprint 1 foundation (auth, organizations, tenant isolation, worker).
@@ -13,7 +14,7 @@ ICP. Built on the Sprint 1 foundation (auth, organizations, tenant isolation, wo
 | Database | PostgreSQL 16 | Docker volume `pgdata` |
 | API contract | OpenAPI → TypeScript types | `packages/shared-contracts` |
 
-Docs: [Architecture](docs/ARCHITECTURE.md) · [Sprint 3 plan](docs/SPRINT_3_PLAN.md) · [Sprint 2 plan](docs/SPRINT_2_PLAN.md) · [Sprint 1 plan](docs/SPRINT_1_PLAN.md) · [Claude Code guide](CLAUDE.md)
+Docs: [Architecture](docs/ARCHITECTURE.md) · [Sprint 4 plan](docs/SPRINT_4_PLAN.md) · [Sprint 3 plan](docs/SPRINT_3_PLAN.md) · [Sprint 2 plan](docs/SPRINT_2_PLAN.md) · [Sprint 1 plan](docs/SPRINT_1_PLAN.md) · [Claude Code guide](CLAUDE.md)
 
 ## Quick start (Docker)
 
@@ -67,6 +68,25 @@ Stop with `docker compose down` (add `-v` to delete the database).
 6. **Scoring** holds versioned scoring profiles (weights 35/25/20/20 by default, freshness bands 30/90/180 days)
    and ICP profiles (default: Germany, B2B + B2C, 1–249 employees, excluded industries, AI solution categories).
    Owners edit them; **Re-score** recomputes from stored data — no crawling, no AI cost.
+
+### Sales (Sprint 4)
+
+7. On a qualified lead, **Convert to sales opportunity** (retries never duplicate; a second open deal for the same
+   research opportunity needs an explicit "create additional").
+8. **Sales → Pipeline** shows the Kanban board. Stages move only when the recorded facts allow it: *In conversation*
+   needs a recorded call/meeting/e-mail, *Proposal sent* needs a proposal you marked as sent; won / lost / reopen
+   are explicit actions with history.
+9. On the opportunity, **Generate brief** (evidence-cited sales intelligence; observed facts vs hypotheses, the lead
+   score is labelled as a prioritisation score, not a purchase probability) and **Generate proposal** (13 editable
+   sections, price placeholders unless a service price is approved, no ROI guarantees). Edits are saved as revisions;
+   export as Markdown.
+10. **Follow-ups**: tasks with due dates and owners; overdue / today / upcoming views; suggested next actions you
+    can accept. **Contacts**: entered manually with source and legal basis; per-channel eligibility reviews;
+    opt-outs are stored as hashes and always win.
+11. **Overview** metrics (pipeline value only from entered values, win rates), **CSV export**; external CRM export
+    only through a configured provider (none bundled) and an owner's explicit confirmation.
+
+AIgentiX never sends e-mails, LinkedIn messages or SMS and never places calls.
 
 Intent is never invented: without a request, tender or inquiry the lead shows *no verified intent*. No live tender
 feed or intent-data provider is bundled (interfaces only); AIgentiX never contacts prospects.
@@ -124,6 +144,8 @@ E2E_PASSWORD=<seed password> make e2e
 
 # Research evaluation over 12 fixture companies (writes a Markdown report):
 cd apps/api && RESEARCH_EVAL_REPORT=/tmp/eval.md uv run pytest -q tests/test_li_eval.py
+# Sales AI evaluation over 15 scenarios (briefs, proposals, compliance, tenancy):
+cd apps/api && SALES_EVAL_REPORT=/tmp/sales.md uv run pytest -q tests/test_sales_eval.py
 # Lead-scoring evaluation over 16 enrichment scenarios:
 cd apps/api && LEAD_SCORING_EVAL_REPORT=/tmp/scoring.md uv run pytest -q tests/test_lead_scoring_eval.py
 ```
