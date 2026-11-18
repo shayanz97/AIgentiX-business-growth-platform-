@@ -3,6 +3,7 @@
 Each research task has a `provider:model` route (see aigentix.platform.llm.router):
     LLM_ROUTE_EXTRACTION   semantic extraction from website text (a lower-cost model is enough)
     LLM_ROUTE_AUDIT        AI Opportunity Audit (a stronger reasoning model)
+    LLM_ROUTE_SIGNALS      review of growth-trigger candidates (defaults to the extraction route)
 Without explicit routes, LLM_PROVIDER + LLM_EXTRACTION_MODEL / LLM_AUDIT_MODEL are used (Sprint 2 settings).
 """
 
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 
 EXTRACTION = "extraction"
 AUDIT = "audit"
+SIGNALS = "signals"  # optional AI review of growth-trigger candidates (defaults to the extraction route)
 
 
 def research_routes(settings: "ResearchSettings") -> dict[str, Route]:
@@ -23,6 +25,9 @@ def research_routes(settings: "ResearchSettings") -> dict[str, Route]:
     return {
         EXTRACTION: Route.parse(settings.llm_route_extraction or f"{provider}:{settings.llm_extraction_model}"),
         AUDIT: Route.parse(settings.llm_route_audit or f"{provider}:{settings.llm_audit_model}"),
+        SIGNALS: Route.parse(
+            settings.llm_route_signals or settings.llm_route_extraction or f"{provider}:{settings.llm_extraction_model}"
+        ),
     }
 
 

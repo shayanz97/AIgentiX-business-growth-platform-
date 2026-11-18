@@ -137,6 +137,9 @@ class ResearchRunRead(BaseModel):
     company_id: uuid.UUID
     company_name: str
     project_id: uuid.UUID | None
+    kind: Literal["research", "enrichment"] = Field(
+        description="research = website research + AI audit; enrichment = triggers, intent and score."
+    )
     status: str
     current_step: str | None
     progress: int

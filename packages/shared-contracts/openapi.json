@@ -526,6 +526,336 @@
         "title": "CompanyRead",
         "type": "object"
       },
+      "CompanySignals": {
+        "properties": {
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "enrichment_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResearchRunRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ignored": {
+            "description": "Records found but not counted (expired, irrelevant, ...).",
+            "items": {
+              "type": "string"
+            },
+            "title": "Ignored",
+            "type": "array"
+          },
+          "intent_status": {
+            "enum": [
+              "explicit",
+              "strong",
+              "indirect",
+              "none_verified",
+              "unknown"
+            ],
+            "title": "Intent Status",
+            "type": "string"
+          },
+          "intents": {
+            "items": {
+              "$ref": "#/components/schemas/IntentRead"
+            },
+            "title": "Intents",
+            "type": "array"
+          },
+          "signals": {
+            "items": {
+              "$ref": "#/components/schemas/SignalRead"
+            },
+            "title": "Signals",
+            "type": "array"
+          },
+          "sources_checked": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources Checked",
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_id",
+          "intent_status",
+          "signals",
+          "intents",
+          "enrichment_run",
+          "sources_checked",
+          "ignored"
+        ],
+        "title": "CompanySignals",
+        "type": "object"
+      },
+      "ComponentRead": {
+        "properties": {
+          "contribution_high": {
+            "title": "Contribution High",
+            "type": "number"
+          },
+          "contribution_low": {
+            "title": "Contribution Low",
+            "type": "number"
+          },
+          "coverage": {
+            "title": "Coverage",
+            "type": "number"
+          },
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/CriterionRead"
+            },
+            "title": "Criteria",
+            "type": "array"
+          },
+          "key": {
+            "enum": [
+              "opportunity",
+              "fit",
+              "triggers",
+              "intent"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "score_high": {
+            "title": "Score High",
+            "type": "number"
+          },
+          "score_low": {
+            "title": "Score Low",
+            "type": "number"
+          },
+          "state": {
+            "enum": [
+              "assessed",
+              "unknown",
+              "insufficient_evidence",
+              "not_applicable"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "weight",
+          "state",
+          "score_low",
+          "score_high",
+          "coverage",
+          "contribution_low",
+          "contribution_high",
+          "summary",
+          "criteria"
+        ],
+        "title": "ComponentRead",
+        "type": "object"
+      },
+      "CriterionRead": {
+        "properties": {
+          "evidence_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "max_points": {
+            "title": "Max Points",
+            "type": "number"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "references": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "assessed",
+              "unknown",
+              "insufficient_evidence",
+              "not_applicable"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "state",
+          "points",
+          "max_points",
+          "explanation",
+          "evidence_ids",
+          "references"
+        ],
+        "title": "CriterionRead",
+        "type": "object"
+      },
+      "EnrichmentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "default": false,
+            "description": "Re-crawl even if a recent enrichment exists.",
+            "title": "Force",
+            "type": "boolean"
+          }
+        },
+        "title": "EnrichmentRequest",
+        "type": "object"
+      },
+      "EnrichmentRunCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "company_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Ids"
+          },
+          "force": {
+            "default": false,
+            "description": "Re-crawl even if a recent enrichment exists.",
+            "title": "Force",
+            "type": "boolean"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Enrich every company in this project.",
+            "title": "Project Id"
+          }
+        },
+        "title": "EnrichmentRunCreate",
+        "type": "object"
+      },
+      "EnrichmentSkipped": {
+        "properties": {
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "not_found",
+              "no_website",
+              "already_running"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "company_id",
+          "reason"
+        ],
+        "title": "EnrichmentSkipped",
+        "type": "object"
+      },
+      "EnrichmentStartResult": {
+        "properties": {
+          "rescored": {
+            "items": {
+              "$ref": "#/components/schemas/RescoredCompany"
+            },
+            "title": "Rescored",
+            "type": "array"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/EnrichmentSkipped"
+            },
+            "title": "Skipped",
+            "type": "array"
+          },
+          "started": {
+            "items": {
+              "$ref": "#/components/schemas/ResearchRunRead"
+            },
+            "title": "Started",
+            "type": "array"
+          }
+        },
+        "required": [
+          "started",
+          "rescored",
+          "skipped"
+        ],
+        "title": "EnrichmentStartResult",
+        "type": "object"
+      },
       "ErrorBody": {
         "properties": {
           "code": {
@@ -708,6 +1038,52 @@
         "title": "EvidenceRef",
         "type": "object"
       },
+      "FirstPartyIntentCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "enum": [
+              "contact_form",
+              "email",
+              "phone",
+              "event",
+              "referral",
+              "other"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "received_on": {
+            "format": "date",
+            "title": "Received On",
+            "type": "string"
+          },
+          "solution_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Solution Category"
+          },
+          "summary": {
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel",
+          "received_on",
+          "summary"
+        ],
+        "title": "FirstPartyIntentCreate",
+        "type": "object"
+      },
       "HealthStatus": {
         "properties": {
           "status": {
@@ -719,6 +1095,177 @@
           "status"
         ],
         "title": "HealthStatus",
+        "type": "object"
+      },
+      "IntentRead": {
+        "properties": {
+          "active": {
+            "description": "False once the deadline has passed.",
+            "title": "Active",
+            "type": "boolean"
+          },
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "deadline_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline On"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "external_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Ref"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "observed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed On"
+          },
+          "reliability": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Reliability",
+            "type": "string"
+          },
+          "solution_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Solution Category"
+          },
+          "source_type": {
+            "enum": [
+              "website",
+              "public_tender",
+              "first_party",
+              "licensed_provider"
+            ],
+            "title": "Source Type",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "strength": {
+            "enum": [
+              "explicit",
+              "strong",
+              "indirect"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "strength",
+          "source_type",
+          "title",
+          "summary",
+          "solution_category",
+          "observed_on",
+          "deadline_on",
+          "active",
+          "external_ref",
+          "source_url",
+          "reliability",
+          "evidence",
+          "created_at"
+        ],
+        "title": "IntentRead",
+        "type": "object"
+      },
+      "LeadDetail": {
+        "properties": {
+          "lead": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LeadRead"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null until the company has been scored."
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/components/schemas/LeadReviewRead"
+            },
+            "title": "Reviews",
+            "type": "array"
+          }
+        },
+        "required": [
+          "lead",
+          "reviews"
+        ],
+        "title": "LeadDetail",
         "type": "object"
       },
       "LeadIntelligenceSummary": {
@@ -765,6 +1312,382 @@
           "opportunities_by_status"
         ],
         "title": "LeadIntelligenceSummary",
+        "type": "object"
+      },
+      "LeadRead": {
+        "properties": {
+          "canonical_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canonical Domain"
+          },
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "company_name": {
+            "title": "Company Name",
+            "type": "string"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
+          },
+          "review_status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "score": {
+            "$ref": "#/components/schemas/LeadScoreRead"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url"
+          }
+        },
+        "required": [
+          "company_id",
+          "company_name",
+          "canonical_domain",
+          "website_url",
+          "review_status",
+          "review_note",
+          "reviewed_at",
+          "score"
+        ],
+        "title": "LeadRead",
+        "type": "object"
+      },
+      "LeadReviewRead": {
+        "properties": {
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lead_score_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Score Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "reviewed_by_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By User Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "status",
+          "note",
+          "lead_score_id",
+          "reviewed_by_user_id",
+          "created_at"
+        ],
+        "title": "LeadReviewRead",
+        "type": "object"
+      },
+      "LeadReviewUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "LeadReviewUpdate",
+        "type": "object"
+      },
+      "LeadScoreRead": {
+        "properties": {
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/ComponentRead"
+            },
+            "title": "Components",
+            "type": "array"
+          },
+          "confidence_level": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Confidence Level",
+            "type": "string"
+          },
+          "coverage": {
+            "description": "Share of the total weight that could be assessed (0-1).",
+            "title": "Coverage",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "enrichment_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enrichment Run Id"
+          },
+          "evidence_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "exclusion_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exclusion Reasons",
+            "type": "array"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "fit_excluded": {
+            "title": "Fit Excluded",
+            "type": "boolean"
+          },
+          "icp_profile_id": {
+            "format": "uuid",
+            "title": "Icp Profile Id",
+            "type": "string"
+          },
+          "icp_profile_version": {
+            "title": "Icp Profile Version",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "intent_status": {
+            "enum": [
+              "explicit",
+              "strong",
+              "indirect",
+              "none_verified",
+              "unknown"
+            ],
+            "title": "Intent Status",
+            "type": "string"
+          },
+          "latest_trigger_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Trigger On"
+          },
+          "next_step": {
+            "title": "Next Step",
+            "type": "string"
+          },
+          "next_step_text": {
+            "title": "Next Step Text",
+            "type": "string"
+          },
+          "opportunity_categories": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Opportunity Categories",
+            "type": "array"
+          },
+          "priority_band": {
+            "enum": [
+              "high",
+              "medium",
+              "low",
+              "excluded"
+            ],
+            "title": "Priority Band",
+            "type": "string"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "reference_date": {
+            "format": "date",
+            "title": "Reference Date",
+            "type": "string"
+          },
+          "research_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Research Run Id"
+          },
+          "score_high": {
+            "description": "Upper bound: unassessed criteria count as full points.",
+            "title": "Score High",
+            "type": "number"
+          },
+          "score_low": {
+            "description": "Conservative score: unassessed criteria count as 0.",
+            "title": "Score Low",
+            "type": "number"
+          },
+          "scoring_profile_id": {
+            "format": "uuid",
+            "title": "Scoring Profile Id",
+            "type": "string"
+          },
+          "scoring_profile_version": {
+            "title": "Scoring Profile Version",
+            "type": "integer"
+          },
+          "scoring_version": {
+            "title": "Scoring Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "scoring_profile_id",
+          "scoring_profile_version",
+          "icp_profile_id",
+          "icp_profile_version",
+          "scoring_version",
+          "score_low",
+          "score_high",
+          "coverage",
+          "provisional",
+          "confidence_level",
+          "priority_band",
+          "fit_excluded",
+          "exclusion_reasons",
+          "intent_status",
+          "latest_trigger_on",
+          "opportunity_categories",
+          "components",
+          "explanation",
+          "next_step",
+          "next_step_text",
+          "evidence_ids",
+          "reference_date",
+          "research_run_id",
+          "enrichment_run_id",
+          "created_at"
+        ],
+        "title": "LeadScoreRead",
         "type": "object"
       },
       "LinkResult": {
@@ -1189,6 +2112,68 @@
         "title": "Page[CompanyRead]",
         "type": "object"
       },
+      "Page_LeadRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LeadRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[LeadRead]",
+        "type": "object"
+      },
+      "Page_LeadScoreRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LeadScoreRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[LeadScoreRead]",
+        "type": "object"
+      },
       "Page_OpportunityRead_": {
         "properties": {
           "items": {
@@ -1311,6 +2296,154 @@
           "offset"
         ],
         "title": "Page[WorkflowRunRead]",
+        "type": "object"
+      },
+      "ProfileCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Profile configuration; omitted = defaults.",
+            "title": "Config"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Description",
+            "type": "string"
+          },
+          "is_default": {
+            "default": false,
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ProfileCreate",
+        "type": "object"
+      },
+      "ProfileRead": {
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "title": "Config",
+            "type": "object"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "version",
+          "is_default",
+          "config",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ProfileRead",
+        "type": "object"
+      },
+      "ProfileUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Complete new configuration (validated).",
+            "title": "Config"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "is_default": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Default"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "ProfileUpdate",
         "type": "object"
       },
       "ProjectCompaniesAdd": {
@@ -1449,6 +2582,32 @@
         ],
         "title": "ProjectStatus",
         "type": "string"
+      },
+      "RescoredCompany": {
+        "properties": {
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "reason": {
+            "const": "recently_enriched",
+            "default": "recently_enriched",
+            "title": "Reason",
+            "type": "string"
+          },
+          "score_id": {
+            "format": "uuid",
+            "title": "Score Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "company_id",
+          "score_id"
+        ],
+        "title": "RescoredCompany",
+        "type": "object"
       },
       "ResearchResults": {
         "properties": {
@@ -1625,6 +2784,15 @@
             "title": "Input Tokens",
             "type": "integer"
           },
+          "kind": {
+            "description": "research = website research + AI audit; enrichment = triggers, intent and score.",
+            "enum": [
+              "research",
+              "enrichment"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
           "max_attempts": {
             "title": "Max Attempts",
             "type": "integer"
@@ -1708,6 +2876,7 @@
           "company_id",
           "company_name",
           "project_id",
+          "kind",
           "status",
           "current_step",
           "progress",
@@ -1755,6 +2924,243 @@
           "skipped"
         ],
         "title": "ResearchRunStartResult",
+        "type": "object"
+      },
+      "ReviewStatus": {
+        "enum": [
+          "new",
+          "needs_research",
+          "qualified_for_review",
+          "reviewed",
+          "rejected"
+        ],
+        "title": "ReviewStatus",
+        "type": "string"
+      },
+      "ScoreRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "icp_profile_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Defaults to the default profile.",
+            "title": "Icp Profile Id"
+          },
+          "scoring_profile_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Defaults to the default profile.",
+            "title": "Scoring Profile Id"
+          }
+        },
+        "title": "ScoreRequest",
+        "type": "object"
+      },
+      "ScoreRunResult": {
+        "properties": {
+          "new_snapshots": {
+            "title": "New Snapshots",
+            "type": "integer"
+          },
+          "scored": {
+            "title": "Scored",
+            "type": "integer"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/LeadScoreRead"
+            },
+            "title": "Scores",
+            "type": "array"
+          }
+        },
+        "required": [
+          "scored",
+          "new_snapshots",
+          "scores"
+        ],
+        "title": "ScoreRunResult",
+        "type": "object"
+      },
+      "SignalRead": {
+        "properties": {
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "confidence": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Confidence",
+            "type": "string"
+          },
+          "date_candidates": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Date Candidates",
+            "type": "array"
+          },
+          "date_conflict": {
+            "title": "Date Conflict",
+            "type": "boolean"
+          },
+          "date_precision": {
+            "enum": [
+              "day",
+              "month",
+              "year",
+              "unknown"
+            ],
+            "title": "Date Precision",
+            "type": "string"
+          },
+          "deadline_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline On"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "first_seen_at": {
+            "format": "date-time",
+            "title": "First Seen At",
+            "type": "string"
+          },
+          "freshness": {
+            "enum": [
+              "recent",
+              "moderate",
+              "older",
+              "historical",
+              "unknown"
+            ],
+            "title": "Freshness",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_seen_at": {
+            "format": "date-time",
+            "title": "Last Seen At",
+            "type": "string"
+          },
+          "mention_count": {
+            "title": "Mention Count",
+            "type": "integer"
+          },
+          "occurred_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Event date stated by the source; null when unknown.",
+            "title": "Occurred On"
+          },
+          "origin": {
+            "enum": [
+              "deterministic",
+              "llm_reviewed"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "relevance": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Relevance",
+            "type": "string"
+          },
+          "signal_type": {
+            "title": "Signal Type",
+            "type": "string"
+          },
+          "source_urls": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Urls",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "signal_type",
+          "title",
+          "summary",
+          "occurred_on",
+          "date_precision",
+          "date_conflict",
+          "date_candidates",
+          "deadline_on",
+          "freshness",
+          "confidence",
+          "relevance",
+          "origin",
+          "mention_count",
+          "source_urls",
+          "details",
+          "evidence",
+          "first_seen_at",
+          "last_seen_at"
+        ],
+        "title": "SignalRead",
         "type": "object"
       },
       "SkippedCompany": {
@@ -2702,6 +4108,124 @@
         ]
       }
     },
+    "/api/v1/companies/{company_id}/enrich": {
+      "post": {
+        "operationId": "enrichCompany",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/EnrichmentRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentStartResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Enrich Company",
+        "tags": [
+          "enrichment"
+        ]
+      }
+    },
     "/api/v1/companies/{company_id}/evidence": {
       "get": {
         "operationId": "listCompanyEvidence",
@@ -2823,6 +4347,127 @@
         "summary": "List Evidence",
         "tags": [
           "companies"
+        ]
+      }
+    },
+    "/api/v1/companies/{company_id}/intent-signals": {
+      "post": {
+        "operationId": "recordFirstPartyIntent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirstPartyIntentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentRead"
+                }
+              }
+            },
+            "description": "Already recorded (deduplicated)"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Record Intent",
+        "tags": [
+          "enrichment"
         ]
       }
     },
@@ -2950,6 +4595,349 @@
         ]
       }
     },
+    "/api/v1/companies/{company_id}/score": {
+      "post": {
+        "operationId": "scoreCompany",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ScoreRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreRunResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Score Company",
+        "tags": [
+          "scoring"
+        ]
+      }
+    },
+    "/api/v1/companies/{company_id}/scores": {
+      "get": {
+        "operationId": "listCompanyScores",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_LeadScoreRead_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Company Scores",
+        "tags": [
+          "scoring"
+        ]
+      }
+    },
+    "/api/v1/companies/{company_id}/signals": {
+      "get": {
+        "operationId": "getCompanySignals",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanySignals"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Company Signals",
+        "tags": [
+          "enrichment"
+        ]
+      }
+    },
     "/api/v1/companies/{company_id}/sources": {
       "get": {
         "operationId": "listCompanySources",
@@ -3074,6 +5062,412 @@
         ]
       }
     },
+    "/api/v1/enrichment-runs": {
+      "post": {
+        "operationId": "startEnrichment",
+        "parameters": [
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrichmentRunCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentStartResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Start Enrichment",
+        "tags": [
+          "enrichment"
+        ]
+      }
+    },
+    "/api/v1/icp-profiles": {
+      "get": {
+        "operationId": "listIcpProfiles",
+        "parameters": [
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProfileRead"
+                  },
+                  "title": "Response Listicpprofiles",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "List Profiles",
+        "tags": [
+          "scoring"
+        ]
+      },
+      "post": {
+        "operationId": "createIcpProfile",
+        "parameters": [
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Create Profile",
+        "tags": [
+          "scoring"
+        ]
+      }
+    },
+    "/api/v1/icp-profiles/{profile_id}": {
+      "patch": {
+        "operationId": "updateIcpProfile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Profile Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Update Profile",
+        "tags": [
+          "scoring"
+        ]
+      }
+    },
     "/api/v1/lead-intelligence/summary": {
       "get": {
         "operationId": "getLeadIntelligenceSummary",
@@ -3162,6 +5556,871 @@
         "summary": "Get Summary",
         "tags": [
           "research"
+        ]
+      }
+    },
+    "/api/v1/leads/export": {
+      "get": {
+        "operationId": "exportLeads",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "score",
+              "enum": [
+                "score",
+                "score_high",
+                "coverage",
+                "latest_trigger",
+                "intent",
+                "name",
+                "scored_at"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scoring_profile_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scoring Profile Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "icp_profile_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Icp Profile Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "project_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "review_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReviewStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Review Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority_band",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low",
+                    "excluded"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority Band"
+            }
+          },
+          {
+            "in": "query",
+            "name": "intent_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "explicit",
+                    "strong",
+                    "indirect",
+                    "none_verified",
+                    "unknown"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Intent Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "signal_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Signal Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_score",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Score"
+            }
+          },
+          {
+            "in": "query",
+            "name": "provisional",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Provisional"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_excluded",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Excluded",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "triggered_since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Triggered Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {}
+            },
+            "description": "Shortlist as CSV"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Export Leads",
+        "tags": [
+          "leads"
+        ]
+      }
+    },
+    "/api/v1/leads/ranked": {
+      "get": {
+        "operationId": "listRankedLeads",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "score",
+              "enum": [
+                "score",
+                "score_high",
+                "coverage",
+                "latest_trigger",
+                "intent",
+                "name",
+                "scored_at"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scoring_profile_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scoring Profile Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "icp_profile_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Icp Profile Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "project_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "review_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReviewStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Review Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority_band",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low",
+                    "excluded"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority Band"
+            }
+          },
+          {
+            "in": "query",
+            "name": "intent_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "explicit",
+                    "strong",
+                    "indirect",
+                    "none_verified",
+                    "unknown"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Intent Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "signal_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Signal Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_score",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Score"
+            }
+          },
+          {
+            "in": "query",
+            "name": "provisional",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Provisional"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_excluded",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Excluded",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "triggered_since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Triggered Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_LeadRead_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Ranked Leads",
+        "tags": [
+          "leads"
+        ]
+      }
+    },
+    "/api/v1/leads/{company_id}": {
+      "get": {
+        "operationId": "getLead",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Lead",
+        "tags": [
+          "leads"
+        ]
+      }
+    },
+    "/api/v1/leads/{company_id}/review": {
+      "patch": {
+        "operationId": "reviewLead",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadReviewUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadReviewRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Review Lead",
+        "tags": [
+          "leads"
         ]
       }
     },
@@ -4550,6 +7809,431 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/leads": {
+      "get": {
+        "operationId": "listProjectLeads",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "score",
+              "enum": [
+                "score",
+                "score_high",
+                "coverage",
+                "latest_trigger",
+                "intent",
+                "name",
+                "scored_at"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "review_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReviewStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Review Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority_band",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low",
+                    "excluded"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority Band"
+            }
+          },
+          {
+            "in": "query",
+            "name": "intent_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "explicit",
+                    "strong",
+                    "indirect",
+                    "none_verified",
+                    "unknown"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Intent Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "signal_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Signal Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_score",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Score"
+            }
+          },
+          {
+            "in": "query",
+            "name": "provisional",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Provisional"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_excluded",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Excluded",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "triggered_since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Triggered Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_LeadRead_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Project Leads",
+        "tags": [
+          "leads"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/score": {
+      "post": {
+        "description": "Re-score every company of the project from stored data (no crawling, no AI calls).",
+        "operationId": "scoreProject",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ScoreRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreRunResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Score Project",
+        "tags": [
+          "scoring"
+        ]
+      }
+    },
     "/api/v1/research-runs": {
       "get": {
         "operationId": "listResearchRuns",
@@ -5097,6 +8781,311 @@
         "summary": "Get Results",
         "tags": [
           "research"
+        ]
+      }
+    },
+    "/api/v1/scoring-profiles": {
+      "get": {
+        "operationId": "listScoringProfiles",
+        "parameters": [
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProfileRead"
+                  },
+                  "title": "Response Listscoringprofiles",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "List Profiles",
+        "tags": [
+          "scoring"
+        ]
+      },
+      "post": {
+        "operationId": "createScoringProfile",
+        "parameters": [
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Create Profile",
+        "tags": [
+          "scoring"
+        ]
+      }
+    },
+    "/api/v1/scoring-profiles/{profile_id}": {
+      "patch": {
+        "operationId": "updateScoringProfile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Profile Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Active organization. Membership is verified server-side.",
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Active organization. Membership is verified server-side.",
+              "title": "X-Organization-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Update Profile",
+        "tags": [
+          "scoring"
         ]
       }
     },

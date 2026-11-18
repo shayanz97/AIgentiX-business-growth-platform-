@@ -90,6 +90,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/companies/{company_id}/enrich": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enrich Company */
+        post: operations["enrichCompany"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/companies/{company_id}/evidence": {
         parameters: {
             query?: never;
@@ -107,6 +124,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/companies/{company_id}/intent-signals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Intent */
+        post: operations["recordFirstPartyIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/companies/{company_id}/opportunities": {
         parameters: {
             query?: never;
@@ -116,6 +150,57 @@ export interface paths {
         };
         /** List Company Opportunities */
         get: operations["listCompanyOpportunities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{company_id}/score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Score Company */
+        post: operations["scoreCompany"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{company_id}/scores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Company Scores */
+        get: operations["listCompanyScores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{company_id}/signals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Company Signals */
+        get: operations["getCompanySignals"];
         put?: never;
         post?: never;
         delete?: never;
@@ -141,6 +226,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enrichment-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start Enrichment */
+        post: operations["startEnrichment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/icp-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Profiles */
+        get: operations["listIcpProfiles"];
+        put?: never;
+        /** Create Profile */
+        post: operations["createIcpProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/icp-profiles/{profile_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Profile */
+        patch: operations["updateIcpProfile"];
+        trace?: never;
+    };
     "/api/v1/lead-intelligence/summary": {
         parameters: {
             query?: never;
@@ -156,6 +293,74 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Leads */
+        get: operations["exportLeads"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/ranked": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ranked Leads */
+        get: operations["listRankedLeads"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/{company_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Lead */
+        get: operations["getLead"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/{company_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Review Lead */
+        patch: operations["reviewLead"];
         trace?: never;
     };
     "/api/v1/me": {
@@ -335,6 +540,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Project Leads */
+        get: operations["listProjectLeads"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Score Project
+         * @description Re-score every company of the project from stored data (no crawling, no AI calls).
+         */
+        post: operations["scoreProject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/research-runs": {
         parameters: {
             query?: never;
@@ -402,6 +644,41 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scoring-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Profiles */
+        get: operations["listScoringProfiles"];
+        put?: never;
+        /** Create Profile */
+        post: operations["createScoringProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scoring-profiles/{profile_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Profile */
+        patch: operations["updateScoringProfile"];
         trace?: never;
     };
     "/api/v1/workflows": {
@@ -643,6 +920,133 @@ export interface components {
             /** Website Url */
             website_url: string | null;
         };
+        /** CompanySignals */
+        CompanySignals: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            enrichment_run: components["schemas"]["ResearchRunRead"] | null;
+            /**
+             * Ignored
+             * @description Records found but not counted (expired, irrelevant, ...).
+             */
+            ignored: string[];
+            /**
+             * Intent Status
+             * @enum {string}
+             */
+            intent_status: "explicit" | "strong" | "indirect" | "none_verified" | "unknown";
+            /** Intents */
+            intents: components["schemas"]["IntentRead"][];
+            /** Signals */
+            signals: components["schemas"]["SignalRead"][];
+            /** Sources Checked */
+            sources_checked: string[];
+        };
+        /** ComponentRead */
+        ComponentRead: {
+            /** Contribution High */
+            contribution_high: number;
+            /** Contribution Low */
+            contribution_low: number;
+            /** Coverage */
+            coverage: number;
+            /** Criteria */
+            criteria: components["schemas"]["CriterionRead"][];
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "opportunity" | "fit" | "triggers" | "intent";
+            /** Label */
+            label: string;
+            /** Score High */
+            score_high: number;
+            /** Score Low */
+            score_low: number;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "assessed" | "unknown" | "insufficient_evidence" | "not_applicable";
+            /** Summary */
+            summary: string;
+            /** Weight */
+            weight: number;
+        };
+        /** CriterionRead */
+        CriterionRead: {
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Explanation */
+            explanation: string;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Max Points */
+            max_points: number;
+            /** Points */
+            points: number | null;
+            /** References */
+            references: {
+                [key: string]: string;
+            }[];
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "assessed" | "unknown" | "insufficient_evidence" | "not_applicable";
+        };
+        /** EnrichmentRequest */
+        EnrichmentRequest: {
+            /**
+             * Force
+             * @description Re-crawl even if a recent enrichment exists.
+             * @default false
+             */
+            force?: boolean;
+        };
+        /** EnrichmentRunCreate */
+        EnrichmentRunCreate: {
+            /** Company Ids */
+            company_ids?: string[] | null;
+            /**
+             * Force
+             * @description Re-crawl even if a recent enrichment exists.
+             * @default false
+             */
+            force?: boolean;
+            /**
+             * Project Id
+             * @description Enrich every company in this project.
+             */
+            project_id?: string | null;
+        };
+        /** EnrichmentSkipped */
+        EnrichmentSkipped: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "not_found" | "no_website" | "already_running";
+        };
+        /** EnrichmentStartResult */
+        EnrichmentStartResult: {
+            /** Rescored */
+            rescored: components["schemas"]["RescoredCompany"][];
+            /** Skipped */
+            skipped: components["schemas"]["EnrichmentSkipped"][];
+            /** Started */
+            started: components["schemas"]["ResearchRunRead"][];
+        };
         /** ErrorBody */
         ErrorBody: {
             /** Code */
@@ -729,10 +1133,88 @@ export interface components {
             /** Supporting Excerpt */
             supporting_excerpt: string;
         };
+        /** FirstPartyIntentCreate */
+        FirstPartyIntentCreate: {
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "contact_form" | "email" | "phone" | "event" | "referral" | "other";
+            /**
+             * Received On
+             * Format: date
+             */
+            received_on: string;
+            /** Solution Category */
+            solution_category?: string | null;
+            /** Summary */
+            summary: string;
+        };
         /** HealthStatus */
         HealthStatus: {
             /** Status */
             status: string;
+        };
+        /** IntentRead */
+        IntentRead: {
+            /**
+             * Active
+             * @description False once the deadline has passed.
+             */
+            active: boolean;
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Deadline On */
+            deadline_on: string | null;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceRef"][];
+            /** External Ref */
+            external_ref: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Observed On */
+            observed_on: string | null;
+            /**
+             * Reliability
+             * @enum {string}
+             */
+            reliability: "low" | "medium" | "high";
+            /** Solution Category */
+            solution_category: string | null;
+            /**
+             * Source Type
+             * @enum {string}
+             */
+            source_type: "website" | "public_tender" | "first_party" | "licensed_provider";
+            /** Source Url */
+            source_url: string | null;
+            /**
+             * Strength
+             * @enum {string}
+             */
+            strength: "explicit" | "strong" | "indirect";
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+        };
+        /** LeadDetail */
+        LeadDetail: {
+            /** @description Null until the company has been scored. */
+            lead: components["schemas"]["LeadRead"] | null;
+            /** Reviews */
+            reviews: components["schemas"]["LeadReviewRead"][];
         };
         /** LeadIntelligenceSummary */
         LeadIntelligenceSummary: {
@@ -752,6 +1234,150 @@ export interface components {
             research_runs: number;
             /** Total Companies */
             total_companies: number;
+        };
+        /** LeadRead */
+        LeadRead: {
+            /** Canonical Domain */
+            canonical_domain: string | null;
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** Company Name */
+            company_name: string;
+            /** Review Note */
+            review_note: string | null;
+            review_status: components["schemas"]["ReviewStatus"];
+            /** Reviewed At */
+            reviewed_at: string | null;
+            score: components["schemas"]["LeadScoreRead"];
+            /** Website Url */
+            website_url: string | null;
+        };
+        /** LeadReviewRead */
+        LeadReviewRead: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lead Score Id */
+            lead_score_id: string | null;
+            /** Note */
+            note: string | null;
+            /** Reviewed By User Id */
+            reviewed_by_user_id: string | null;
+            status: components["schemas"]["ReviewStatus"];
+        };
+        /** LeadReviewUpdate */
+        LeadReviewUpdate: {
+            /** Note */
+            note?: string | null;
+            status: components["schemas"]["ReviewStatus"];
+        };
+        /** LeadScoreRead */
+        LeadScoreRead: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** Components */
+            components: components["schemas"]["ComponentRead"][];
+            /**
+             * Confidence Level
+             * @enum {string}
+             */
+            confidence_level: "low" | "medium" | "high";
+            /**
+             * Coverage
+             * @description Share of the total weight that could be assessed (0-1).
+             */
+            coverage: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Enrichment Run Id */
+            enrichment_run_id: string | null;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Exclusion Reasons */
+            exclusion_reasons: string[];
+            /** Explanation */
+            explanation: string;
+            /** Fit Excluded */
+            fit_excluded: boolean;
+            /**
+             * Icp Profile Id
+             * Format: uuid
+             */
+            icp_profile_id: string;
+            /** Icp Profile Version */
+            icp_profile_version: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Intent Status
+             * @enum {string}
+             */
+            intent_status: "explicit" | "strong" | "indirect" | "none_verified" | "unknown";
+            /** Latest Trigger On */
+            latest_trigger_on: string | null;
+            /** Next Step */
+            next_step: string;
+            /** Next Step Text */
+            next_step_text: string;
+            /** Opportunity Categories */
+            opportunity_categories: string[];
+            /**
+             * Priority Band
+             * @enum {string}
+             */
+            priority_band: "high" | "medium" | "low" | "excluded";
+            /** Provisional */
+            provisional: boolean;
+            /**
+             * Reference Date
+             * Format: date
+             */
+            reference_date: string;
+            /** Research Run Id */
+            research_run_id: string | null;
+            /**
+             * Score High
+             * @description Upper bound: unassessed criteria count as full points.
+             */
+            score_high: number;
+            /**
+             * Score Low
+             * @description Conservative score: unassessed criteria count as 0.
+             */
+            score_low: number;
+            /**
+             * Scoring Profile Id
+             * Format: uuid
+             */
+            scoring_profile_id: string;
+            /** Scoring Profile Version */
+            scoring_profile_version: number;
+            /** Scoring Version */
+            scoring_version: string;
         };
         /** LinkResult */
         LinkResult: {
@@ -917,6 +1543,28 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[LeadRead] */
+        Page_LeadRead_: {
+            /** Items */
+            items: components["schemas"]["LeadRead"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[LeadScoreRead] */
+        Page_LeadScoreRead_: {
+            /** Items */
+            items: components["schemas"]["LeadScoreRead"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        };
         /** Page[OpportunityRead] */
         Page_OpportunityRead_: {
             /** Items */
@@ -960,6 +1608,74 @@ export interface components {
             offset: number;
             /** Total */
             total: number;
+        };
+        /** ProfileCreate */
+        ProfileCreate: {
+            /**
+             * Config
+             * @description Profile configuration; omitted = defaults.
+             */
+            config?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Description
+             * @default
+             */
+            description?: string;
+            /**
+             * Is Default
+             * @default false
+             */
+            is_default?: boolean;
+            /** Name */
+            name: string;
+        };
+        /** ProfileRead */
+        ProfileRead: {
+            /** Config */
+            config: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Default */
+            is_default: boolean;
+            /** Name */
+            name: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+        };
+        /** ProfileUpdate */
+        ProfileUpdate: {
+            /**
+             * Config
+             * @description Complete new configuration (validated).
+             */
+            config?: {
+                [key: string]: unknown;
+            } | null;
+            /** Description */
+            description?: string | null;
+            /** Is Default */
+            is_default?: boolean | null;
+            /** Name */
+            name?: string | null;
         };
         /** ProjectCompaniesAdd */
         ProjectCompaniesAdd: {
@@ -1018,6 +1734,25 @@ export interface components {
          * @enum {string}
          */
         ProjectStatus: "draft" | "active" | "archived";
+        /** RescoredCompany */
+        RescoredCompany: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Reason
+             * @default recently_enriched
+             * @constant
+             */
+            reason?: "recently_enriched";
+            /**
+             * Score Id
+             * Format: uuid
+             */
+            score_id: string;
+        };
         /** ResearchResults */
         ResearchResults: {
             /** Evidence */
@@ -1081,6 +1816,12 @@ export interface components {
             id: string;
             /** Input Tokens */
             input_tokens: number;
+            /**
+             * Kind
+             * @description research = website research + AI audit; enrichment = triggers, intent and score.
+             * @enum {string}
+             */
+            kind: "research" | "enrichment";
             /** Max Attempts */
             max_attempts: number;
             /** Models Used */
@@ -1112,6 +1853,110 @@ export interface components {
             skipped: components["schemas"]["SkippedCompany"][];
             /** Started */
             started: components["schemas"]["ResearchRunRead"][];
+        };
+        /**
+         * ReviewStatus
+         * @enum {string}
+         */
+        ReviewStatus: "new" | "needs_research" | "qualified_for_review" | "reviewed" | "rejected";
+        /** ScoreRequest */
+        ScoreRequest: {
+            /**
+             * Icp Profile Id
+             * @description Defaults to the default profile.
+             */
+            icp_profile_id?: string | null;
+            /**
+             * Scoring Profile Id
+             * @description Defaults to the default profile.
+             */
+            scoring_profile_id?: string | null;
+        };
+        /** ScoreRunResult */
+        ScoreRunResult: {
+            /** New Snapshots */
+            new_snapshots: number;
+            /** Scored */
+            scored: number;
+            /** Scores */
+            scores: components["schemas"]["LeadScoreRead"][];
+        };
+        /** SignalRead */
+        SignalRead: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Confidence
+             * @enum {string}
+             */
+            confidence: "low" | "medium" | "high";
+            /** Date Candidates */
+            date_candidates: {
+                [key: string]: unknown;
+            }[];
+            /** Date Conflict */
+            date_conflict: boolean;
+            /**
+             * Date Precision
+             * @enum {string}
+             */
+            date_precision: "day" | "month" | "year" | "unknown";
+            /** Deadline On */
+            deadline_on: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceRef"][];
+            /**
+             * First Seen At
+             * Format: date-time
+             */
+            first_seen_at: string;
+            /**
+             * Freshness
+             * @enum {string}
+             */
+            freshness: "recent" | "moderate" | "older" | "historical" | "unknown";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /** Mention Count */
+            mention_count: number;
+            /**
+             * Occurred On
+             * @description Event date stated by the source; null when unknown.
+             */
+            occurred_on: string | null;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "deterministic" | "llm_reviewed";
+            /**
+             * Relevance
+             * @enum {string}
+             */
+            relevance: "low" | "medium" | "high";
+            /** Signal Type */
+            signal_type: string;
+            /** Source Urls */
+            source_urls: string[];
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
         };
         /** SkippedCompany */
         SkippedCompany: {
@@ -1687,6 +2532,80 @@ export interface operations {
             };
         };
     };
+    enrichCompany: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EnrichmentRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrichmentStartResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     listCompanyEvidence: {
         parameters: {
             query?: {
@@ -1711,6 +2630,89 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EvidenceRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    recordFirstPartyIntent: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FirstPartyIntentCreate"];
+            };
+        };
+        responses: {
+            /** @description Already recorded (deduplicated) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntentRead"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntentRead"];
                 };
             };
             /** @description Bad Request */
@@ -1833,6 +2835,223 @@ export interface operations {
             };
         };
     };
+    scoreCompany: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ScoreRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreRunResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listCompanyScores: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_LeadScoreRead_"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCompanySignals: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanySignals"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     listCompanySources: {
         parameters: {
             query?: {
@@ -1906,6 +3125,292 @@ export interface operations {
             };
         };
     };
+    startEnrichment: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnrichmentRunCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrichmentStartResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listIcpProfiles: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createIcpProfile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateIcpProfile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getLeadIntelligenceSummary: {
         parameters: {
             query?: never;
@@ -1925,6 +3430,316 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeadIntelligenceSummary"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    exportLeads: {
+        parameters: {
+            query?: {
+                sort?: "score" | "score_high" | "coverage" | "latest_trigger" | "intent" | "name" | "scored_at";
+                scoring_profile_id?: string | null;
+                icp_profile_id?: string | null;
+                project_id?: string | null;
+                review_status?: components["schemas"]["ReviewStatus"] | null;
+                priority_band?: ("high" | "medium" | "low" | "excluded") | null;
+                intent_status?: ("explicit" | "strong" | "indirect" | "none_verified" | "unknown") | null;
+                signal_type?: string | null;
+                min_score?: number | null;
+                provisional?: boolean | null;
+                include_excluded?: boolean;
+                triggered_since?: string | null;
+                q?: string | null;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shortlist as CSV */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": unknown;
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listRankedLeads: {
+        parameters: {
+            query?: {
+                sort?: "score" | "score_high" | "coverage" | "latest_trigger" | "intent" | "name" | "scored_at";
+                scoring_profile_id?: string | null;
+                icp_profile_id?: string | null;
+                limit?: number;
+                offset?: number;
+                project_id?: string | null;
+                review_status?: components["schemas"]["ReviewStatus"] | null;
+                priority_band?: ("high" | "medium" | "low" | "excluded") | null;
+                intent_status?: ("explicit" | "strong" | "indirect" | "none_verified" | "unknown") | null;
+                signal_type?: string | null;
+                min_score?: number | null;
+                provisional?: boolean | null;
+                include_excluded?: boolean;
+                triggered_since?: string | null;
+                q?: string | null;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_LeadRead_"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getLead: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reviewLead: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadReviewUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadReviewRead"];
                 };
             };
             /** @description Bad Request */
@@ -2953,6 +4768,163 @@ export interface operations {
             };
         };
     };
+    listProjectLeads: {
+        parameters: {
+            query?: {
+                sort?: "score" | "score_high" | "coverage" | "latest_trigger" | "intent" | "name" | "scored_at";
+                limit?: number;
+                offset?: number;
+                review_status?: components["schemas"]["ReviewStatus"] | null;
+                priority_band?: ("high" | "medium" | "low" | "excluded") | null;
+                intent_status?: ("explicit" | "strong" | "indirect" | "none_verified" | "unknown") | null;
+                signal_type?: string | null;
+                min_score?: number | null;
+                provisional?: boolean | null;
+                include_excluded?: boolean;
+                triggered_since?: string | null;
+                q?: string | null;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                project_id: string | null;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_LeadRead_"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    scoreProject: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ScoreRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreRunResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     listResearchRuns: {
         parameters: {
             query?: {
@@ -3259,6 +5231,220 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResearchResults"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listScoringProfiles: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createScoringProfile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateScoringProfile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"];
                 };
             };
             /** @description Bad Request */

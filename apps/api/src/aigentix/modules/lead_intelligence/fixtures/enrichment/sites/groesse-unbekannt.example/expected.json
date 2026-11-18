@@ -1,0 +1,23 @@
+{
+  "scenario": "missing_size",
+  "expected_outcome": "completed",
+  "expected_signal_types": [],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {},
+  "expected_dates": {},
+  "expected_date_conflict": false,
+  "expected_freshness": {},
+  "expected_intent_strength": "none_verified",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Architektur",
+    "architecture"
+  ],
+  "expected_fit": "medium",
+  "expected_score_band": "low",
+  "notes": "Rich description but no employee counts anywhere: company size must be reported as unknown, not guessed.",
+  "expected_company_size": null,
+  "calibration_notes": [
+    "expected_score_band medium -> low (score band = default priority thresholds on the conservative score (high >= 60, medium >= 35))"
+  ]
+}

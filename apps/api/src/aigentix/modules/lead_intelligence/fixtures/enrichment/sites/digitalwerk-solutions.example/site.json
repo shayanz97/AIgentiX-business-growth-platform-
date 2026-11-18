@@ -1,0 +1,12 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/ueber-uns": "about.html",
+    "/kontakt": "kontakt.html",
+    "/buchung": "buchung.html",
+    "/downloads": "downloads.html",
+    "/faq": "faq.html",
+    "/news": "news.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

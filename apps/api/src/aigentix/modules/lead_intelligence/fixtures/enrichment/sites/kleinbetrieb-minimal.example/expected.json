@@ -1,0 +1,25 @@
+{
+  "scenario": "weak_opportunity",
+  "expected_outcome": "completed",
+  "expected_signal_types": [],
+  "forbidden_signal_types": [
+    "hiring",
+    "expansion",
+    "funding",
+    "public_project_request",
+    "procurement_tender"
+  ],
+  "expected_signal_count": {},
+  "expected_dates": {},
+  "expected_date_conflict": false,
+  "expected_freshness": {},
+  "expected_intent_strength": "none_verified",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Maler",
+    "painting"
+  ],
+  "expected_fit": "medium",
+  "expected_score_band": "low",
+  "notes": "Tiny two-page site, no forms, no news: no triggers, low opportunity."
+}

@@ -1,0 +1,36 @@
+{
+  "scenario": "contradictory_sources",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "expansion",
+    "hiring"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "expansion": 1,
+    "hiring": 1
+  },
+  "expected_dates": {
+    "expansion": null,
+    "hiring": null
+  },
+  "expected_date_conflict": true,
+  "expected_freshness": {
+    "expansion": "unknown",
+    "hiring": "unknown"
+  },
+  "expected_intent_strength": "none_verified",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Büro",
+    "office"
+  ],
+  "expected_fit": "medium",
+  "expected_score_band": "low",
+  "notes": "Opening dated 2026-09-01 on /news vs 15 July 2026 on /presse: flag conflict, no single invented date. Team of 40 vs over 200 employees: size conflict. The careers page states a hiring need without a date (hiring, unknown freshness).",
+  "expected_company_size_conflict": true,
+  "calibration_notes": [
+    "expected_fit high -> medium (fit band = conservative fit score (unpublished employee count counts as 0 of 20 points))",
+    "expected_score_band medium -> low (score band = default priority thresholds on the conservative score (high >= 60, medium >= 35))"
+  ]
+}

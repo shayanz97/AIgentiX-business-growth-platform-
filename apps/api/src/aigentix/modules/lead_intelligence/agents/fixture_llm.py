@@ -20,11 +20,13 @@ from aigentix.modules.lead_intelligence.agents.schemas import (
     ExtractedAssertion,
     ExtractionOutput,
     ProposedOpportunity,
+    SignalDecision,
+    SignalReviewOutput,
 )
 from aigentix.platform.llm import LLMResponse, LLMUsage, Task
 
 FIXTURE_MODEL = "fixture-rules-v1"
-_SOURCE = re.compile(r'<website_content source_id="(S\d+)" page_type="(\w+)"[^>]*>\n(.*?)\n</website_content>', re.S)
+_SOURCE = re.compile(r'<website_content source_id="([SC]\d+)" page_type="(\w+)"[^>]*>\n(.*?)\n</website_content>', re.S)
 _EVIDENCE = re.compile(r"<evidence>\n(.*?)\n</evidence>", re.S)
 _SENTENCE = re.compile(r"(?:^|(?<=[.!?] ))[A-Z][^.!?]{40,240}[.!?]")
 
@@ -97,6 +99,8 @@ class FixtureLLMProvider:
             output: BaseModel = self._extract(prompt)
         elif output_model is AuditOutput:
             output = self._audit(prompt)
+        elif output_model is SignalReviewOutput:
+            output = self._review_signals(prompt)
         else:  # pragma: no cover - programming error
             raise TypeError(f"Unsupported output model {output_model}")
         return LLMResponse(output=output, usage=_zero_usage())  # type: ignore[arg-type]
@@ -119,6 +123,21 @@ class FixtureLLMProvider:
                     )
                 )
         return ExtractionOutput(company_name=None, assertions=assertions[:6], unknown_fields=["industry"])
+
+    def _review_signals(self, prompt: str) -> SignalReviewOutput:
+        """Keeps every candidate with its proposed type; relevance from the type (transparent rule)."""
+        decisions = [
+            SignalDecision(
+                candidate_id=label,
+                keep=True,
+                signal_type=kind,
+                relevance="low" if kind in ("other", "product_launch") else "medium",
+                reason="Rule-based fixture review: candidate kept as proposed.",
+            )
+            for label, kind, _ in _SOURCE.findall(prompt)
+            if label.startswith("C")
+        ]
+        return SignalReviewOutput(decisions=decisions)
 
     def _audit(self, prompt: str) -> AuditOutput:
         match = _EVIDENCE.search(prompt)

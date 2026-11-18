@@ -1,5 +1,6 @@
 """Lead Intelligence settings (environment-based). See apps/api/.env.example."""
 
+from datetime import date
 from decimal import Decimal
 from functools import lru_cache
 from typing import Literal
@@ -31,6 +32,17 @@ class ResearchSettings(BaseSettings):
     # Stop reading further pages after this long (each request is separately capped by a 30 s deadline).
     research_max_discovery_seconds: float = Field(default=180.0, gt=0)
 
+    # Enrichment (Sprint 3): growth triggers, buying intent, scoring
+    research_enrichment_max_pages: int = Field(default=10, ge=1, le=25)
+    # A completed enrichment younger than this is reused (re-score only) unless the request forces a re-crawl.
+    research_enrichment_cache_hours: float = Field(default=24.0, ge=0)
+    research_tender_source: Literal["none", "fixtures"] = "none"
+    # Fixed "today" for freshness bands (tests, evaluation, reproducible demos); unset = the current date.
+    scoring_reference_date: date | None = None
+    # Optional AI review of deterministic trigger candidates (task "signals"; default: the extraction route).
+    llm_route_signals: str | None = None
+    research_signal_ai_review: bool = True
+
     # LLM — task routes "provider:model" (provider: anthropic | openai). Keys and client settings live in
     # aigentix.platform.llm.config (ANTHROPIC_API_KEY, OPENAI_API_KEY, LLM_TIMEOUT_SECONDS, LLM_PRICES_JSON).
     llm_route_extraction: str | None = None
@@ -49,13 +61,17 @@ class ResearchSettings(BaseSettings):
                 raise ValueError("RESEARCH_FETCH_BACKEND=fixtures is not allowed in production")
             if self.llm_provider == "fixture":
                 raise ValueError("LLM_PROVIDER=fixture is not allowed in production")
+            if self.research_tender_source == "fixtures":
+                raise ValueError("RESEARCH_TENDER_SOURCE=fixtures is not allowed in production")
+            if self.scoring_reference_date is not None:
+                raise ValueError("SCORING_REFERENCE_DATE is for tests and demos only, not production")
         self._validate_routes()
         return self
 
     def _validate_routes(self) -> None:
         from aigentix.platform.llm import Route
 
-        for value in (self.llm_route_extraction, self.llm_route_audit):
+        for value in (self.llm_route_extraction, self.llm_route_audit, self.llm_route_signals):
             if value:
                 Route.parse(value)
         if self.llm_provider == "openai":
@@ -68,6 +84,11 @@ class ResearchSettings(BaseSettings):
                         f"LLM_PROVIDER=openai needs an OpenAI model for the {task} task: set "
                         f"LLM_ROUTE_{task.upper()}=openai:<model> or LLM_{task.upper()}_MODEL"
                     )
+
+    def reference_date(self) -> date:
+        from aigentix.core.db import utcnow
+
+        return self.scoring_reference_date or utcnow().date()
 
 
 @lru_cache

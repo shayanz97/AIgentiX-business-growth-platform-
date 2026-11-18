@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { ProvisionalBadge } from "@/components/leads/lead-badges";
 import { StatusBadge } from "@/components/research/badges";
 import { RunProgress } from "@/components/research/run-detail-view";
 import { RequireOrganization } from "@/components/require-organization";
@@ -9,6 +10,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Alert, Card, EmptyState, PageHeader } from "@/components/ui/surface";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import { formatCoverage, formatScoreRange, humanize } from "@/lib/leads";
 import { useApi } from "@/lib/use-api";
 
 export default function LeadIntelligencePage() {
@@ -28,6 +30,7 @@ export default function LeadIntelligencePage() {
 
 function Overview() {
   const summary = useApi(() => api.GET("/api/v1/lead-intelligence/summary"), []);
+  const top = useApi(() => api.GET("/api/v1/leads/ranked", { params: { query: { limit: 5, sort: "score" } } }), []);
   const runs = useApi(() => api.GET("/api/v1/research-runs", { params: { query: { limit: 10 } } }), []);
 
   const s = summary.data;
@@ -51,6 +54,40 @@ function Overview() {
             </Card>
           ))}
         </dl>
+      </section>
+
+      <section aria-labelledby="top-leads">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 id="top-leads" className="text-lg font-medium text-white">
+            Top leads
+          </h2>
+          <Link href="/leads" className="text-sm text-accent hover:underline">
+            Ranked leads
+          </Link>
+        </div>
+        {top.error && !top.data ? <Alert>{top.error}</Alert> : null}
+        {top.loading ? <p className="text-sm text-slate-400">Loading…</p> : null}
+        {top.data && top.data.items.length === 0 ? (
+          <EmptyState title="No scored leads yet">Leads appear here after a company has been enriched.</EmptyState>
+        ) : null}
+        {top.data && top.data.items.length > 0 ? (
+          <ol className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-navy-900/70" aria-label="Top leads">
+            {top.data.items.map((lead) => (
+              <li key={lead.company_id}>
+                <Link href={`/leads/${lead.company_id}`} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 hover:bg-navy-800/60">
+                  <span className="min-w-0 truncate font-medium text-slate-100">{lead.company_name}</span>
+                  <span className="flex flex-wrap items-center gap-2 text-sm text-slate-300">
+                    {formatScoreRange(lead.score.score_low, lead.score.score_high)}
+                    <span className="text-xs text-slate-400">coverage {formatCoverage(lead.score.coverage)}</span>
+                    <ProvisionalBadge provisional={lead.score.provisional} />
+                    <span className="text-xs text-slate-400">{humanize(lead.score.priority_band)}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+        {top.data && top.data.total > 5 ? <p className="mt-2 text-xs text-slate-400">Showing the top 5 of {top.data.total} scored leads.</p> : null}
       </section>
 
       <section aria-labelledby="recent-runs">

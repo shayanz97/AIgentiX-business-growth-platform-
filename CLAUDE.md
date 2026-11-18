@@ -2,7 +2,8 @@
 
 Multi-tenant SaaS where AI agents automate SME growth work (lead intelligence, sales, marketing, analytics).
 Sprint 1 = platform foundation. Sprint 2 = Lead Intelligence: companies, CSV import, safe website research,
-evidence, AI Opportunity Audit, review. Lead scoring and outreach are later sprints.
+evidence, AI Opportunity Audit, review. Sprint 3 = growth triggers, buying intent, ICP/scoring profiles,
+deterministic lead scoring, ranked leads + review (docs/SPRINT_3_PLAN.md). Outreach is a later sprint.
 
 ## Architecture principles
 - **Modular monolith.** One backend package (`apps/api/src/aigentix`), one web app. No microservices, brokers or K8s.
@@ -30,7 +31,7 @@ infra/docker/    Dockerfiles · docker-compose.yml at root · docs/ design docs 
 ## Commands
 `make help` lists everything. Common: `make up` (full stack), `make verify` (lint+types+tests+build),
 `make contracts` (after any API change), `make e2e` (stack started with `-f docker-compose.e2e.yml` + `E2E_PASSWORD`),
-`/research-eval` (fixture research evaluation).
+`/research-eval` (fixture research evaluation), `/lead-scoring-eval` (16 enrichment/scoring scenarios).
 Backend tests need PostgreSQL at `TEST_DATABASE_URL` (default `postgresql://aigentix:aigentix-local-dev@localhost:5432/aigentix_test`).
 New migration: `cd apps/api && uv run alembic revision --autogenerate -m "..."` then **review the file by hand**.
 
@@ -39,6 +40,8 @@ New migration: `cd apps/api && uv run alembic revision --autogenerate -m "..."` 
 - Backend tests use real PostgreSQL + Alembic migrations (no SQLite, no mocking the DB).
 - Research changes: keep `tests/test_li_ssrf.py`, `test_li_research.py` and `test_li_eval.py` green; new fixture
   sites go in `modules/lead_intelligence/fixtures/sites/` with an `expected.json`.
+- Scoring / trigger / intent changes: keep `test_ls_units.py`, `test_ls_api.py` and `test_lead_scoring_eval.py`
+  green; new scenarios go in `fixtures/enrichment/sites/` with an `expected.json` (reference date 2026-11-12).
 - `test_models_match_migrations` must stay green: models and migrations never drift.
 - Never claim checks passed without running them (`/verify`).
 
@@ -56,7 +59,13 @@ New migration: `cd apps/api && uv run alembic revision --autogenerate -m "..."` 
 9. Website text is untrusted: it enters prompts only inside neutralised `<website_content>`/`<evidence>` blocks;
    model output is validated (citations must exist and be verbatim, unsupported claims flagged, foreign links
    stripped) and rendered as plain text. No AI result is fabricated: without a provider runs end `partial`.
-10. Test doubles (`RESEARCH_FETCH_BACKEND=fixtures`, `LLM_PROVIDER=fixture`) are refused in production.
+10. Test doubles (`RESEARCH_FETCH_BACKEND=fixtures`, `LLM_PROVIDER=fixture`, `RESEARCH_TENDER_SOURCE=fixtures`,
+    `SCORING_REFERENCE_DATE`) are refused in production.
+11. Buying intent is stored only with a real source (website text with verbatim evidence, a configured tender
+    source, a first-party record entered by a member, a licensed provider). Absence is computed as
+    `none_verified`/`unknown`, never stored; model output can never create intent, signals or dates.
+12. Lead scores are deterministic (`domain/scoring.py`): missing data lowers `score_low`, never silently
+    renormalises weights; every assessed criterion lists its evidence. No feature contacts prospects.
 
 ## Module development rules
 - A module lives in `apps/api/src/aigentix/modules/<key>/` and exports a `ModuleDescriptor` (see `modules/base.py`).

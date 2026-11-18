@@ -1,0 +1,12 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/ueber-uns": "about.html",
+    "/kontakt": "kontakt.html",
+    "/angebot": "angebot.html",
+    "/support": "support.html",
+    "/karriere": "careers.html",
+    "/news": "news.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

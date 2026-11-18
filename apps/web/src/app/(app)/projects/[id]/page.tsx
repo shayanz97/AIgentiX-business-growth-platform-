@@ -9,7 +9,7 @@ import { StartFeedback } from "@/components/research/start-feedback";
 import { RequireOrganization } from "@/components/require-organization";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Alert, Badge, Card, EmptyState, PageHeader } from "@/components/ui/surface";
-import { api, errorMessage, type Company, type ResearchRunStartResult } from "@/lib/api";
+import { api, errorMessage, type Company, type EnrichmentStartResult, type ResearchRunStartResult, type ScoreRunResult } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
 
@@ -74,6 +74,7 @@ function ProjectDetail() {
           <ProjectResearchActions projectId={project.id} companies={companies.data?.items ?? []} total={companies.data?.total ?? 0} onStarted={companies.reload} />
         </Card>
       </div>
+      <ProjectLeadActions projectId={project.id} total={companies.data?.total ?? 0} />
       <ProjectCompanies projectId={project.id} companies={companies.data?.items ?? []} total={companies.data?.total ?? 0} loading={companies.loading} error={companies.data ? null : companies.error} />
     </>
   );
@@ -135,6 +136,75 @@ function ProjectResearchActions({
       {error ? <Alert>{error}</Alert> : null}
       {result ? <StartFeedback result={result} names={Object.fromEntries(companies.map((c) => [c.id, c.name]))} /> : null}
     </div>
+  );
+}
+
+function ProjectLeadActions({ projectId, total }: { projectId: string; total: number }) {
+  const [pending, setPending] = useState<"enrich" | "score" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [enrich, setEnrich] = useState<EnrichmentStartResult | null>(null);
+  const [score, setScore] = useState<ScoreRunResult | null>(null);
+
+  async function run(kind: "enrich" | "score") {
+    setPending(kind);
+    setError(null);
+    setEnrich(null);
+    setScore(null);
+    try {
+      if (kind === "enrich") {
+        const { data, error: e } = await api.POST("/api/v1/enrichment-runs", { body: { project_id: projectId } });
+        if (!data) setError(errorMessage(e, "Could not start enrichment."));
+        else setEnrich(data);
+      } else {
+        const { data, error: e } = await api.POST("/api/v1/projects/{project_id}/score", { params: { path: { project_id: projectId } } });
+        if (!data) setError(errorMessage(e, "Could not re-score the project."));
+        else setScore(data);
+      }
+    } catch {
+      setError("Cannot reach the server. Please try again.");
+    } finally {
+      setPending(null);
+    }
+  }
+
+  return (
+    <section aria-labelledby="project-leads" className="mt-8 space-y-3">
+      <h2 id="project-leads" className="text-lg font-medium text-white">
+        Lead scoring
+      </h2>
+      <p className="text-sm text-slate-400">
+        Enrich re-fetches websites to find growth triggers and buying intent. Re-score only recalculates from stored data (no crawling).
+      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button onClick={() => void run("enrich")} disabled={pending !== null || total === 0}>
+          {pending === "enrich" ? "Starting…" : "Enrich all"}
+        </Button>
+        <Button variant="secondary" onClick={() => void run("score")} disabled={pending !== null || total === 0}>
+          {pending === "score" ? "Scoring…" : "Re-score project"}
+        </Button>
+        <Link href={`/leads?project_id=${projectId}`} className="text-sm text-accent hover:underline">
+          View ranked leads for this project
+        </Link>
+      </div>
+      {error ? <Alert>{error}</Alert> : null}
+      {enrich ? (
+        <div role="status" className="space-y-2">
+          <Alert tone="info">
+            Started enrichment for {enrich.started.length} {enrich.started.length === 1 ? "company" : "companies"}
+            {enrich.rescored.length > 0 ? `; ${enrich.rescored.length} recently enriched and only re-scored` : ""}
+            {enrich.skipped.length > 0 ? `; ${enrich.skipped.length} skipped (no website or already running)` : ""}.
+          </Alert>
+        </div>
+      ) : null}
+      {score ? (
+        <Alert tone="info">
+          <span role="status">
+            Re-scored {score.scored} {score.scored === 1 ? "company" : "companies"}; {score.new_snapshots} new score{" "}
+            {score.new_snapshots === 1 ? "snapshot" : "snapshots"} saved.
+          </span>
+        </Alert>
+      ) : null}
+    </section>
   );
 }
 

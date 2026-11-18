@@ -1,0 +1,32 @@
+{
+  "scenario": "public_tender",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "procurement_tender"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "procurement_tender": 1
+  },
+  "expected_dates": {
+    "procurement_tender": "2026-10-28"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "procurement_tender": "recent"
+  },
+  "expected_intent_strength": "strong",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Stadtwerke",
+    "utility"
+  ],
+  "expected_fit": "high",
+  "expected_score_band": "medium",
+  "notes": "Open municipal tender with deadline and reference number; also present as T-2026-001 in tenders.json.",
+  "expected_deadline": "2026-12-15",
+  "calibration_notes": [
+    "expected_score_band high -> medium (score band = default priority thresholds on the conservative score (high >= 60, medium >= 35))",
+    "a 300-employee utility is outside the default SME size range; the active tender drives next_step=review_active_request instead"
+  ]
+}

@@ -9,6 +9,7 @@ const run: ResearchRun = {
   company_id: "c1",
   company_name: "Acme",
   project_id: null,
+  kind: "research",
   status: "running",
   current_step: "extract_information",
   progress: 45,

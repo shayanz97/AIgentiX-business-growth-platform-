@@ -1,0 +1,8 @@
+{
+  "pages": {
+    "/": "index.html",
+    "/ueber-uns": "about.html",
+    "/news": "news.html"
+  },
+  "robots": "User-agent: *\nAllow: /\n"
+}

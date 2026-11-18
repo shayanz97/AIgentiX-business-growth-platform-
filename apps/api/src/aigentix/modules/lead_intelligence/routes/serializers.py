@@ -19,7 +19,7 @@ from aigentix.modules.lead_intelligence.schemas import (
 from aigentix.modules.lead_intelligence.services import companies as company_service
 from aigentix.modules.lead_intelligence.services import opportunities as opportunity_service
 from aigentix.modules.lead_intelligence.services.research import RunView
-from aigentix.modules.lead_intelligence.workflows.constants import STEP_NAMES
+from aigentix.modules.lead_intelligence.workflows.constants import ENRICHMENT_STEPS, STEP_NAMES
 from aigentix.platform.organizations.service import TenantContext
 from aigentix.platform.workflows.models import WorkflowStatus
 
@@ -57,7 +57,8 @@ def run_read(view: RunView) -> ResearchRunRead:
     durations = state.get("step_ms", {})
     status = WorkflowStatus(wf.status)
     steps = []
-    for name in STEP_NAMES:
+    names = [n for n, _ in ENRICHMENT_STEPS] if rr.kind == "enrichment" else STEP_NAMES
+    for name in names:
         if name in done:
             step_state = "done"
         elif name == wf.current_step and status in (WorkflowStatus.RUNNING, WorkflowStatus.PENDING):
@@ -72,6 +73,7 @@ def run_read(view: RunView) -> ResearchRunRead:
         company_id=rr.company_id,
         company_name=view.company.name,
         project_id=rr.project_id,
+        kind=rr.kind,
         status=wf.status,
         current_step=wf.current_step,
         progress=wf.progress,

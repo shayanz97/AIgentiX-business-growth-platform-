@@ -1,0 +1,27 @@
+{
+  "scenario": "relevant_hiring",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "hiring"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "hiring": 1
+  },
+  "expected_dates": {
+    "hiring": "2026-10-20"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "hiring": "recent"
+  },
+  "expected_intent_strength": "none_verified",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Maschinenbau",
+    "machinery"
+  ],
+  "expected_fit": "high",
+  "expected_score_band": "medium",
+  "notes": "Three dated customer-service/back-office roles (latest 2026-10-20 recent, others moderate) plus one undated role (unknown freshness). The road-construction tender in tenders.json is irrelevant."
+}

@@ -142,6 +142,8 @@ def make_research_handler(
 
 
 class _Research:
+    _discovery_step = "discover_relevant_pages"
+
     def __init__(self, ctx: WorkflowContext, deps: ResearchDependencies) -> None:
         self.ctx = ctx
         self.db = ctx.db
@@ -358,7 +360,7 @@ class _Research:
 
         domain: str = self.ctx.get_state("site_domain")
         links = [Link(url=u, text=t) for u, t in self.ctx.get_state("home_links", [])]
-        candidates = discover_relevant_links(links, domain=domain, limit=self.settings.research_max_pages - 1)
+        candidates = self._candidate_pages(links, domain)
         existing = {s.source_url for s in self._sources()}
         origin: str = self.ctx.get_state("site_origin") or self.ctx.get_state("homepage")
         try:
@@ -376,7 +378,7 @@ class _Research:
                 self._save_source(url, category, status="skipped", error="Time budget for this run was reached")
                 continue
             # Heartbeat, cancellation point and commit of the previous page.
-            self.ctx.checkpoint("discover_relevant_pages", 20 + int(30 * index / max(len(candidates), 1)))
+            self.ctx.checkpoint(self._discovery_step, 20 + int(30 * index / max(len(candidates), 1)))
             if not robots.allows(self.settings.research_robots_token, url):
                 self._save_source(url, category, status="skipped", error="Disallowed by robots.txt")
                 continue
@@ -415,6 +417,9 @@ class _Research:
                 page=content,
             )
         self.research.pages_fetched = sum(1 for s in self._sources() if s.extraction_status in ("extracted", "empty"))
+
+    def _candidate_pages(self, links: list[Any], domain: str) -> list[tuple[str, str]]:
+        return discover_relevant_links(links, domain=domain, limit=self.settings.research_max_pages - 1)
 
     def extract_information(self) -> None:
         sources = [s for s in self._sources() if s.extraction_status == "extracted"]

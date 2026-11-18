@@ -1,0 +1,31 @@
+{
+  "scenario": "explicit_request",
+  "expected_outcome": "completed",
+  "expected_signal_types": [
+    "public_project_request",
+    "hiring"
+  ],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {
+    "public_project_request": 1,
+    "hiring": 1
+  },
+  "expected_dates": {
+    "public_project_request": "2026-11-03",
+    "hiring": "2026-11-02"
+  },
+  "expected_date_conflict": false,
+  "expected_freshness": {
+    "public_project_request": "recent",
+    "hiring": "recent"
+  },
+  "expected_intent_strength": "explicit",
+  "expected_country": "Germany",
+  "expected_industry_keywords": [
+    "Versicherung",
+    "insurance"
+  ],
+  "expected_fit": "high",
+  "expected_score_band": "high",
+  "notes": "Explicit request for an external partner to automate customer inquiries, with deadline; plus recent hiring."
+}

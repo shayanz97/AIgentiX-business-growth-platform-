@@ -1,0 +1,16 @@
+{
+  "scenario": "invalid_company",
+  "expected_outcome": "failed",
+  "expected_signal_types": [],
+  "forbidden_signal_types": [],
+  "expected_signal_count": {},
+  "expected_dates": {},
+  "expected_date_conflict": false,
+  "expected_freshness": {},
+  "expected_intent_strength": "unknown",
+  "expected_country": null,
+  "expected_industry_keywords": [],
+  "expected_fit": "low",
+  "expected_score_band": "low",
+  "notes": "Homepage returns HTTP 500: enrichment must fail cleanly, intent unknown, no invented data."
+}

@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import { EnrichmentActions } from "@/components/leads/enrichment-actions";
 import { BasisBadge, capitalize, ConfidenceBadge, StatusBadge } from "@/components/research/badges";
 import { ExternalLink } from "@/components/research/external-link";
 import { OpportunityCard } from "@/components/research/opportunity-card";
@@ -106,6 +108,7 @@ function CompanyView({ company, reload }: { company: CompanyDetail; reload: () =
         {!company.website_url ? <Alert tone="warning">This company has no website, so it cannot be researched.</Alert> : null}
         {actionError ? <Alert>{actionError}</Alert> : null}
         {feedback ? <StartFeedback result={feedback} names={{ [company.id]: company.name }} /> : null}
+        <EnrichmentPanel company={company} />
         {company.latest_run_id ? (
           <Results key={`${company.latest_run_id}:${company.research_status}`} company={company} runId={company.latest_run_id} />
         ) : (
@@ -116,6 +119,47 @@ function CompanyView({ company, reload }: { company: CompanyDetail; reload: () =
         )}
       </div>
     </>
+  );
+}
+
+function EnrichmentPanel({ company }: { company: CompanyDetail }) {
+  const signals = useApi(() => api.GET("/api/v1/companies/{company_id}/signals", { params: { path: { company_id: company.id } } }), [company.id]);
+  const run = signals.data?.enrichment_run ?? null;
+  const active = isActiveStatus(run?.status);
+  usePolling(signals.reload, active, 3000);
+  return (
+    <Card>
+      <h2 className="text-lg font-medium text-white">Enrichment &amp; score</h2>
+      <p className="mt-1 text-sm text-slate-400">Find dated growth triggers and buying intent on the public website, then score the lead.</p>
+      <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
+        <div>
+          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Latest enrichment</dt>
+          <dd className="mt-1">{signals.loading ? "…" : run ? <StatusBadge status={run.status} /> : <Badge tone="muted">Not enriched</Badge>}</dd>
+        </div>
+        {run ? (
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Run</dt>
+            <dd className="mt-1">
+              <Link href={`/research-runs/${run.id}`} className="text-accent hover:underline">
+                View enrichment run
+              </Link>
+            </dd>
+          </div>
+        ) : null}
+        <div>
+          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Lead score</dt>
+          <dd className="mt-1">
+            <Link href={`/leads/${company.id}`} className="text-accent hover:underline">
+              Open lead detail
+            </Link>
+          </dd>
+        </div>
+      </dl>
+      {signals.error && !signals.data ? <div className="mt-4"><Alert>{signals.error}</Alert></div> : null}
+      <div className="mt-4">
+        <EnrichmentActions companyId={company.id} hasWebsite={!!company.website_url} busy={active} onDone={signals.reload} />
+      </div>
+    </Card>
   );
 }
 

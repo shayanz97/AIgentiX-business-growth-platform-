@@ -43,9 +43,10 @@ jobs:
       - run: uv run pytest
         env:
           RESEARCH_EVAL_REPORT: research-eval.md
-      - name: Research evaluation report
+          LEAD_SCORING_EVAL_REPORT: lead-scoring-eval.md
+      - name: Evaluation reports
         if: always()
-        run: cat research-eval.md >> "$GITHUB_STEP_SUMMARY" || true
+        run: cat research-eval.md lead-scoring-eval.md >> "$GITHUB_STEP_SUMMARY" || true
 
   contracts:
     name: API contract is up to date
@@ -130,6 +131,11 @@ jobs:
             "SELECT count(*) FROM evidence" | xargs test 1 -le
           docker compose exec -T db psql -U aigentix -d aigentix -tAc \
             "SELECT count(*) FROM opportunity_evidence" | xargs test 1 -le
+      - name: Verify enrichment and scores persisted in PostgreSQL
+        run: |
+          for table in business_signals buying_intent_signals lead_scores lead_score_evidence lead_reviews; do
+            docker compose exec -T db psql -U aigentix -d aigentix -tAc "SELECT count(*) FROM $table" | xargs test 1 -le
+          done
       - name: Service logs
         if: failure()
         run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml logs --no-color
