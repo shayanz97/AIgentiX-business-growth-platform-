@@ -27,3 +27,6 @@ class ModuleDescriptor:
     status: ModuleStatus
     router: APIRouter | None = None
     workflows: dict[str, WorkflowSpec] = field(default_factory=dict)
+    # Read-only services offered to other modules through a platform contract (e.g. "lead_data" →
+    # aigentix.platform.leads.LeadDataProvider). Modules never import each other directly.
+    provides: dict[str, object] = field(default_factory=dict)

@@ -1,16 +1,11 @@
 """Explicit module registration. Add a module by appending its descriptor here."""
 
-from aigentix.modules import lead_intelligence
+from aigentix.modules import lead_intelligence, sales
 from aigentix.modules.base import ModuleDescriptor, ModuleStatus
 
 MODULES: tuple[ModuleDescriptor, ...] = (
     lead_intelligence.descriptor,
-    ModuleDescriptor(
-        key="sales",
-        name="Sales Automation",
-        description="Outreach preparation, lead management and CRM integration.",
-        status=ModuleStatus.PLANNED,
-    ),
+    sales.descriptor,
     ModuleDescriptor(
         key="marketing",
         name="Marketing Studio",

@@ -77,7 +77,10 @@ def _clean_tables(request: pytest.FixtureRequest) -> Iterator[None]:
         with get_engine().begin() as conn:
             conn.execute(
                 text(
-                    "TRUNCATE lead_reviews, lead_score_evidence, lead_scores, scoring_profiles, icp_profiles, "
+                    "TRUNCATE sales_crm_mappings, sales_service_offerings, sales_proposal_revisions, sales_proposals, "
+                    "sales_briefs, sales_tasks, sales_activities, sales_suppressions, sales_contact_reviews, "
+                    "sales_contacts, sales_stage_history, sales_opportunities, "
+                    "lead_reviews, lead_score_evidence, lead_scores, scoring_profiles, icp_profiles, "
                     "buying_intent_evidence, buying_intent_signals, business_signal_evidence, business_signals, "
                     "opportunity_evidence, opportunities, evidence, research_sources, research_runs, "
                     "research_project_companies, companies, workflow_runs, research_projects, user_sessions, "
