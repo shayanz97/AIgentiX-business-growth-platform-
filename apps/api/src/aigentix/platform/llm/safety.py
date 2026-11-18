@@ -150,6 +150,16 @@ def contains_guarantee(text: str) -> bool:
     return bool(_GUARANTEE.search(text))
 
 
+_GENERIC_CERTIFICATION = {"certified", "zertifiziert", "zertifizierung", "certification"}
+
+
+def certification_terms(text: str) -> set[str]:
+    """The specific standards / compliance terms mentioned (normalised), e.g. {"iso 27001"}; generic words such
+    as "certified" are not terms of their own."""
+    terms = {re.sub(r"[\s/-]+", " ", m.group(0).lower()).strip() for m in _CERTIFICATION.finditer(text)}
+    return terms - _GENERIC_CERTIFICATION
+
+
 def contains_certification_claim(text: str) -> bool:
     """Certification or compliance promises (ISO 27001, "DSGVO-zertifiziert", "GDPR-certified", ...)."""
     return bool(_CERTIFICATION.search(text))

@@ -81,8 +81,14 @@ def create_deal(
     conversion_key: uuid.UUID | None = None,
     reason: str = "Created",
 ) -> SalesOpportunity:
-    if not get_lead_data_provider().company_exists(db, tenant.organization_id, company_id):
+    provider = get_lead_data_provider()
+    if not provider.company_exists(db, tenant.organization_id, company_id):
         raise NotFound("Company not found")
+    if conversion_key is None:
+        # Manual opportunities (e.g. existing customers) skip the qualification gate, but never for rejected leads.
+        lead = provider.snapshot(db, tenant.organization_id, company_id)
+        if lead is not None and lead.review_status == "rejected":
+            raise InvalidInput("This lead was rejected in Lead Intelligence; change its review status first")
     require_member(db, tenant, owner_user_id)
     deal = SalesOpportunity(
         organization_id=tenant.organization_id,

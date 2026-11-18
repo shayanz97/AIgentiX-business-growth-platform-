@@ -155,7 +155,18 @@ def test_contact_compliance_flow(deal_a: dict[str, Any], tenant_a: Tenant) -> No
     assert not any(p["allowed"] for p in listed[0]["permissions"])
     patch = {"expected_version": listed[0]["version"], "restriction_status": "unverified"}
     edited = tenant_a.client.patch(f"/api/v1/sales/contacts/{contact['id']}", json=patch, headers=tenant_a.headers)
-    assert edited.json()["restriction_status"] == "suppressed"
+    assert edited.status_code == 400  # an opt-out is one-way
+    sneaky = {
+        "expected_version": listed[0]["version"],
+        "business_email": "new@kunde.example",
+        "restriction_status": "unverified",
+    }
+    assert (
+        tenant_a.client.patch(
+            f"/api/v1/sales/contacts/{contact['id']}", json=sneaky, headers=tenant_a.headers
+        ).status_code
+        == 400
+    )
     assert tenant_a.client.post(url, json=ok, headers=tenant_a.headers).status_code == 400
     # Recording an outbound e-mail to a suppressed contact is refused; a received e-mail is still recorded.
     activities = f"/api/v1/sales/opportunities/{deal['id']}/activities"
@@ -177,3 +188,43 @@ def test_contact_validation(deal_a: dict[str, Any], tenant_a: Tenant) -> None:
     assert "not-an-email" not in response.text  # validation errors never echo input
     scraped = {"company_id": company, "name": "A", "source": "linkedin_scrape"}
     assert tenant_a.client.post("/api/v1/sales/contacts", json=scraped, headers=tenant_a.headers).status_code == 422
+
+
+def test_review_regressions(deal_a: dict[str, Any], tenant_a: Tenant) -> None:
+    """Fixes from the independent review: one-way manual suppression with audit, outbound refused for suppressed
+    contacts, nulls rejected, rejected leads not manually re-entered, no 'sent' on a closed deal."""
+    contact, deal = deal_a["contact"], deal_a["deal"]
+    url = f"/api/v1/sales/contacts/{contact['id']}"
+    allow = {"channel": "letter", "decision": "allowed", "lawful_basis": "legitimate_interest"}
+    assert tenant_a.client.post(f"{url}/reviews", json=allow, headers=tenant_a.headers).status_code == 201
+    # A manual objection (e.g. by letter) is stored as suppressed: audited, all channels reset, irreversible.
+    objected = tenant_a.client.patch(
+        url, json={"expected_version": contact["version"], "restriction_status": "suppressed"}, headers=tenant_a.headers
+    ).json()
+    assert objected["restriction_status"] == "suppressed"
+    assert not any(p["allowed"] for p in objected["permissions"])
+    reviews = client_get(tenant_a.client, f"{url}/reviews", tenant_a.headers)
+    assert sum("Restriction changed" in (r["note"] or "") for r in reviews) == 4  # one audit row per channel
+    back = tenant_a.client.patch(
+        url,
+        json={"expected_version": objected["version"], "restriction_status": "unverified"},
+        headers=tenant_a.headers,
+    )
+    assert back.status_code == 400
+    call = {"activity_type": "letter_sent", "description": "Letter", "contact_id": contact["id"]}
+    activities = f"/api/v1/sales/opportunities/{deal['id']}/activities"
+    assert tenant_a.client.post(activities, json=call, headers=tenant_a.headers).status_code == 400
+    # Explicit nulls for required fields are validation errors, not server errors.
+    deal_url = f"/api/v1/sales/opportunities/{deal['id']}"
+    for field in ("title", "priority", "currency"):
+        body = {"expected_version": deal["version"], field: None}
+        assert tenant_a.client.patch(deal_url, json=body, headers=tenant_a.headers).status_code == 422, field
+    nulled = {"expected_version": objected["version"], "restriction_status": None}
+    assert tenant_a.client.patch(url, json=nulled, headers=tenant_a.headers).status_code == 422
+
+
+def test_rejected_lead_cannot_be_added_manually(tenant_a: Tenant) -> None:
+    rejected = qualified_lead(tenant_a, "nordwerk-hiring.example", review="rejected")
+    body = {"company_id": rejected["company_id"], "title": "Back door"}
+    response = tenant_a.client.post("/api/v1/sales/opportunities", json=body, headers=tenant_a.headers)
+    assert response.status_code == 400

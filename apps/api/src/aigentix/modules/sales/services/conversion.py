@@ -9,7 +9,7 @@ asks for an additional opportunity. Lead Intelligence data is read, never modifi
 import uuid
 from dataclasses import dataclass
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -80,6 +80,9 @@ def convert_lead(
         if source.status == "rejected":
             raise InvalidInput("A rejected research opportunity cannot be converted")
 
+    # Serialise conversions of the same lead (different keys, two tabs / users) so the duplicate check below
+    # cannot race; the lock is released at commit.
+    db.execute(select(func.pg_advisory_xact_lock(func.hashtext(f"sales-convert:{org}:{company_id}"))))
     existing = db.scalar(
         select(SalesOpportunity)
         .where(

@@ -90,12 +90,19 @@ history row and a `system` activity. Historical scores are never modified.
   needs at least presumed consent, a public business address alone permits nothing). Recording an outbound
   activity to a suppressed contact is refused.
 
+Opt-out hashes are unsalted SHA-256 of the normalised address, so a known address can be matched (which is the
+purpose) and a guessed one confirmed; they are not a secret store. A suppressed contact can never be made
+contactable again, every restriction change resets all channels to "not allowed" with an audit row, and outbound
+activities to suppressed contacts are refused.
+
 ## CRM integration
 
 `integrations/crm.py`: `CRMProvider` protocol (health, upsert company / contact / deal, idempotent by external id)
 + `ExternalCRMMapping`. **No provider is configured** (HubSpot / Pipedrive adapters are future work; the contract
 is documented). Export to a provider requires an owner and `confirm=true`; without a configured provider the API
-says so — no fake sync. CSV export of deals works without any account.
+says so — no fake sync. Contacts are exported only when requested and only if a person reviewed them as contactable
+on at least one channel. Each mapping is committed right after its external write, so a later failure cannot lose
+the external id (and a re-export updates instead of duplicating). CSV export of deals works without any account.
 
 ## Metrics (`GET /api/v1/sales/metrics`, deterministic)
 
@@ -106,9 +113,10 @@ says so — no fake sync. CSV export of deals works without any account.
 | lead_to_opportunity_rate | converted_leads / qualified_leads (null when 0) |
 | opportunities_by_stage | count per stage |
 | pipeline_value | sum of `estimated_value` of open deals **with a value**, per currency; count without value reported |
-| won_count / lost_count, won_value | closed deals; won value = recorded `won_value` (or estimated value if the user confirmed it at close) per currency |
+| won_count / lost_count, won_value | closed deals; won value = the `won_value` a person entered at close, per currency (deals won without a value are counted in `won_without_value`, never estimated) |
 | opportunity_to_won_rate | won / all opportunities; win_rate = won / (won + lost) |
 | overdue_tasks | open tasks with due_at < now |
+| proposals_drafted / proposals_sent | proposals not marked as sent / marked as sent by a person |
 
 ## API (all under `/api/v1`, tenant-scoped)
 

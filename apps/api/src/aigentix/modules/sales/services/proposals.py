@@ -269,6 +269,8 @@ def _transition(
         options = ", ".join(sorted(allowed)) or "none"
         raise InvalidInput(f"Cannot change a {proposal.status} proposal to {status}. Allowed: {options}.")
     if status == ProposalStatus.SENT.value:
+        if deal.status != "open":
+            raise InvalidInput("The deal is closed; reopen it before recording that a proposal was sent")
         if sent_at is None:
             raise InvalidInput("Confirm when you sent the proposal (sent_at); AIgentiX does not send it")
         if sent_at.tzinfo is None:
@@ -302,9 +304,17 @@ class MarkdownExport:
     content: str
 
 
+_MD_IMAGE = re.compile(r"!\[([^\]]*)\]\([^)]*\)")
+_MD_LINK = re.compile(r"\[([^\]]*)\]\(\s*(?!https?://)[^)]*\)", re.I)
+_BARE_SCHEME = re.compile(r"(?i)\b(?:javascript|data|vbscript|file):")
+
+
 def _md(text: str) -> str:
-    """Plain-text safe: no HTML can survive (tags are neutralised)."""
-    return neutralise_markup(text)
+    """Safe Markdown: no HTML (tags neutralised), no images (tracking pixels), no non-http(s) links."""
+    text = neutralise_markup(text)
+    text = _MD_IMAGE.sub(lambda m: m.group(1), text)
+    text = _MD_LINK.sub(lambda m: m.group(1), text)
+    return _BARE_SCHEME.sub("", text)
 
 
 def export_markdown(db: Session, tenant: TenantContext, proposal_id: uuid.UUID) -> MarkdownExport:

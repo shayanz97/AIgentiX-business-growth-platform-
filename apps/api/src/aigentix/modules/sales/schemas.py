@@ -5,7 +5,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, model_validator
 
 from aigentix.modules.sales.models import (
     ActivityType,
@@ -27,6 +27,13 @@ Requirement = Annotated[str, StringConstraints(strip_whitespace=True, min_length
 
 class _Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")
+
+
+def _no_nulls(model: BaseModel, fields: tuple[str, ...]) -> None:
+    """Optional in a PATCH means "leave unchanged"; an explicit null for a required column is rejected."""
+    nulled = [f for f in fields if f in model.model_fields_set and getattr(model, f) is None]
+    if nulled:
+        raise ValueError(f"{', '.join(nulled)} cannot be null")
 
 
 # --- deals -----------------------------------------------------------------------------------------------
@@ -53,6 +60,11 @@ class DealUpdate(_Strict):
     currency: Currency | None = None
     expected_close_date: date | None = None
     confirmed_requirements: list[Requirement] | None = Field(default=None, max_length=50)
+
+    @model_validator(mode="after")
+    def _required_not_null(self) -> "DealUpdate":
+        _no_nulls(self, ("title", "description", "priority", "currency", "confirmed_requirements"))
+        return self
 
 
 class StageChange(_Strict):
@@ -188,6 +200,11 @@ class ContactUpdate(_Strict):
     lawful_basis: LawfulBasis | None = None
     lawful_basis_reference: Note | None = None
     restriction_status: ContactRestriction | None = None
+
+    @model_validator(mode="after")
+    def _required_not_null(self) -> "ContactUpdate":
+        _no_nulls(self, ("name", "restriction_status", "lawful_basis"))
+        return self
 
 
 class ChannelPermissionRead(BaseModel):

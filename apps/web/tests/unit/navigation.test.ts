@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isLeadIntelligencePath, isTabActive, LEAD_INTELLIGENCE_TABS, NAV_ITEMS } from "@/components/navigation";
+import { isLeadIntelligencePath, isSalesPath, isSalesTabActive, isTabActive, SALES_TABS, LEAD_INTELLIGENCE_TABS, NAV_ITEMS } from "@/components/navigation";
 
 describe("navigation", () => {
   it("lists all product areas in order", () => {
@@ -16,7 +16,7 @@ describe("navigation", () => {
 
   it("does not present unimplemented modules as functional", () => {
     const disabled = NAV_ITEMS.filter((i) => !i.enabled).map((i) => i.label);
-    expect(disabled).toEqual(["Sales", "Marketing", "Analytics"]);
+    expect(disabled).toEqual(["Marketing", "Analytics"]);
   });
 
   it("sends Lead Intelligence to its overview page", () => {
@@ -44,5 +44,28 @@ describe("navigation", () => {
     expect(isTabActive("/companies/abc", "/companies")).toBe(true);
     expect(isTabActive("/companies", "/lead-intelligence")).toBe(false);
     expect(isTabActive("/lead-intelligence", "/lead-intelligence")).toBe(true);
+  });
+
+  it("enables Sales with its own tabs", () => {
+    const sales = NAV_ITEMS.find((i) => i.label === "Sales");
+    expect(sales?.enabled).toBe(true);
+    expect(sales?.href).toBe("/sales");
+    expect(SALES_TABS.map((t) => [t.label, t.href])).toEqual([
+      ["Overview", "/sales"],
+      ["Pipeline", "/sales/pipeline"],
+      ["Follow-ups", "/sales/tasks"],
+      ["Contacts", "/sales/contacts"],
+      ["Services", "/sales/services"],
+    ]);
+  });
+
+  it("recognises Sales paths and keeps opportunity pages under Pipeline", () => {
+    expect(isSalesPath("/sales")).toBe(true);
+    expect(isSalesPath("/sales/opportunities/abc")).toBe(true);
+    expect(isSalesPath("/salesforce")).toBe(false);
+    expect(isSalesTabActive("/sales", "/sales")).toBe(true);
+    expect(isSalesTabActive("/sales/pipeline", "/sales")).toBe(false);
+    expect(isSalesTabActive("/sales/opportunities/abc", "/sales/pipeline")).toBe(true);
+    expect(isSalesTabActive("/sales/tasks", "/sales/tasks")).toBe(true);
   });
 });

@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from aigentix.platform.llm.safety import (
     REMOVED_CONTACT,
     REMOVED_LINK,
+    certification_terms,
     contains_certification_claim,
     contains_guarantee,
     drop_sentences,
@@ -83,6 +84,9 @@ class TextGuard:
     flags: set[str] = field(default_factory=set)
     # True: every amount of money is removed (proposals quote prices only from approved offerings).
     strict_money: bool = False
+    # Proposals speak for the vendor: guarantees and certification / compliance promises are never kept there,
+    # whatever the evidence says about the customer.
+    strict_claims: bool = False
 
     def clean(self, text: str, limit: int) -> str:
         cleaned, contact_removed = strip_contact_data(text.strip()[:limit])
@@ -95,7 +99,7 @@ class TextGuard:
 
     def filter(self, text: str, *, support: str, allow_money: bool = False) -> str:
         """Drop the sentences that break a grounding rule. `support` = the text the statement may rely on."""
-        support_has_certification = contains_certification_claim(support)
+        support_terms = certification_terms(support)
 
         def violates(sentence: str) -> bool:
             if REMOVED_LINK in sentence or REMOVED_CONTACT in sentence:
@@ -106,10 +110,14 @@ class TextGuard:
             if mentions_probability(sentence):
                 self.flags.add("score_as_probability_removed")
                 return True
-            if contains_certification_claim(sentence) and not support_has_certification:
+            if contains_certification_claim(sentence) and (
+                self.strict_claims
+                or not contains_certification_claim(support)
+                or not certification_terms(sentence) <= support_terms
+            ):
                 self.flags.add("certification_claim_removed")
                 return True
-            if contains_guarantee(sentence) and not contains_guarantee(support):
+            if contains_guarantee(sentence) and (self.strict_claims or not contains_guarantee(support)):
                 self.flags.add("guarantee_removed")
                 return True
             money = not allow_money and mentions_money(sentence)

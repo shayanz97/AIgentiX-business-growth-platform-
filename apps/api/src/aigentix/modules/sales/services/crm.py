@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from functools import partial
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from aigentix.core.db import utcnow
@@ -28,7 +29,7 @@ from aigentix.modules.sales.integrations.crm import (
 )
 from aigentix.modules.sales.models import ContactRestriction, ExternalCRMMapping, SalesContact, SalesOpportunity
 from aigentix.modules.sales.services.common import audit, get_deal
-from aigentix.modules.sales.services.contacts import is_suppressed
+from aigentix.modules.sales.services.contacts import is_suppressed, permissions
 from aigentix.platform.leads import get_lead_data_provider
 from aigentix.platform.organizations.service import TenantContext
 
@@ -126,13 +127,25 @@ def _run(
     except Exception as exc:
         mapping.sync_status = "failed"
         mapping.last_error = sanitize_error(exc)
-        db.flush()
+        db.commit()
         return EntityResult(entity_type, local_id, "failed", mapping.external_entity_id, mapping.last_error)
-    mapping.external_entity_id = external_id
-    mapping.sync_status = "synced"
-    mapping.last_error = None
-    mapping.last_synced_at = utcnow()
-    db.flush()
+    try:
+        with db.begin_nested():
+            mapping.external_entity_id = external_id
+            mapping.sync_status = "synced"
+            mapping.last_error = None
+            mapping.last_synced_at = utcnow()
+            db.flush()
+    except IntegrityError:
+        # The provider returned an id that is already mapped to another local record: never overwrite it.
+        mapping = _mapping(db, org, provider.name, entity_type, local_id)
+        mapping.sync_status = "failed"
+        mapping.last_error = "The external id is already mapped to another record"
+        db.commit()
+        return EntityResult(entity_type, local_id, "failed", mapping.external_entity_id, mapping.last_error)
+    # Commit right after each external write: the external id must survive a later failure in this export,
+    # otherwise the next export would create duplicates in the CRM.
+    db.commit()
     return EntityResult(entity_type, local_id, "synced", external_id, None)
 
 
@@ -149,11 +162,14 @@ def _eligible_contacts(db: Session, tenant: TenantContext, company_id: uuid.UUID
             .limit(200)
         )
     )
+    # Personal data leaves AIgentiX only for contacts a person reviewed as contactable on at least one channel
+    # (which also excludes suppressed and restricted contacts): invariant 14.
     ok = [
         c
         for c in contacts
         if c.restriction_status == ContactRestriction.UNVERIFIED.value
         and not is_suppressed(db, tenant.organization_id, c)
+        and any(p.permission.allowed for p in permissions(db, tenant, c))
     ]
     return ok, len(contacts) - len(ok)
 

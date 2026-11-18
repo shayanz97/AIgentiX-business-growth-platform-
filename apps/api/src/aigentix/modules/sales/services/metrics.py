@@ -47,6 +47,7 @@ DEFINITIONS = {
     "opportunity_to_won_rate": "won / all opportunities.",
     "win_rate": "won / (won + lost).",
     "overdue_tasks": "Open tasks whose due time has passed.",
+    "proposals_drafted": "Proposals not (yet) marked as sent, whatever their draft / ready status.",
     "proposals_sent": "Proposals a person marked as sent (drafts are not counted as sent).",
 }
 
@@ -106,7 +107,10 @@ def sales_metrics(db: Session, tenant: TenantContext) -> SalesMetrics:
         overdue_tasks=db.scalar(select(func.count()).select_from(SalesTask).where(*tasks, SalesTask.due_at < utcnow()))
         or 0,
         open_tasks=db.scalar(select(func.count()).select_from(SalesTask).where(*tasks)) or 0,
-        proposals_drafted=db.scalar(select(func.count()).select_from(SalesProposal).where(proposals)) or 0,
+        proposals_drafted=db.scalar(
+            select(func.count()).select_from(SalesProposal).where(proposals, SalesProposal.sent_at.is_(None))
+        )
+        or 0,
         proposals_sent=db.scalar(
             select(func.count()).select_from(SalesProposal).where(proposals, SalesProposal.sent_at.is_not(None))
         )

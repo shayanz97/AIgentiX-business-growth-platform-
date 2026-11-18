@@ -207,7 +207,7 @@ def _placeholder(section: str) -> str:
 
 
 def validate_proposal(output: ProposalOutput, inputs: ProposalInputs) -> ValidatedProposal:
-    guard = TextGuard(inputs.company_domain, strict_money=True)
+    guard = TextGuard(inputs.company_domain, strict_money=True, strict_claims=True)
     flags = guard.flags
     by_label = {e.label: e for e in inputs.evidence}
     support = inputs.support

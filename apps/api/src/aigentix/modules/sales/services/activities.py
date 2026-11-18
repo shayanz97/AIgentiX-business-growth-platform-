@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from aigentix.core.db import utcnow
 from aigentix.core.errors import InvalidInput
-from aigentix.modules.sales.models import ActivityType, Channel, SalesActivity
+from aigentix.modules.sales.models import ActivityType, Channel, ContactRestriction, SalesActivity
 from aigentix.modules.sales.services.common import get_deal, touch
 from aigentix.modules.sales.services.contacts import get_contact, is_suppressed
 from aigentix.platform.organizations.service import TenantContext
@@ -42,7 +42,10 @@ def record_activity(
         if contact.company_id != deal.company_id:
             raise InvalidInput("The contact belongs to another company")
         channel = OUTBOUND_CHANNEL.get(activity_type)
-        if channel is not None and is_suppressed(db, tenant.organization_id, contact, channel):
+        if channel is not None and (
+            contact.restriction_status == ContactRestriction.SUPPRESSED.value
+            or is_suppressed(db, tenant.organization_id, contact, channel)
+        ):
             raise InvalidInput("The contact opted out of this channel (suppressed); the activity was not recorded")
     activity = SalesActivity(
         organization_id=tenant.organization_id,

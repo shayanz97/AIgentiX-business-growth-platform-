@@ -34,12 +34,11 @@ from aigentix.platform.leads import get_lead_data_provider
 from aigentix.platform.organizations.service import TenantContext
 
 
-def get_contact(db: Session, tenant: TenantContext, contact_id: uuid.UUID) -> SalesContact:
-    contact = db.scalar(
-        select(SalesContact).where(
-            SalesContact.id == contact_id, SalesContact.organization_id == tenant.organization_id
-        )
+def get_contact(db: Session, tenant: TenantContext, contact_id: uuid.UUID, *, for_update: bool = False) -> SalesContact:
+    query = select(SalesContact).where(
+        SalesContact.id == contact_id, SalesContact.organization_id == tenant.organization_id
     )
+    contact = db.scalar(query.with_for_update() if for_update else query)
     if contact is None:
         raise NotFound("Contact not found")
     return contact
@@ -105,10 +104,18 @@ _EDITABLE = {
 def update_contact(
     db: Session, tenant: TenantContext, contact_id: uuid.UUID, changes: dict[str, Any], *, expected_version: int
 ) -> SalesContact:
-    contact = get_contact(db, tenant, contact_id)
+    contact = get_contact(db, tenant, contact_id, for_update=True)
     check_version(contact.version, expected_version)
     if set(changes) - _EDITABLE:
         raise InvalidInput("Unknown contact field")
+    previous_restriction = contact.restriction_status
+    new_restriction = changes.get("restriction_status")
+    new_restriction = getattr(new_restriction, "value", new_restriction)
+    if previous_restriction == ContactRestriction.SUPPRESSED.value and new_restriction not in (
+        None,
+        ContactRestriction.SUPPRESSED.value,
+    ):
+        raise InvalidInput("A suppressed contact (opt-out / objection) cannot be made contactable again")
     for key, value in changes.items():
         value = value.value if hasattr(value, "value") else value
         if key == "business_email" and value:
@@ -118,6 +125,20 @@ def update_contact(
         raise InvalidInput("Document where the legal basis is recorded (lawful_basis_reference)")
     if is_suppressed(db, tenant.organization_id, contact):
         contact.restriction_status = ContactRestriction.SUPPRESSED.value  # an opt-out cannot be edited away
+    if contact.restriction_status != previous_restriction:
+        # Audit trail + conservative reset: after any restriction change every channel needs a fresh review.
+        for channel in Channel:
+            db.add(
+                SalesContactReview(
+                    organization_id=tenant.organization_id,
+                    contact_id=contact.id,
+                    channel=channel.value,
+                    decision="not_allowed",
+                    lawful_basis=LawfulBasis.NONE.value,
+                    note=f"Restriction changed from {previous_restriction} to {contact.restriction_status}",
+                    reviewed_by_user_id=tenant.user.id,
+                )
+            )
     contact.version += 1
     db.flush()
     return contact

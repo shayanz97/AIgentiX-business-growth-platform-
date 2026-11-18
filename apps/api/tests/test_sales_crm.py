@@ -209,7 +209,14 @@ def test_suppressed_and_restricted_contacts_never_exported(tenant_a: Tenant, moc
         return response.json()  # type: ignore[no-any-return]
 
     fine = contact("Fine Person", "fine@kunde.example")
+    unreviewed = contact("Not Reviewed", "unreviewed@kunde.example")
     optout = contact("Opt Out", "optout@kunde.example")
+    # Only a contact a person reviewed as contactable leaves AIgentiX (here: letter, legitimate interest).
+    review = {"channel": "letter", "decision": "allowed", "lawful_basis": "legitimate_interest"}
+    reviewed = tenant_a.client.post(
+        f"/api/v1/sales/contacts/{fine['id']}/reviews", json=review, headers=tenant_a.headers
+    )
+    assert reviewed.status_code == 201, reviewed.text
     restricted = contact("Restricted One", "restricted@kunde.example")
     assert tenant_a.client.post(
         "/api/v1/sales/suppressions",
@@ -227,10 +234,11 @@ def test_suppressed_and_restricted_contacts_never_exported(tenant_a: Tenant, moc
     assert not any(c[0] == "contact" for c in mock_crm.calls)
     item = _export(tenant_a, [deal["id"]], include_contacts=True).json()["items"][0]
     assert [c["local_entity_id"] for c in item["contacts"]] == [fine["id"]]
-    assert item["skipped_contacts"] == 2
+    assert item["skipped_contacts"] == 3
     exported = {m["local_entity_id"] for m in _mappings(tenant_a, local_entity_type="contact")}
     assert exported == {fine["id"]}
     assert optout["id"] not in exported
+    assert unreviewed["id"] not in exported
     blob = str([r["payload"] for r in mock_crm.records.values()])
     assert "optout@" not in blob
     assert "restricted@" not in blob
@@ -260,3 +268,25 @@ def test_auth_required(client: Any, method: str, path: str) -> None:
 def test_spoofed_org_header_gets_403(tenant_a: Tenant, tenant_b: Tenant, method: str, path: str) -> None:
     body = {"opportunity_ids": [random_uuid()], "confirm": True}
     assert tenant_b.client.request(method, path, json=body, headers=tenant_a.headers).status_code == 403
+
+
+def test_external_id_collision_is_failed_and_mappings_are_committed(
+    tenant_a: Tenant, mock_crm: MockCRMProvider, db: Session, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A provider returning an id already mapped to another record fails that entity (never overwrites), and
+    mappings written before the failure are kept (committed per external write)."""
+    first = new_deal(tenant_a)
+    second_lead = tenant_a.client.post(
+        "/api/v1/sales/opportunities",
+        json={"company_id": first["company"]["id"], "title": "Second deal"},
+        headers=tenant_a.headers,
+    ).json()
+    assert _export(tenant_a, [first["id"]]).status_code == 200
+    taken = next(m["external_entity_id"] for m in _mappings(tenant_a, local_entity_type="deal"))
+    monkeypatch.setattr(mock_crm, "upsert_deal", lambda payload, external_id: taken)
+    item = _export(tenant_a, [second_lead["id"]]).json()["items"][0]
+    assert item["deal"]["status"] == "failed"
+    assert "already mapped" in item["deal"]["error"]
+    deals = _mappings(tenant_a, local_entity_type="deal")
+    assert sorted(m["sync_status"] for m in deals) == ["failed", "synced"]
+    assert db.scalar(select(func.count()).select_from(ExternalCRMMapping)) == 3  # company + 2 deals

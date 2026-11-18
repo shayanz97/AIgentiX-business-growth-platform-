@@ -25,5 +25,6 @@ export const config = {
     "/companies/:path*",
     "/research-runs/:path*",
     "/opportunities/:path*",
+    "/sales/:path*",
   ],
 };
