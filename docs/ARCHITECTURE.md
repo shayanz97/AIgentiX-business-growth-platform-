@@ -175,6 +175,29 @@ re-score ─▶ services.scoring (stored data only: no fetch, no model call)
 * **External intent sources** are interfaces: `TenderSource` (offline fixture adapter only) and `IntentProvider`
   (none). Buying or scraping intent data is out of scope.
 
+## Sales module (Sprint 4)
+
+Details: [SPRINT_4_PLAN.md](SPRINT_4_PLAN.md).
+
+```
+Lead Intelligence ──provides──▶ platform/leads.py LeadDataProvider ◀──reads── Sales
+  (companies, evidence, research opportunities, triggers, intent, scores, reviews)     (read-only, org-scoped)
+
+Sales: convert (idempotent) ─▶ sales_opportunities ─▶ stage rules (domain/pipeline.py) ─▶ sales_stage_history
+       activities (manual) · contacts + eligibility reviews + suppressions (domain/compliance.py)
+       briefs / proposals ─▶ worker workflows (LLMProvider, validated, evidence-cited) ─▶ revisions (ai | human)
+       tasks + deterministic suggestions · metrics · CSV export · CRMProvider (explicit export only)
+```
+
+* **No module imports another.** Sales never imports `modules.lead_intelligence`; it reads through the platform
+  contract implemented by `lead_intelligence/services/lead_data.py` and registered in its descriptor's `provides`.
+  Database integrity across modules uses composite FKs to `companies`, `opportunities`, `lead_scores`.
+* **Deterministic business state**: stage transitions, eligibility, conversion, metrics and suggestions are plain
+  code; LLMs only draft text (briefs, proposals) and their output is validated before it is stored.
+* **Human edits are separate**: brief `edited_content` vs `content`; proposal revisions are immutable rows with
+  `origin` ai/human. Optimistic locking (`version`) on deals, contacts, briefs and proposals.
+* **Nothing is sent.** There is no mail, SMS or telephony integration; a test fails if one is imported.
+
 ## API conventions
 
 - Versioned under `/api/v1`; OpenAPI at `/api/v1/openapi.json`, Swagger UI at `/api/v1/docs`.
@@ -193,6 +216,8 @@ re-score ─▶ services.scoring (stored data only: no fetch, no model call)
   and English; other languages are not detected.
 - Growth-trigger detection is keyword-based (DE/EN) with an optional AI review; it misses events phrased without
   the listed terms, and job postings collapse into one hiring trigger per company.
+- Sales: no live CRM adapter (HubSpot / Pipedrive are documented contracts only); "today" for tasks uses the
+  request's time zone (default Europe/Berlin); compliance rules are conservative product defaults, not legal advice.
 - Lead scoring is calibrated on 16 fixture scenarios only; weights and thresholds are defaults, not validated
   against real conversion data. No live tender feed or intent provider is integrated.
 - The concurrency limit counts `running` runs only; the advisory lock makes the check exact across workers.
