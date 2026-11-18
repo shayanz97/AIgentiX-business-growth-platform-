@@ -1,0 +1,18 @@
+{
+  "sections": [
+    {"key": "executive_summary", "title": "Summary", "body": "We guarantee a 300% ROI in the first year. This draft outlines an inquiry assistant.", "status": "draft", "evidence": ["E1"]},
+    {"key": "business_context", "title": "Context", "body": "The company serves business customers.", "status": "draft", "evidence": ["E77"]},
+    {"key": "identified_opportunity", "title": "Opportunity", "body": "Inquiries may be sorted by hand today, to be validated.", "status": "draft", "evidence": []},
+    {"key": "proposed_solution", "title": "Solution", "body": "Our solution is ISO 27001 certified and DSGVO-zertifiziert. An assistant triages incoming inquiries.", "status": "draft", "evidence": []},
+    {"key": "scope_and_deliverables", "title": "Scope", "body": "- Inquiry classification\n- Draft answers for common questions", "status": "draft", "evidence": []},
+    {"key": "implementation_approach", "title": "Approach", "body": "Phase 1: discovery. Phase 2: pilot.", "status": "draft", "evidence": []},
+    {"key": "customer_dependencies", "title": "Dependencies", "body": "Access to the inquiry inbox.", "status": "draft", "evidence": []},
+    {"key": "assumptions", "title": "Assumptions", "body": "- Inquiry volume is meaningful.", "status": "draft", "evidence": []},
+    {"key": "expected_benefits", "title": "Benefits", "body": "Savings of 50.000 € per year. Faster first responses may be possible.", "status": "draft", "evidence": []},
+    {"key": "success_criteria", "title": "Success", "body": "Response time is reduced by 80%.", "status": "draft", "evidence": []},
+    {"key": "timeline_estimate", "title": "Timeline", "body": "The project is completed in 4 weeks.", "status": "draft", "evidence": []},
+    {"key": "commercial_terms", "title": "Price", "body": "Total price: 12.500 EUR one-time, compliance guaranteed.", "status": "draft", "evidence": []},
+    {"key": "pricing_details", "title": "Discount", "body": "20% discount if signed this week.", "status": "draft", "evidence": []}
+  ],
+  "assumptions": ["Results are guaranteed.", "The customer provides a process owner."]
+}

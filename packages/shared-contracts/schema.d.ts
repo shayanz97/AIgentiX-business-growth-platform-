@@ -346,6 +346,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/leads/{company_id}/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Convert Lead */
+        post: operations["convertLead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/leads/{company_id}/review": {
         parameters: {
             query?: never;
@@ -646,6 +663,493 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sales/briefs/{brief_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Brief */
+        get: operations["getSalesBrief"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Brief */
+        patch: operations["updateSalesBrief"];
+        trace?: never;
+    };
+    "/api/v1/sales/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Contacts */
+        get: operations["listSalesContacts"];
+        put?: never;
+        /** Create Contact */
+        post: operations["createSalesContact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/contacts/{contact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Contact */
+        patch: operations["updateSalesContact"];
+        trace?: never;
+    };
+    "/api/v1/sales/contacts/{contact_id}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Reviews */
+        get: operations["listSalesContactReviews"];
+        put?: never;
+        /** Review Contact */
+        post: operations["reviewSalesContact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/crm/mappings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Mappings */
+        get: operations["listCrmMappings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/crm/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Providers */
+        get: operations["listCrmProviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/crm/{provider}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Export To Crm */
+        post: operations["exportToCrm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Csv */
+        get: operations["exportSalesCsv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metrics */
+        get: operations["getSalesMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Deals */
+        get: operations["listSalesOpportunities"];
+        put?: never;
+        /** Create Deal */
+        post: operations["createSalesOpportunity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Deal Route */
+        get: operations["getSalesOpportunity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Deal */
+        patch: operations["updateSalesOpportunity"];
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Activities */
+        get: operations["listSalesActivities"];
+        put?: never;
+        /** Record Activity */
+        post: operations["recordSalesActivity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/briefs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Briefs */
+        get: operations["listSalesBriefs"];
+        put?: never;
+        /** Create Brief */
+        post: operations["createSalesBrief"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close Deal */
+        post: operations["closeSalesOpportunity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** History */
+        get: operations["getSalesStageHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Proposals */
+        get: operations["listSalesProposals"];
+        put?: never;
+        /** Create Proposal */
+        post: operations["createSalesProposal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen Deal */
+        post: operations["reopenSalesOpportunity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/stage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change Stage */
+        post: operations["changeSalesStage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/opportunities/{deal_id}/task-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Task Suggestions */
+        get: operations["getSalesTaskSuggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/proposals/{proposal_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Proposal */
+        get: operations["getSalesProposal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Proposal */
+        patch: operations["updateSalesProposal"];
+        trace?: never;
+    };
+    "/api/v1/sales/proposals/{proposal_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Proposal */
+        get: operations["exportSalesProposal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/proposals/{proposal_id}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Revisions */
+        get: operations["listSalesProposalRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Services */
+        get: operations["listSalesServices"];
+        put?: never;
+        /** Create Service */
+        post: operations["createSalesService"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/services/{offering_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Service */
+        patch: operations["updateSalesService"];
+        trace?: never;
+    };
+    "/api/v1/sales/suppressions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Suppression */
+        post: operations["addSalesSuppression"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tasks */
+        get: operations["listSalesTasks"];
+        put?: never;
+        /** Create Task */
+        post: operations["createSalesTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/tasks/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Task Summary */
+        get: operations["getSalesTaskSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Task */
+        patch: operations["updateSalesTask"];
+        trace?: never;
+    };
     "/api/v1/scoring-profiles": {
         parameters: {
             query?: never;
@@ -742,6 +1246,295 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActivityCreate */
+        ActivityCreate: {
+            /**
+             * Activity Type
+             * @enum {string}
+             */
+            activity_type: "note" | "call" | "meeting" | "email_sent" | "email_received" | "letter_sent" | "other";
+            /** Contact Id */
+            contact_id?: string | null;
+            /** Description */
+            description: string;
+            /**
+             * Occurred At
+             * @description When it happened (default: now; never future).
+             */
+            occurred_at?: string | null;
+        };
+        /** ActivityRead */
+        ActivityRead: {
+            activity_type: components["schemas"]["ActivityType"];
+            /** Contact Id */
+            contact_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By User Id */
+            created_by_user_id: string | null;
+            /** Description */
+            description: string;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Sales Opportunity Id
+             * Format: uuid
+             */
+            sales_opportunity_id: string;
+        };
+        /**
+         * ActivityType
+         * @enum {string}
+         */
+        ActivityType: "note" | "call" | "meeting" | "email_sent" | "email_received" | "letter_sent" | "proposal_sent" | "other" | "system";
+        /**
+         * BriefEdit
+         * @description Human edits, stored separately from the AI content (which is never overwritten). Omitted = unchanged.
+         */
+        BriefEdit: {
+            /** Assumptions And Uncertainty */
+            assumptions_and_uncertainty?: string[] | null;
+            /** Company Summary */
+            company_summary?: string | null;
+            /** Discovery Questions */
+            discovery_questions?: string[] | null;
+            /** Implementation Requirements */
+            implementation_requirements?: string[] | null;
+            /** Main Opportunity */
+            main_opportunity?: string | null;
+            /** Main Opportunity Title */
+            main_opportunity_title?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Observed Situation */
+            observed_situation?: string[] | null;
+            /** Potential Impact */
+            potential_impact?: string[] | null;
+            /** Recommended Next Action */
+            recommended_next_action?: string | null;
+            /** Suggested Solution */
+            suggested_solution?: string | null;
+            /** Supporting Evidence */
+            supporting_evidence?: string[] | null;
+        };
+        /** BriefRead */
+        BriefRead: {
+            /**
+             * Content
+             * @description Validated AI output. Plain text: render as text, never as HTML.
+             */
+            content: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By User Id */
+            created_by_user_id: string | null;
+            /** Edited By User Id */
+            edited_by_user_id: string | null;
+            /** Edited Content */
+            edited_content: {
+                [key: string]: unknown;
+            } | null;
+            /** Generation Version */
+            generation_version: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Message */
+            message: string | null;
+            /** Model */
+            model: string | null;
+            /** Quality Flags */
+            quality_flags: string[];
+            /**
+             * Sales Opportunity Id
+             * Format: uuid
+             */
+            sales_opportunity_id: string;
+            /** Source Evidence Ids */
+            source_evidence_ids: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "generating" | "draft" | "approved" | "superseded" | "failed";
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            workflow: components["schemas"]["WorkflowInfo"] | null;
+        };
+        /** BriefUpdate */
+        BriefUpdate: {
+            edited_content?: components["schemas"]["BriefEdit"] | null;
+            /**
+             * Expected Version
+             * @description Version the change is based on (optimistic locking).
+             */
+            expected_version: number;
+            /** Status */
+            status?: ("approved" | "draft") | null;
+        };
+        /** CRMEntityResult */
+        CRMEntityResult: {
+            /** Error */
+            error: string | null;
+            /** External Entity Id */
+            external_entity_id: string | null;
+            /**
+             * Local Entity Id
+             * Format: uuid
+             */
+            local_entity_id: string;
+            /**
+             * Local Entity Type
+             * @enum {string}
+             */
+            local_entity_type: "company" | "contact" | "deal";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "synced" | "failed";
+        };
+        /** CRMExportItem */
+        CRMExportItem: {
+            company: components["schemas"]["CRMEntityResult"];
+            /** Contacts */
+            contacts: components["schemas"]["CRMEntityResult"][];
+            deal: components["schemas"]["CRMEntityResult"] | null;
+            /**
+             * Opportunity Id
+             * Format: uuid
+             */
+            opportunity_id: string;
+            /**
+             * Skipped Contacts
+             * @description Contacts left out because they are suppressed or restricted.
+             */
+            skipped_contacts: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "synced" | "failed";
+        };
+        /** CRMExportRequest */
+        CRMExportRequest: {
+            /**
+             * Confirm
+             * @description Must be true: exporting sends business data to the external system.
+             */
+            confirm: boolean;
+            /**
+             * Include Contacts
+             * @default false
+             */
+            include_contacts?: boolean;
+            /** Opportunity Ids */
+            opportunity_ids: string[];
+        };
+        /** CRMExportResult */
+        CRMExportResult: {
+            /** Items */
+            items: components["schemas"]["CRMExportItem"][];
+            /** Provider */
+            provider: string;
+        };
+        /** CRMMappingRead */
+        CRMMappingRead: {
+            /** External Entity Id */
+            external_entity_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Error */
+            last_error: string | null;
+            /** Last Synced At */
+            last_synced_at: string | null;
+            /**
+             * Local Entity Id
+             * Format: uuid
+             */
+            local_entity_id: string;
+            /**
+             * Local Entity Type
+             * @enum {string}
+             */
+            local_entity_type: "company" | "contact" | "deal";
+            /** Provider */
+            provider: string;
+            /**
+             * Sync Status
+             * @enum {string}
+             */
+            sync_status: "pending" | "synced" | "failed";
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CRMProviderRead */
+        CRMProviderRead: {
+            /** Detail */
+            detail: string;
+            /** Name */
+            name: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "degraded" | "unavailable";
+            /** Test Double */
+            test_double: boolean;
+        };
+        /** CRMProvidersRead */
+        CRMProvidersRead: {
+            /** Note */
+            note: string;
+            /** Providers */
+            providers: components["schemas"]["CRMProviderRead"][];
+        };
+        /**
+         * Channel
+         * @enum {string}
+         */
+        Channel: "email" | "phone" | "letter" | "linkedin";
+        /** ChannelPermissionRead */
+        ChannelPermissionRead: {
+            /** Allowed */
+            allowed: boolean;
+            channel: components["schemas"]["Channel"];
+            /** Reason */
+            reason: string;
+        };
         /** CompanyCreate */
         CompanyCreate: {
             /** Name */
@@ -920,6 +1713,20 @@ export interface components {
             /** Website Url */
             website_url: string | null;
         };
+        /** CompanyRef */
+        CompanyRef: {
+            /** Canonical Domain */
+            canonical_domain: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Website Url */
+            website_url: string | null;
+        };
         /** CompanySignals */
         CompanySignals: {
             /**
@@ -976,6 +1783,169 @@ export interface components {
             /** Weight */
             weight: number;
         };
+        /** ContactCreate */
+        ContactCreate: {
+            /** Business Email */
+            business_email?: string | null;
+            /** Business Phone */
+            business_phone?: string | null;
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** @default none */
+            lawful_basis?: components["schemas"]["LawfulBasis"];
+            /** Lawful Basis Reference */
+            lawful_basis_reference?: string | null;
+            /** Name */
+            name: string;
+            /** Role */
+            role?: string | null;
+            source: components["schemas"]["ContactSource"];
+            /** Source Note */
+            source_note?: string | null;
+        };
+        /** ContactRead */
+        ContactRead: {
+            /** Business Email */
+            business_email: string | null;
+            /** Business Phone */
+            business_phone: string | null;
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            lawful_basis: components["schemas"]["LawfulBasis"];
+            /** Lawful Basis Reference */
+            lawful_basis_reference: string | null;
+            /** Name */
+            name: string;
+            /** Permissions */
+            permissions: components["schemas"]["ChannelPermissionRead"][];
+            restriction_status: components["schemas"]["ContactRestriction"];
+            /** Role */
+            role: string | null;
+            source: components["schemas"]["ContactSource"];
+            /** Source Note */
+            source_note: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+        };
+        /**
+         * ContactRestriction
+         * @enum {string}
+         */
+        ContactRestriction: "unverified" | "restricted" | "suppressed";
+        /** ContactReviewCreate */
+        ContactReviewCreate: {
+            channel: components["schemas"]["Channel"];
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "allowed" | "not_allowed";
+            lawful_basis: components["schemas"]["LawfulBasis"];
+            /** Note */
+            note?: string | null;
+        };
+        /** ContactReviewRead */
+        ContactReviewRead: {
+            channel: components["schemas"]["Channel"];
+            /**
+             * Contact Id
+             * Format: uuid
+             */
+            contact_id: string;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "allowed" | "not_allowed";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            lawful_basis: components["schemas"]["LawfulBasis"];
+            /** Note */
+            note: string | null;
+            /**
+             * Reviewed At
+             * Format: date-time
+             */
+            reviewed_at: string;
+            /** Reviewed By User Id */
+            reviewed_by_user_id: string | null;
+        };
+        /**
+         * ContactSource
+         * @enum {string}
+         */
+        ContactSource: "inbound_inquiry" | "business_card" | "event" | "referral" | "website_imprint" | "website_contact_page" | "existing_customer" | "other";
+        /** ContactUpdate */
+        ContactUpdate: {
+            /** Business Email */
+            business_email?: string | null;
+            /** Business Phone */
+            business_phone?: string | null;
+            /** Expected Version */
+            expected_version: number;
+            lawful_basis?: components["schemas"]["LawfulBasis"] | null;
+            /** Lawful Basis Reference */
+            lawful_basis_reference?: string | null;
+            /** Name */
+            name?: string | null;
+            restriction_status?: components["schemas"]["ContactRestriction"] | null;
+            /** Role */
+            role?: string | null;
+            /** Source Note */
+            source_note?: string | null;
+        };
+        /** ConversionRequest */
+        ConversionRequest: {
+            /**
+             * Allow Additional
+             * @description Create another opportunity although an open one exists for the same lead.
+             * @default false
+             */
+            allow_additional?: boolean;
+            /**
+             * Idempotency Key
+             * Format: uuid
+             * @description Client-generated; retries with the same key never duplicate.
+             */
+            idempotency_key: string;
+            /**
+             * Source Opportunity Id
+             * @description Research opportunity to pursue.
+             */
+            source_opportunity_id?: string | null;
+            /** Title */
+            title?: string | null;
+        };
+        /** ConversionResult */
+        ConversionResult: {
+            /** Created */
+            created: boolean;
+            opportunity: components["schemas"]["DealRead"];
+        };
         /** CriterionRead */
         CriterionRead: {
             /** Evidence Ids */
@@ -999,6 +1969,140 @@ export interface components {
              * @enum {string}
              */
             state: "assessed" | "unknown" | "insufficient_evidence" | "not_applicable";
+        };
+        /** DealClose */
+        DealClose: {
+            /** Expected Version */
+            expected_version: number;
+            /** Lost Reason */
+            lost_reason?: string | null;
+            /** Note */
+            note?: string | null;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "won" | "lost";
+            /**
+             * Won Value
+             * @description Value actually won, as entered by a person.
+             */
+            won_value?: number | string | null;
+        };
+        /** DealCreate */
+        DealCreate: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Currency
+             * @default EUR
+             */
+            currency?: string;
+            /**
+             * Description
+             * @default
+             */
+            description?: string;
+            /** Estimated Value */
+            estimated_value?: number | string | null;
+            /** Expected Close Date */
+            expected_close_date?: string | null;
+            /** Owner User Id */
+            owner_user_id?: string | null;
+            /** @default medium */
+            priority?: components["schemas"]["Priority"];
+            /** Title */
+            title: string;
+        };
+        /** DealRead */
+        DealRead: {
+            /** Closed At */
+            closed_at: string | null;
+            company: components["schemas"]["CompanyRef"];
+            /** Confirmed Requirements */
+            confirmed_requirements: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Currency */
+            currency: string;
+            /** Description */
+            description: string;
+            /** Estimated Value */
+            estimated_value: string | null;
+            /** Expected Close Date */
+            expected_close_date: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lost Reason */
+            lost_reason: string | null;
+            /** Open Tasks */
+            open_tasks: number;
+            /** Overdue Tasks */
+            overdue_tasks: number;
+            /** Owner User Id */
+            owner_user_id: string | null;
+            priority: components["schemas"]["Priority"];
+            /** Source Lead Score Id */
+            source_lead_score_id: string | null;
+            /** Source Opportunity Id */
+            source_opportunity_id: string | null;
+            stage: components["schemas"]["Stage"];
+            status: components["schemas"]["DealStatus"];
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            /** Won Value */
+            won_value: string | null;
+        };
+        /** DealReopen */
+        DealReopen: {
+            /** Expected Version */
+            expected_version: number;
+            /** Reason */
+            reason: string;
+        };
+        /**
+         * DealStatus
+         * @enum {string}
+         */
+        DealStatus: "open" | "won" | "lost";
+        /** DealUpdate */
+        DealUpdate: {
+            /** Confirmed Requirements */
+            confirmed_requirements?: string[] | null;
+            /** Currency */
+            currency?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Estimated Value */
+            estimated_value?: number | string | null;
+            /** Expected Close Date */
+            expected_close_date?: string | null;
+            /**
+             * Expected Version
+             * @description Version the change is based on (optimistic locking).
+             */
+            expected_version: number;
+            /** Owner User Id */
+            owner_user_id?: string | null;
+            priority?: components["schemas"]["Priority"] | null;
+            /** Title */
+            title?: string | null;
         };
         /** EnrichmentRequest */
         EnrichmentRequest: {
@@ -1209,6 +2313,11 @@ export interface components {
             /** Title */
             title: string;
         };
+        /**
+         * LawfulBasis
+         * @enum {string}
+         */
+        LawfulBasis: "none" | "explicit_consent" | "existing_customer" | "presumed_consent_b2b" | "inbound_request" | "legitimate_interest";
         /** LeadDetail */
         LeadDetail: {
             /** @description Null until the company has been scored. */
@@ -1427,6 +2536,91 @@ export interface components {
          * @enum {string}
          */
         ModuleStatus: "available" | "planned";
+        /** OfferingCreate */
+        OfferingCreate: {
+            /**
+             * Active
+             * @default true
+             */
+            active?: boolean;
+            /**
+             * Currency
+             * @default EUR
+             */
+            currency?: string;
+            /**
+             * Description
+             * @default
+             */
+            description?: string;
+            /** Name */
+            name: string;
+            /** Price Amount */
+            price_amount?: number | string | null;
+            /**
+             * Price Approved
+             * @description Only approved prices are used in proposals.
+             * @default false
+             */
+            price_approved?: boolean;
+            /** Price Unit */
+            price_unit?: string | null;
+            /** Solution Category */
+            solution_category?: string | null;
+        };
+        /** OfferingRead */
+        OfferingRead: {
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Currency */
+            currency: string;
+            /** Description */
+            description: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Price Amount */
+            price_amount: string | null;
+            /** Price Approved */
+            price_approved: boolean;
+            /** Price Unit */
+            price_unit: string | null;
+            /** Solution Category */
+            solution_category: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** OfferingUpdate */
+        OfferingUpdate: {
+            /** Active */
+            active?: boolean | null;
+            /** Currency */
+            currency?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Price Amount */
+            price_amount?: number | string | null;
+            /** Price Approved */
+            price_approved?: boolean | null;
+            /** Price Unit */
+            price_unit?: string | null;
+            /** Solution Category */
+            solution_category?: string | null;
+        };
         /** OpportunityRead */
         OpportunityRead: {
             /** Assumptions */
@@ -1532,10 +2726,32 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** Page[CRMMappingRead] */
+        Page_CRMMappingRead_: {
+            /** Items */
+            items: components["schemas"]["CRMMappingRead"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        };
         /** Page[CompanyRead] */
         Page_CompanyRead_: {
             /** Items */
             items: components["schemas"]["CompanyRead"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[DealRead] */
+        Page_DealRead_: {
+            /** Items */
+            items: components["schemas"]["DealRead"][];
             /** Limit */
             limit: number;
             /** Offset */
@@ -1598,6 +2814,17 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[TaskRead] */
+        Page_TaskRead_: {
+            /** Items */
+            items: components["schemas"]["TaskRead"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        };
         /** Page[WorkflowRunRead] */
         Page_WorkflowRunRead_: {
             /** Items */
@@ -1609,6 +2836,11 @@ export interface components {
             /** Total */
             total: number;
         };
+        /**
+         * Priority
+         * @enum {string}
+         */
+        Priority: "low" | "medium" | "high";
         /** ProfileCreate */
         ProfileCreate: {
             /**
@@ -1734,6 +2966,154 @@ export interface components {
          * @enum {string}
          */
         ProjectStatus: "draft" | "active" | "archived";
+        /** ProposalCreate */
+        ProposalCreate: {
+            /**
+             * Brief Id
+             * @description Default: the latest approved, else draft brief.
+             */
+            brief_id?: string | null;
+            /** Title */
+            title?: string | null;
+        };
+        /** ProposalDetail */
+        ProposalDetail: {
+            /** Assumptions */
+            assumptions: string[];
+            /** Brief Id */
+            brief_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By User Id */
+            created_by_user_id: string | null;
+            /** Current Revision */
+            current_revision: number;
+            /** Generation Version */
+            generation_version: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Message */
+            message: string | null;
+            /** Model */
+            model: string | null;
+            /** Quality Flags */
+            quality_flags: string[];
+            /** Revision Origin */
+            revision_origin: ("ai" | "human") | null;
+            /**
+             * Sales Opportunity Id
+             * Format: uuid
+             */
+            sales_opportunity_id: string;
+            /** Sections */
+            sections: components["schemas"]["ProposalSection"][];
+            /** Sent At */
+            sent_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "generating" | "draft" | "ready" | "sent" | "accepted" | "declined" | "failed";
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            workflow: components["schemas"]["WorkflowInfo"] | null;
+        };
+        /** ProposalRead */
+        ProposalRead: {
+            /** Brief Id */
+            brief_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By User Id */
+            created_by_user_id: string | null;
+            /** Current Revision */
+            current_revision: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Message */
+            message: string | null;
+            /**
+             * Sales Opportunity Id
+             * Format: uuid
+             */
+            sales_opportunity_id: string;
+            /** Sent At */
+            sent_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "generating" | "draft" | "ready" | "sent" | "accepted" | "declined" | "failed";
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            workflow: components["schemas"]["WorkflowInfo"] | null;
+        };
+        /** ProposalSection */
+        ProposalSection: {
+            /** Body */
+            body: string;
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "executive_summary" | "business_context" | "identified_opportunity" | "proposed_solution" | "scope_and_deliverables" | "implementation_approach" | "customer_dependencies" | "assumptions" | "expected_benefits" | "success_criteria" | "timeline_estimate" | "commercial_terms" | "next_steps";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "needs_input";
+            /** Title */
+            title: string;
+        };
+        /** ProposalUpdate */
+        ProposalUpdate: {
+            /** Assumptions */
+            assumptions?: string[] | null;
+            /** Expected Version */
+            expected_version: number;
+            /**
+             * Note
+             * @description Why this revision was made.
+             */
+            note?: string | null;
+            /** Sections */
+            sections?: components["schemas"]["SectionEdit"][] | null;
+            /**
+             * Sent At
+             * @description When a person sent it outside AIgentiX (required for status 'sent'; not future).
+             */
+            sent_at?: string | null;
+            /** Status */
+            status?: ("draft" | "ready" | "sent" | "accepted" | "declined") | null;
+            /** Title */
+            title?: string | null;
+        };
         /** RescoredCompany */
         RescoredCompany: {
             /**
@@ -1859,6 +3239,91 @@ export interface components {
          * @enum {string}
          */
         ReviewStatus: "new" | "needs_research" | "qualified_for_review" | "reviewed" | "rejected";
+        /** RevisionRead */
+        RevisionRead: {
+            /** Assumptions */
+            assumptions: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By User Id */
+            created_by_user_id: string | null;
+            /** Generation Version */
+            generation_version: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Model */
+            model: string | null;
+            /** Note */
+            note: string | null;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "ai" | "human";
+            /** Quality Flags */
+            quality_flags: string[];
+            /** Revision */
+            revision: number;
+            /** Sections */
+            sections: components["schemas"]["ProposalSection"][];
+            /** Source Evidence Ids */
+            source_evidence_ids: string[];
+        };
+        /** SalesMetricsRead */
+        SalesMetricsRead: {
+            /** Converted Leads */
+            converted_leads: number;
+            /** Definitions */
+            definitions: {
+                [key: string]: string;
+            };
+            /** Lead To Opportunity Rate */
+            lead_to_opportunity_rate: number | null;
+            /** Lost Count */
+            lost_count: number;
+            /** Open Opportunities */
+            open_opportunities: number;
+            /** Open Tasks */
+            open_tasks: number;
+            /** Open Without Value */
+            open_without_value: number;
+            /** Opportunities By Stage */
+            opportunities_by_stage: {
+                [key: string]: number;
+            };
+            /** Opportunities Total */
+            opportunities_total: number;
+            /** Opportunity To Won Rate */
+            opportunity_to_won_rate: number | null;
+            /** Overdue Tasks */
+            overdue_tasks: number;
+            /** Pipeline Value */
+            pipeline_value: {
+                [key: string]: string;
+            };
+            /** Proposals Drafted */
+            proposals_drafted: number;
+            /** Proposals Sent */
+            proposals_sent: number;
+            /** Qualified Leads */
+            qualified_leads: number;
+            /** Win Rate */
+            win_rate: number | null;
+            /** Won Count */
+            won_count: number;
+            /** Won Value */
+            won_value: {
+                [key: string]: string;
+            };
+            /** Won Without Value */
+            won_without_value: number;
+        };
         /** ScoreRequest */
         ScoreRequest: {
             /**
@@ -1880,6 +3345,20 @@ export interface components {
             scored: number;
             /** Scores */
             scores: components["schemas"]["LeadScoreRead"][];
+        };
+        /** SectionEdit */
+        SectionEdit: {
+            /** Body */
+            body: string;
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "executive_summary" | "business_context" | "identified_opportunity" | "proposed_solution" | "scope_and_deliverables" | "implementation_approach" | "customer_dependencies" | "assumptions" | "expected_benefits" | "success_criteria" | "timeline_estimate" | "commercial_terms" | "next_steps";
+            /** Status */
+            status?: ("draft" | "needs_input") | null;
+            /** Title */
+            title?: string | null;
         };
         /** SignalRead */
         SignalRead: {
@@ -1998,6 +3477,38 @@ export interface components {
             /** Source Url */
             source_url: string;
         };
+        /**
+         * Stage
+         * @enum {string}
+         */
+        Stage: "qualified" | "researching" | "contact_planned" | "in_conversation" | "proposal_sent" | "won" | "lost";
+        /** StageChange */
+        StageChange: {
+            /** Expected Version */
+            expected_version: number;
+            /** Reason */
+            reason?: string | null;
+            stage: components["schemas"]["Stage"];
+        };
+        /** StageHistoryRead */
+        StageHistoryRead: {
+            /**
+             * Changed At
+             * Format: date-time
+             */
+            changed_at: string;
+            /** Changed By User Id */
+            changed_by_user_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            new_stage: components["schemas"]["Stage"];
+            previous_stage: components["schemas"]["Stage"] | null;
+            /** Reason */
+            reason: string | null;
+        };
         /** StepRead */
         StepRead: {
             /** Duration Ms */
@@ -2010,6 +3521,152 @@ export interface components {
              */
             state: "done" | "current" | "pending" | "skipped";
         };
+        /** SuppressionCreate */
+        SuppressionCreate: {
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "email" | "phone";
+            /** Reason */
+            reason?: string | null;
+            /** Value */
+            value: string;
+        };
+        /** SuppressionResult */
+        SuppressionResult: {
+            /** Created */
+            created: boolean;
+            /**
+             * Detail
+             * @default Only a hash of the address is stored; matching contacts are now suppressed.
+             */
+            detail?: string;
+        };
+        /** TaskCreate */
+        TaskCreate: {
+            /**
+             * Assigned User Id
+             * @description Defaults to the current user.
+             */
+            assigned_user_id?: string | null;
+            /**
+             * Description
+             * @default
+             */
+            description?: string;
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+            /**
+             * Sales Opportunity Id
+             * Format: uuid
+             */
+            sales_opportunity_id: string;
+            /** Suggestion Key */
+            suggestion_key?: string | null;
+            /** Title */
+            title: string;
+        };
+        /** TaskRead */
+        TaskRead: {
+            /** Assigned User Id */
+            assigned_user_id: string | null;
+            /** Company Name */
+            company_name: string | null;
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Deal Title */
+            deal_title: string;
+            /** Description */
+            description: string;
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Overdue */
+            overdue: boolean;
+            /**
+             * Sales Opportunity Id
+             * Format: uuid
+             */
+            sales_opportunity_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "completed" | "cancelled";
+            /** Suggestion Key */
+            suggestion_key: string | null;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** TaskSuggestionRead */
+        TaskSuggestionRead: {
+            /** Key */
+            key: string;
+            /** Reason */
+            reason: string;
+            /**
+             * Suggested Due At
+             * Format: date-time
+             */
+            suggested_due_at: string;
+            /** Title */
+            title: string;
+        };
+        /** TaskSummaryRead */
+        TaskSummaryRead: {
+            /** Completed Last 7 Days */
+            completed_last_7_days: number;
+            /** Mine Open */
+            mine_open: number;
+            /** Open */
+            open: number;
+            /** Overdue */
+            overdue: number;
+            /** Today */
+            today: number;
+            /** Upcoming */
+            upcoming: number;
+        };
+        /** TaskUpdate */
+        TaskUpdate: {
+            /**
+             * Assigned User Id
+             * @description null unassigns.
+             */
+            assigned_user_id?: string | null;
+            /** Description */
+            description?: string | null;
+            /**
+             * Due At
+             * @description Reschedule.
+             */
+            due_at?: string | null;
+            /** Status */
+            status?: ("open" | "completed" | "cancelled") | null;
+            /** Title */
+            title?: string | null;
+        };
         /** UserRead */
         UserRead: {
             /** Email */
@@ -2021,6 +3678,37 @@ export interface components {
              * Format: uuid
              */
             id: string;
+        };
+        /** WorkflowInfo */
+        WorkflowInfo: {
+            /** Attempts */
+            attempts: number;
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Current Step */
+            current_step: string | null;
+            /** Error Message */
+            error_message: string | null;
+            /** Estimated Cost Usd */
+            estimated_cost_usd: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Progress */
+            progress: number;
+            /** Status */
+            status: string;
         };
         /**
          * WorkflowRunRead
@@ -3715,6 +5403,89 @@ export interface operations {
             };
         };
     };
+    convertLead: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConversionRequest"];
+            };
+        };
+        responses: {
+            /** @description Retry: the deal created by this key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversionResult"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversionResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     reviewLead: {
         parameters: {
             query?: never;
@@ -5231,6 +7002,2821 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResearchResults"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSalesBrief: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                brief_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BriefRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateSalesBrief: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                brief_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BriefUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BriefRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesContacts: {
+        parameters: {
+            query?: {
+                company_id?: string | null;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createSalesContact: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContactCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateSalesContact: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContactUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesContactReviews: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactReviewRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reviewSalesContact: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContactReviewCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactReviewRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listCrmMappings: {
+        parameters: {
+            query?: {
+                provider?: string | null;
+                local_entity_type?: ("company" | "contact" | "deal") | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CRMMappingRead_"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listCrmProviders: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CRMProvidersRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    exportToCrm: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CRMExportRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CRMExportResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    exportSalesCsv: {
+        parameters: {
+            query?: {
+                /** @description opportunities | activities | tasks */
+                entity?: string;
+                stage?: string | null;
+                status?: string | null;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSV download */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": unknown;
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSalesMetrics: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesMetricsRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesOpportunities: {
+        parameters: {
+            query?: {
+                stage?: components["schemas"]["Stage"] | null;
+                status?: components["schemas"]["DealStatus"] | null;
+                owner_user_id?: string | null;
+                company_id?: string | null;
+                priority?: components["schemas"]["Priority"] | null;
+                q?: string | null;
+                closing_before?: string | null;
+                sort?: "updated" | "created" | "value" | "close_date" | "priority" | "title";
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_DealRead_"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createSalesOpportunity: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DealCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DealRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSalesOpportunity: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DealRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateSalesOpportunity: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DealUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DealRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesActivities: {
+        parameters: {
+            query?: {
+                include_system?: boolean;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    recordSalesActivity: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivityCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesBriefs: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BriefRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createSalesBrief: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BriefRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    closeSalesOpportunity: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DealClose"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DealRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSalesStageHistory: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageHistoryRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesProposals: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createSalesProposal: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reopenSalesOpportunity: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DealReopen"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DealRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    changeSalesStage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StageChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DealRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSalesTaskSuggestions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                deal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskSuggestionRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSalesProposal: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalDetail"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateSalesProposal: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalDetail"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    exportSalesProposal: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Markdown download of the current revision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/markdown": unknown;
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesProposalRevisions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevisionRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesServices: {
+        parameters: {
+            query?: {
+                active?: boolean | null;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingRead"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createSalesService: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateSalesService: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferingUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addSalesSuppression: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuppressionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuppressionResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSalesTasks: {
+        parameters: {
+            query?: {
+                view?: "overdue" | "today" | "upcoming" | "completed" | "open" | "all";
+                mine?: boolean;
+                assigned_user_id?: string | null;
+                sales_opportunity_id?: string | null;
+                /** @description IANA time zone for the today / upcoming boundaries. */
+                tz?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_TaskRead_"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createSalesTask: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSalesTaskSummary: {
+        parameters: {
+            query?: {
+                /** @description IANA time zone for the today / upcoming boundaries. */
+                tz?: string;
+            };
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskSummaryRead"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateSalesTask: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Active organization. Membership is verified server-side. */
+                "X-Organization-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRead"];
                 };
             };
             /** @description Bad Request */

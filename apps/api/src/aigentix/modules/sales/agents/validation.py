@@ -10,11 +10,12 @@ import re
 from dataclasses import dataclass, field
 
 from aigentix.platform.llm.safety import (
+    REMOVED_CONTACT,
+    REMOVED_LINK,
     contains_certification_claim,
     contains_guarantee,
     drop_sentences,
     mentions_money,
-    normalise_for_match,
     strip_contact_data,
     strip_foreign_urls,
     unsupported_numbers,
@@ -40,6 +41,12 @@ _HEDGE = re.compile(
     r"|möglicherweise|vermutlich|könnte|eventuell|zu prüfen|zu validieren)\b"
 )
 
+_INSTRUCTION_LIKE = re.compile(
+    r"(?i)(ignore (?:all |any |the |previous |prior |above )*(?:instructions|evidence|rules|data)|ignoriere"
+    r"|disregard (?:the|all|previous)|system prompt|you are now|new instructions|neue anweisung)"
+)
+_WORD = re.compile(r"[^\W\d_]{4,}")
+
 HUMAN_NEXT_ACTION = "Review the evidence and prepare discovery questions before any contact."
 
 
@@ -59,20 +66,31 @@ def is_outreach_action(text: str) -> bool:
     return bool(_OUTREACH.search(text))
 
 
+def word_overlap(claim: str, support: str) -> float:
+    """Share of the claim's content words (4+ letters) that occur in `support` (cheap grounding check)."""
+    words = {w.lower() for w in _WORD.findall(claim)}
+    if not words:
+        return 1.0
+    present = {w.lower() for w in _WORD.findall(support)}
+    return len(words & present) / len(words)
+
+
 @dataclass
 class TextGuard:
     """Cleans model text for one output; `flags` collects what was removed (shared across the output)."""
 
     company_domain: str | None
     flags: set[str] = field(default_factory=set)
+    # True: every amount of money is removed (proposals quote prices only from approved offerings).
+    strict_money: bool = False
 
     def clean(self, text: str, limit: int) -> str:
-        cleaned, link_removed = strip_foreign_urls(text.strip()[:limit], self.company_domain)
-        if link_removed:
-            self.flags.add("external_link_removed")
-        cleaned, contact_removed = strip_contact_data(cleaned)
+        cleaned, contact_removed = strip_contact_data(text.strip()[:limit])
         if contact_removed:
             self.flags.add("contact_data_removed")
+        cleaned, link_removed = strip_foreign_urls(cleaned, self.company_domain)
+        if link_removed:
+            self.flags.add("external_link_removed")
         return cleaned.strip()
 
     def filter(self, text: str, *, support: str, allow_money: bool = False) -> str:
@@ -80,20 +98,29 @@ class TextGuard:
         support_has_certification = contains_certification_claim(support)
 
         def violates(sentence: str) -> bool:
+            if REMOVED_LINK in sentence or REMOVED_CONTACT in sentence:
+                return True  # a sentence built around a foreign link or contact data is not kept at all
+            if _INSTRUCTION_LIKE.search(sentence):
+                self.flags.add("instruction_like_text_removed")
+                return True
             if mentions_probability(sentence):
                 self.flags.add("score_as_probability_removed")
-                return True
-            if contains_guarantee(sentence) and not contains_guarantee(support):
-                self.flags.add("guarantee_removed")
                 return True
             if contains_certification_claim(sentence) and not support_has_certification:
                 self.flags.add("certification_claim_removed")
                 return True
-            if not allow_money and mentions_money(sentence) and not mentions_money(support):
+            if contains_guarantee(sentence) and not contains_guarantee(support):
+                self.flags.add("guarantee_removed")
+                return True
+            money = not allow_money and mentions_money(sentence)
+            if money and self.strict_money:
                 self.flags.add("unapproved_price_removed")
                 return True
             if unsupported_numbers(_numbers_text(sentence), support):
                 self.flags.add("unsupported_number")
+                return True
+            if money and not mentions_money(support):
+                self.flags.add("unsupported_amount")
                 return True
             return False
 
@@ -104,7 +131,7 @@ class TextGuard:
         return self.filter(self.clean(text, limit), support=support, allow_money=allow_money)
 
 
-def contains_phrase(haystack: str, needle: str, *, min_length: int = 25) -> bool:
-    """Does `haystack` contain `needle` (normalised, at least `min_length` characters)?"""
-    n = normalise_for_match(needle).strip(" .")
-    return len(n) >= min_length and n in normalise_for_match(haystack)
+def restates(text: str, hypothesis: str, *, min_overlap: float = 0.7) -> bool:
+    """Does `text` restate `hypothesis` (most of its content words, hedges aside)?"""
+    stripped = _HEDGE.sub(" ", hypothesis)
+    return len(_WORD.findall(stripped)) >= 4 and word_overlap(stripped, text) >= min_overlap

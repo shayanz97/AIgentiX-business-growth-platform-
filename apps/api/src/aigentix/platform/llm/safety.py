@@ -9,9 +9,9 @@ import re
 from collections.abc import Callable
 from urllib.parse import urlsplit
 
-_LT, _GT = "‹", "›"  # single angle quotation marks: look like < > but cannot open or close tags
+_LT, _GT = chr(0x2039), chr(0x203A)  # single angle quotation marks: look like < > but cannot open tags
 _WS = re.compile(r"\s+")
-_QUOTES = str.maketrans({"“": '"', "”": '"', "‘": "'", "’": "'", "…": "..."})
+_QUOTES = str.maketrans({chr(0x201C): '"', chr(0x201D): '"', chr(0x2018): "'", chr(0x2019): "'", chr(0x2026): "..."})
 
 
 def neutralise_markup(text: str) -> str:
@@ -32,6 +32,9 @@ def excerpt_in_source(excerpt: str, source_text: str, *, min_length: int = 10) -
 
 
 # --- links ----------------------------------------------------------------------------------------------
+
+REMOVED_LINK = "[link removed]"
+REMOVED_CONTACT = "[contact removed]"
 
 _LINKISH = re.compile(
     r"(?i)\b(?:https?://[^\s<>\"')\]]+"  # explicit URLs
@@ -67,7 +70,7 @@ def strip_foreign_urls(text: str, allowed_domain: str | None) -> tuple[str, bool
         if is_company_host(_host_of(match.group(0)), allowed_domain):
             return match.group(0)
         removed = True
-        return "[link removed]"
+        return REMOVED_LINK
 
     return _LINKISH.sub(_replace, text), removed
 
@@ -86,7 +89,7 @@ def strip_contact_data(text: str) -> tuple[str, bool]:
     def _email(match: re.Match[str]) -> str:
         nonlocal removed
         removed = True
-        return "[contact removed]"
+        return REMOVED_CONTACT
 
     def _phone(match: re.Match[str]) -> str:
         nonlocal removed
@@ -95,7 +98,7 @@ def strip_contact_data(text: str) -> tuple[str, bool]:
         if len(digits) < 8 or _DATE_LIKE.match(value.strip()):
             return value
         removed = True
-        return "[contact removed]"
+        return REMOVED_CONTACT
 
     text = _EMAIL.sub(_email, text)
     return _PHONE.sub(_phone, text), removed
