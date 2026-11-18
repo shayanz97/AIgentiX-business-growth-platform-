@@ -7,7 +7,8 @@ import { ACME_OWNER, GLOBEX_OWNER, signIn } from "./helpers";
  * plus a tenant-isolation check. Requires the stack to run with docker-compose.e2e.yml (fixture websites,
  * LLM_PROVIDER=fixture, RESEARCH_TENDER_SOURCE=fixtures, SCORING_REFERENCE_DATE=2026-11-12) on a fresh database.
  */
-const DOMAIN = "kundenservice-anfrage.example";
+// Its own fixture company: the Sprint 3 spec uses kundenservice-anfrage in the same (shared) E2E database.
+const DOMAIN = "digitalwerk-solutions.example";
 const GENEROUS = 90_000;
 const TASK_TITLE = "Call back about the inquiry";
 
@@ -133,6 +134,9 @@ test.describe.serial("Sprint 4 — Sales pipeline, briefs, proposals and follow-
     await row.getByRole("button", { name: "Confirm: mark as sent" }).click();
     await expect(row.getByTestId("proposal-editor")).toContainText("Sent", { timeout: 15_000 });
 
+    // Recording the sent proposal updates the deal (new version): work on the fresh state.
+    await page.reload();
+    await expect(page.getByTestId("deal-header")).toContainText("In conversation");
     await page.getByLabel(/^Move .* to…/).selectOption("proposal_sent");
     await expect(page.getByTestId("deal-header")).toContainText("Proposal sent");
   });

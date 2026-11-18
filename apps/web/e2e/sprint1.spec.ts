@@ -27,7 +27,7 @@ test.describe.serial("Sprint 1 acceptance", () => {
 
     // Navigation: planned modules are visible but disabled.
     const nav = page.getByRole("navigation", { name: "Main" });
-    await expect(nav.getByText("Sales")).toHaveAttribute("aria-disabled", "true");
+    await expect(nav.getByText("Marketing")).toHaveAttribute("aria-disabled", "true");
     await nav.getByRole("link", { name: "Settings" }).click();
     await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
     await expect(page.getByText("member@acme.example")).toBeVisible();
