@@ -41,6 +41,34 @@ export type LeadReview = Schemas["LeadReviewRead"];
 export type ReviewStatus = Schemas["ReviewStatus"];
 export type ScoreRunResult = Schemas["ScoreRunResult"];
 
+export type Stage = Schemas["Stage"];
+export type Deal = Schemas["DealRead"];
+export type DealStatus = Schemas["DealStatus"];
+export type Priority = Schemas["Priority"];
+export type ConversionResult = Schemas["ConversionResult"];
+export type Activity = Schemas["ActivityRead"];
+export type ActivityCreate = Schemas["ActivityCreate"];
+export type StageHistory = Schemas["StageHistoryRead"];
+export type Contact = Schemas["ContactRead"];
+export type ContactCreate = Schemas["ContactCreate"];
+export type ContactSource = Schemas["ContactSource"];
+export type LawfulBasis = Schemas["LawfulBasis"];
+export type Channel = Schemas["Channel"];
+export type ChannelPermission = Schemas["ChannelPermissionRead"];
+export type SalesMetrics = Schemas["SalesMetricsRead"];
+export type Brief = Schemas["BriefRead"];
+export type BriefEdit = Schemas["BriefEdit"];
+export type Proposal = Schemas["ProposalRead"];
+export type ProposalDetail = Schemas["ProposalDetail"];
+export type ProposalSection = Schemas["ProposalSection"];
+export type ProposalUpdate = Schemas["ProposalUpdate"];
+export type ProposalRevision = Schemas["RevisionRead"];
+export type Offering = Schemas["OfferingRead"];
+export type SalesTask = Schemas["TaskRead"];
+export type TaskSuggestion = Schemas["TaskSuggestionRead"];
+export type TaskSummary = Schemas["TaskSummaryRead"];
+export type CrmProviders = Schemas["CRMProvidersRead"];
+
 export const ORG_HEADER = "X-Organization-Id";
 const ORG_STORAGE_KEY = "aigx.activeOrganization";
 
@@ -80,4 +108,10 @@ type ErrorPayload = { error?: { message?: string; details?: unknown } } | undefi
 export function errorMessage(error: unknown, fallback = "Something went wrong. Please try again."): string {
   const message = (error as ErrorPayload)?.error?.message;
   return typeof message === "string" && message.length > 0 ? message : fallback;
+}
+
+/** Message for a failed write: a 409 is an optimistic-lock conflict (someone else changed the record). */
+export function writeErrorMessage(status: number | undefined, error: unknown, fallback: string): string {
+  if (status === 409) return "This record was changed by someone else. Reload the page to see the latest version, then try again.";
+  return errorMessage(error, fallback);
 }

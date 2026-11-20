@@ -15,7 +15,7 @@ export const NAV_ITEMS: NavItem[] = [
     enabled: true,
     match: ["/lead-intelligence", "/companies", "/projects", "/opportunities", "/research-runs", "/leads", "/scoring"],
   },
-  { label: "Sales", href: "#", enabled: false, match: ["/sales"] },
+  { label: "Sales", href: "/sales", enabled: true, match: ["/sales"] },
   { label: "Marketing", href: "#", enabled: false, match: ["/marketing"] },
   { label: "Analytics", href: "#", enabled: false, match: ["/analytics"] },
   { label: "Settings", href: "/settings", enabled: true, match: ["/settings"] },
@@ -37,4 +37,23 @@ export function isLeadIntelligencePath(pathname: string): boolean {
 
 export function isTabActive(pathname: string, href: string): boolean {
   return pathname === href || (href !== "/lead-intelligence" && pathname.startsWith(`${href}/`));
+}
+
+export const SALES_TABS: { label: string; href: string }[] = [
+  { label: "Overview", href: "/sales" },
+  { label: "Pipeline", href: "/sales/pipeline" },
+  { label: "Follow-ups", href: "/sales/tasks" },
+  { label: "Contacts", href: "/sales/contacts" },
+  { label: "Services", href: "/sales/services" },
+];
+
+export function isSalesPath(pathname: string): boolean {
+  return pathname === "/sales" || pathname.startsWith("/sales/");
+}
+
+/** Opportunity detail pages belong to the Pipeline tab. */
+export function isSalesTabActive(pathname: string, href: string): boolean {
+  if (href === "/sales") return pathname === "/sales";
+  if (href === "/sales/pipeline") return pathname === href || pathname.startsWith("/sales/opportunities");
+  return pathname === href || pathname.startsWith(`${href}/`);
 }

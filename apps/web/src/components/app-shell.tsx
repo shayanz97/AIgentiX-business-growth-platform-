@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
 import { LeadIntelligenceTabs } from "@/components/lead-intelligence-tabs";
+import { SalesTabs } from "@/components/sales/sales-tabs";
 import { NAV_ITEMS } from "@/components/navigation";
 import { Badge } from "@/components/ui/surface";
 import { cn } from "@/components/ui/cn";
@@ -111,6 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8">
           <LeadIntelligenceTabs />
+          <SalesTabs />
           {children}
         </main>
       </div>

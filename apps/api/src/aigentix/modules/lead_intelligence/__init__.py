@@ -5,9 +5,11 @@ from fastapi import APIRouter
 from aigentix.modules.base import ModuleDescriptor, ModuleStatus
 from aigentix.modules.lead_intelligence.config import get_research_settings
 from aigentix.modules.lead_intelligence.routes import companies, opportunities, projects, research_runs, scoring
+from aigentix.modules.lead_intelligence.services.lead_data import LeadIntelligenceData
 from aigentix.modules.lead_intelligence.workflows.constants import ENRICHMENT_WORKFLOW, RESEARCH_WORKFLOW
 from aigentix.modules.lead_intelligence.workflows.enrichment import make_enrichment_handler
 from aigentix.modules.lead_intelligence.workflows.research import make_research_handler
+from aigentix.platform.leads import LEAD_DATA
 from aigentix.platform.workflows.registry import WorkflowSpec
 
 router = APIRouter()
@@ -30,4 +32,5 @@ descriptor = ModuleDescriptor(
             max_concurrent=get_research_settings().research_max_concurrent_runs,
         ),
     },
+    provides={LEAD_DATA: LeadIntelligenceData()},
 )

@@ -55,7 +55,7 @@ def test_modules_endpoint_lists_registered_modules(tenant_a: Tenant) -> None:
     modules = {m["key"]: m["status"] for m in tenant_a.client.get("/api/v1/modules").json()}
     assert modules == {
         "lead_intelligence": "available",
-        "sales": "planned",
+        "sales": "available",
         "marketing": "planned",
         "analytics": "planned",
     }

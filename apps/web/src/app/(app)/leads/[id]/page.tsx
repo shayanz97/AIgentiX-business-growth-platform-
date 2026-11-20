@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
+import { ConvertPanel } from "@/components/sales/convert-panel";
 import { EnrichmentActions } from "@/components/leads/enrichment-actions";
 import { IntentBadge, PriorityBadge, ProvisionalBadge, ReviewBadge, ScoreSummary } from "@/components/leads/lead-badges";
 import { ScoreBreakdown, type EvidenceLike } from "@/components/leads/score-breakdown";
@@ -142,6 +143,9 @@ function LeadPage() {
         {score && lead.data ? (
           <>
             <ReviewSection companyId={c.id} detail={lead.data} onChanged={lead.reload} />
+            {lead.data.lead?.review_status === "qualified_for_review" || lead.data.lead?.review_status === "reviewed" ? (
+              <ConvertPanel companyId={c.id} />
+            ) : null}
             <section aria-labelledby="actions" className="space-y-3">
               <h2 id="actions" className="text-lg font-medium text-white">
                 Actions
